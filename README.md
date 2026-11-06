@@ -50,3 +50,11 @@ GitHub Actions automatycznie buduje projekt po zmianach w `main`, uruchamia Andr
 Gra jest dołączona do APK i ładowana lokalnie przez AndroidX WebViewAssetLoader. Manifest nie żąda dostępu do internetu, lokalizacji, aparatu ani kontaktów. Linki do źródeł otwierają się w zewnętrznej przeglądarce.
 
 Kod aplikacji jest na licencji MIT. Dane pochodzą z Natural Earth (domena publiczna) i mledoze/countries (ODbL 1.0). Szczegóły znajdują się w [NOTICE.md](NOTICE.md) oraz [LICENSES/DATA_ODBL.md](LICENSES/DATA_ODBL.md).
+
+
+## Relaksujące odkrywanie i rywalizacja
+
+- **Ustawienia ⚙**: można włączyć lub wyłączyć flagi na mapie oraz spokojne dźwięki tła i ustawić ich głośność. Preferencje są zapisywane lokalnie. Muzyka jest generowana przez Web Audio, bez pobierania plików i bez automatycznego odtwarzania przed interakcją użytkownika.
+- W opisach krajów przycisk **Więcej ciekawostek** pokazuje dodatkowe informacje z atlasu, m.in. region, status, kod kraju, liczbę sąsiadów i porównanie wielkości z Polską.
+- **Rywalizacja 🏁** to fikcyjna gra porównująca powierzchnię i liczbę sąsiadów. Zawiera wybór drugiego kraju oraz utrudnień. Nie używa danych wojskowych i nie przewiduje rzeczywistych konfliktów.
+- Nowe elementy mieszczą się w osobnych plikach \`features.js\` i \`features.css\`; mapa pozostaje generowana bez zmian przez \`scripts/build_map.py\`.

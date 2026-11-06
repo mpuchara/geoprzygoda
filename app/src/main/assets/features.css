@@ -1,0 +1,31 @@
+/* Offline add-ons: landscape and narrow Samsung phone layouts. */
+.extras-overlay{z-index:40;padding-top:calc(52px + env(safe-area-inset-top));overflow-y:auto}
+.extras-panel{position:relative;width:min(500px,100%);max-height:calc(100dvh - 80px);overflow-y:auto;padding:28px 24px;border:1px solid #a8d5d849;border-radius:26px;background:#153b51;color:#eefaff;box-shadow:0 20px 75px #001a2f99;animation:sheetIn .25s ease}
+.extras-panel h2{margin:0 38px 12px 0;font-size:23px;letter-spacing:-.6px}
+.extras-panel p{font-size:13px;color:#b5d2dd;line-height:1.55}
+.extras-panel .extras-close{position:absolute;right:16px;top:16px}
+.extra-setting{display:flex;justify-content:space-between;align-items:center;gap:15px;padding:14px 0;border-bottom:1px solid #ffffff22;cursor:pointer}
+.extra-setting strong,.extra-setting small{display:block}
+.extra-setting strong{font-size:14px;line-height:1.4}
+.extra-setting small{font-size:11px;color:#b7ced7;line-height:1.4;margin-top:5px}
+.extra-setting input[type=checkbox]{flex-shrink:0;accent-color:#b6f0c1;width:24px;height:24px}
+.extra-volume{display:block}
+.extra-volume input{accent-color:#b6f0c1;width:100%;margin:13px 0 0}
+.extra-note{font-size:11px!important;color:#9dbdcc!important;margin:15px 0 0}
+.country-more{margin:11px 0 0;padding:11px 12px;border-radius:12px;background:#eaf2ea;color:#315d54}
+.country-more summary{cursor:pointer;font-size:12px;font-weight:800}
+.country-more p{font-size:11px;line-height:1.65;margin-bottom:0}
+.rival-start{width:100%;min-height:44px;border-radius:12px;padding:10px;margin-top:11px;background:#244c68;color:#fff;font-weight:750;font-size:12px}
+.rival-first{padding:12px;border-radius:12px;background:#224e60;font-size:13px;font-weight:750;margin:15px 0}
+.rival-label{display:block;font-weight:750;font-size:12px;margin:15px 0 8px}
+.rival-select{width:100%;min-height:43px;padding:9px;border:1px solid #a0c4d164;border-radius:12px;color:#edfaff;background:#103044}
+.rival-compare{display:block;width:100%;min-height:45px;margin-top:17px;border-radius:13px;background:#c5e9b3;color:#214c41;font-weight:800}
+#rival-result{background:#e9f4ed;color:#244b42;border-radius:14px;margin-top:14px;padding:15px}
+#rival-result:empty{display:none}
+#rival-result h3{margin:0 0 9px;font-size:17px}
+#rival-result p{font-size:11px;color:#536f69;margin:11px 0 0}
+.rival-score-row{font-size:12px;line-height:1.5;font-weight:750}
+.rival-track{height:12px;background:#cfdddb;margin-top:10px;border-radius:20px;overflow:hidden}
+.rival-track span{display:block;height:100%;background:#58a774;border-radius:20px;transition:width .4s}
+@media(max-width:650px){.extras-overlay{padding:calc(35px + env(safe-area-inset-top)) 12px 16px}.extras-panel{padding:24px 18px;border-radius:22px;max-height:calc(100dvh - 55px)}.extras-panel h2{font-size:21px}.extra-setting strong{font-size:13px}.extra-setting small{font-size:10px}.dock-info{width:34px}.bottom-dock{gap:0}.rival-start{font-size:11px}}
+@media(max-height:500px) and (orientation:landscape){.extras-panel{max-height:calc(100dvh - 18px)}.extras-overlay{padding-top:9px}}

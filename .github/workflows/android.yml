@@ -36,6 +36,8 @@ jobs:
           key: geoprzygoda-debug-keystore-v1
       - name: Install Android SDK 35
         run: '"$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-35" "build-tools;35.0.0"'
+      - name: Validate extra JavaScript syntax
+        run: node --check app/src/main/assets/features.js
       - name: Check bundled game
         run: python3 scripts/check_assets.py
       - name: Compile APK and run Android lint
