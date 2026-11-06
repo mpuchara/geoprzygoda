@@ -1,0 +1,87 @@
+name: Android APK
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build and check Android app
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      GEOPRZYGODA_VERSION_NAME: 1.0.${{ github.run_number }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+      - name: Reuse development signing key
+        uses: actions/cache@v4
+        with:
+          path: ~/.android/debug.keystore
+          key: geoprzygoda-debug-keystore-v1
+      - name: Install Android SDK 35
+        run: '"$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-35" "build-tools;35.0.0"'
+      - name: Check bundled game
+        run: python3 scripts/check_assets.py
+      - name: Compile APK and run Android lint
+        run: ./gradlew --no-daemon --console=plain :app:assembleDebug :app:lintDebug
+      - name: Save installable APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: GeoPrzygoda-Android
+          path: app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 30
+      - name: Save Android lint report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Android-lint
+          path: app/build/reports/lint-results-debug.html
+          if-no-files-found: ignore
+
+  publish:
+    name: Publish APK download
+    needs: build
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: GeoPrzygoda-Android
+          path: release
+      - name: Prepare download
+        run: |
+          mv release/app-debug.apk release/GeoPrzygoda.apk
+          cd release
+          sha256sum GeoPrzygoda.apk > GeoPrzygoda.apk.sha256
+      - name: Publish Android build
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          gh release create "android-1.0.${GITHUB_RUN_NUMBER}" \
+            release/GeoPrzygoda.apk release/GeoPrzygoda.apk.sha256 \
+            --target "$GITHUB_SHA" \
+            --title "GeoPrzygoda 1.0.${GITHUB_RUN_NUMBER}" \
+            --notes-file RELEASE_NOTES.md \
+            --prerelease

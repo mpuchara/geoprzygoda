@@ -1,0 +1,6594 @@
+{
+  "source": "mledoze/countries + Natural Earth; adapted Polish descriptions and map focus data",
+  "license": "ODbL-1.0 for the country database",
+  "license_url": "https://opendatacommons.org/licenses/odbl/1-0/",
+  "countries": [
+    {
+      "id": "AFG",
+      "n": "Afganistan",
+      "code": "AF",
+      "flag": "🇦🇫",
+      "r": "as",
+      "cap": "Kabul",
+      "caplabel": "Stolica",
+      "area": 652230,
+      "description": "Afganistan — państwo w Azji Południowej. Stolica: Kabul. To kraj bez dostępu do morza.",
+      "extra": "",
+      "borders": [
+        "IRN",
+        "PAK",
+        "TKM",
+        "UZB",
+        "TJK",
+        "CHN"
+      ],
+      "independent": true,
+      "x": 739.49,
+      "y": 167.51,
+      "mapped": true,
+      "b": [
+        721.59,
+        154.54,
+        765.47,
+        182.04
+      ]
+    },
+    {
+      "id": "ALB",
+      "n": "Albania",
+      "code": "AL",
+      "flag": "🇦🇱",
+      "r": "eu",
+      "cap": "Tirana",
+      "caplabel": "Stolica",
+      "area": 28748,
+      "description": "Albania — państwo w Europie Południowo-Wschodniej. Stolica: Tirana.",
+      "extra": "",
+      "borders": [
+        "MNE",
+        "GRC",
+        "MKD",
+        "UNK"
+      ],
+      "independent": true,
+      "x": 600.34,
+      "y": 148.04,
+      "mapped": true,
+      "b": [
+        597.91,
+        141.94,
+        603.06,
+        151.13
+      ]
+    },
+    {
+      "id": "DZA",
+      "n": "Algieria",
+      "code": "DZ",
+      "flag": "🇩🇿",
+      "r": "af",
+      "cap": "Algier",
+      "caplabel": "Stolica",
+      "area": 2381741,
+      "description": "Algieria — państwo w Afryce Północnej. Stolica: Algier.",
+      "extra": "",
+      "borders": [
+        "TUN",
+        "LBY",
+        "NER",
+        "ESH",
+        "MRT",
+        "MLI",
+        "MAR"
+      ],
+      "independent": true,
+      "x": 548.42,
+      "y": 187.81,
+      "mapped": true,
+      "b": [
+        513.95,
+        158.64,
+        576.0,
+        212.83
+      ]
+    },
+    {
+      "id": "AND",
+      "n": "Andora",
+      "code": "AD",
+      "flag": "🇦🇩",
+      "r": "eu",
+      "cap": "Andora",
+      "caplabel": "Stolica",
+      "area": 468,
+      "description": "Andora — państwo w Europie Południowej. Stolica: Andora. To kraj bez dostępu do morza.",
+      "extra": "",
+      "borders": [
+        "FRA",
+        "ESP"
+      ],
+      "independent": true,
+      "x": 544.5,
+      "y": 142.5,
+      "mapped": false,
+      "b": [
+        542.5,
+        140.5,
+        546.5,
+        144.5
+      ]
+    },
+    {
+      "id": "AGO",
+      "n": "Angola",
+      "code": "AO",
+      "flag": "🇦🇴",
+      "r": "af",
+      "cap": "Luanda",
+      "caplabel": "Stolica",
+      "area": 1246700,
+      "description": "Angola — państwo w Afryce Środkowej. Stolica: Luanda.",
+      "extra": "",
+      "borders": [
+        "COG",
+        "COD",
+        "ZMB",
+        "NAM"
+      ],
+      "independent": true,
+      "x": 593.95,
+      "y": 306.55,
+      "mapped": true,
+      "b": [
+        574.92,
+        287.59,
+        612.24,
+        323.79
+      ]
+    },
+    {
+      "id": "AIA",
+      "n": "Anguilla",
+      "code": "AI",
+      "flag": "🇦🇮",
+      "r": "na",
+      "cap": "The Valley",
+      "caplabel": "Stolica",
+      "area": 91,
+      "description": "Anguilla — miejsce na Karaibach. Stolica: The Valley.",
+      "extra": "",
+      "borders": [],
+      "independent": false,
+      "x": 350.5,
+      "y": 215.25,
+      "mapped": false,
+      "b": [
+        348.5,
+        213.25,
+        352.5,
+        217.25
+      ]
+    },
+    {
+      "id": "ATG",
+      "n": "Antigua i Barbuda",
+      "code": "AG",
+      "flag": "🇦🇬",
+      "r": "na",
+      "cap": "Saint John's",
+      "caplabel": "Stolica",
+      "area": 442,
+      "description": "Antigua i Barbuda — państwo na Karaibach. Stolica: Saint John's.",
+      "extra": "",
+      "borders": [],
+      "independent": true,
+      "x": 354.6,
+      "y": 218.85,
+      "mapped": false,
+      "b": [
+        352.6,
+        216.85,
+        356.6,
+        220.85
+      ]
+    },
+    {
+      "id": "SAU",
+      "n": "Arabia Saudyjska",
+      "code": "SA",
+      "flag": "🇸🇦",
+      "r": "as",
+      "cap": "Rijad",
+      "caplabel": "Stolica",
+      "area": 2149690,
+      "description": "Arabia Saudyjska — państwo w Azji Zachodniej. Stolica: Rijad.",
+      "extra": "",
+      "borders": [
+        "IRQ",
+        "JOR",
+        "KWT",
+        "OMN",
+        "QAT",
+        "ARE",
+        "YEM"
+      ],
+      "independent": true,
+      "x": 674.1,
+      "y": 198.58,
+      "mapped": true,
+      "b": [
+        643.9,
+        173.52,
+        707.0,
+        220.96
+      ]
+    },
+    {
+      "id": "ARG",
+      "n": "Argentyna",
+      "code": "AR",
+      "flag": "🇦🇷",
+      "r": "sa",
+      "cap": "Buenos Aires",
+      "caplabel": "Stolica",
+      "area": 2780400,
+      "description": "Argentyna — państwo w Ameryce Południowej. Stolica: Buenos Aires.",
+      "extra": "",
+      "borders": [
+        "BOL",
+        "BRA",
+        "CHL",
+        "PRY",
+        "URY"
+      ],
+      "independent": true,
+      "x": 347.48,
+      "y": 370.5,
+      "mapped": true,
+      "b": [
+        319.75,
+        335.5,
+        379.11,
+        427.05
+      ]
+    },
+    {
+      "id": "ARM",
+      "n": "Armenia",
+      "code": "AM",
+      "flag": "🇦🇲",
+      "r": "as",
+      "cap": "Erywań",
+      "caplabel": "Stolica",
+      "area": 29743,
+      "description": "Armenia — państwo w Azji Zachodniej. Stolica: Erywań. To kraj bez dostępu do morza.",
+      "extra": "",
+      "borders": [
+        "AZE",
+        "GEO",
+        "IRN",
+        "TUR"
+      ],
+      "independent": true,
+      "x": 674.4,
+      "y": 148.62,
+      "mapped": true,
+      "b": [
+        670.75,
+        146.26,
+        679.52,
+        153.78
+      ]
+    },
+    {
+      "id": "ABW",
+      "n": "Aruba",
+      "code": "AW",
+      "flag": "🇦🇼",
+      "r": "na",
+      "cap": "Oranjestad",
+      "caplabel": "Stolica",
+      "area": 180,
+      "description": "Aruba — miejsce na Karaibach. Stolica: Oranjestad.",
+      "extra": "",
+      "borders": [],
+      "independent": false,
+      "x": 330.1,
+      "y": 232.5,
+      "mapped": false,
+      "b": [
+        328.1,
+        230.5,
+        332.1,
+        234.5
+      ]
+    },
+    {
+      "id": "AUS",
+      "n": "Australia",
+      "code": "AU",
+      "flag": "🇦🇺",
+      "r": "oc",
+      "cap": "Canberra",
+      "caplabel": "Stolica",
+      "area": 7692024,
+      "description": "Australia — państwo w Oceanii. Stolica: Canberra.",
+      "extra": "Australia zajmuje cały najmniejszy kontynent. Na mapie leży między Oceanem Indyjskim a Oceanem Spokojnym.",
+      "borders": [],
+      "independent": true,
+      "x": 942.15,
+      "y": 342.39,
+      "mapped": true,
+      "b": [
+        880.02,
+        302.0,
+        1000.71,
+        387.11
+      ]
+    },
+    {
+      "id": "AUT",
+      "n": "Austria",
+      "code": "AT",
+      "flag": "🇦🇹",
+      "r": "eu",
+      "cap": "Wiedeń",
+      "caplabel": "Stolica",
+      "area": 83871,
+      "description": "Austria — państwo w Europie Środkowej. Stolica: Wiedeń. To kraj bez dostępu do morza.",
+      "extra": "",
+      "borders": [
+        "CZE",
+        "DEU",
+        "HUN",
+        "ITA",
+        "LIE",
+        "SVK",
+        "SVN",
+        "CHE"
+      ],
+      "independent": true,
+      "x": 582.39,
+      "y": 127.44,
+      "mapped": true,
+      "b": [
+        568.44,
+        122.88,
+        590.94,
+        130.7
+      ]
+    },
+    {
+      "id": "AZE",
+      "n": "Azerbejdżan",
+      "code": "AZ",
+      "flag": "🇦🇿",
+      "r": "as",
+      "cap": "Baku",
+      "caplabel": "Stolica",
+      "area": 86600,
+      "description": "Azerbejdżan — państwo w Azji Zachodniej. Stolica: Baku. To kraj bez dostępu do morza.",
+      "extra": "",
+      "borders": [
+        "ARM",
+        "GEO",
+        "IRN",
+        "RUS",
+        "TUR"
+      ],
+      "independent": true,
+      "x": 681.63,
+      "y": 148.79,
+      "mapped": true,
+      "b": [
+        674.92,
+        144.42,
+        691.18,
+        155.19
+      ]
+    },
+    {
+      "id": "BHS",
+      "n": "Bahamy",
+      "code": "BS",
+      "flag": "🇧🇸",
+      "r": "na",
+      "cap": "Nassau",
+      "caplabel": "Stolica",
+      "area": 13943,
+      "description": "Bahamy — państwo na Karaibach. Stolica: Nassau.",
+      "extra": "",
+      "borders": [],
+      "independent": true,
+      "x": 308.56,
+      "y": 190.79,
+      "mapped": true,
+      "b": [
+        306.63,
+        188.88,
+        309,
+        192.36
+      ]
+    },
+    {
+      "id": "BHR",
+      "n": "Bahrajn",
+      "code": "BH",
+      "flag": "🇧🇭",
+      "r": "as",
+      "cap": "Manama",
+      "caplabel": "Stolica",
+      "area": 765,
+      "description": "Bahrajn — państwo w Azji Zachodniej. Stolica: Manama.",
+      "extra": "",
+      "borders": [],
+      "independent": true,
+      "x": 691.65,
+      "y": 192,
+      "mapped": false,
+      "b": [
+        689.65,
+        190,
+        693.65,
+        194
+      ]
+    },
+    {
+      "id": "BGD",
+      "n": "Bangladesz",
+      "code": "BD",
+      "flag": "🇧🇩",
+      "r": "as",
+      "cap": "Dhaka",
+      "caplabel": "Stolica",
+      "area": 147570,
+      "description": "Bangladesz — państwo w Azji Południowej. Stolica: Dhaka.",
+      "extra": "",
+      "borders": [
+        "MMR",
+        "IND"
+      ],
+      "independent": true,
+      "x": 809.05,
+      "y": 197.36,
+      "mapped": true,
+      "b": [
+        804.25,
+        190.66,
+        818.02,
+        207.99
+      ]
+    },
+    {
+      "id": "BRB",
+      "n": "Barbados",
+      "code": "BB",
+      "flag": "🇧🇧",
+      "r": "na",
+      "cap": "Bridgetown",
+      "caplabel": "Stolica",
+      "area": 430,
+      "description": "Barbados — państwo na Karaibach. Stolica: Bridgetown.",
+      "extra": "",
+      "borders": [],
+      "independent": true,
+      "x": 361.4,
+      "y": 230.5,
+      "mapped": false,
+      "b": [
+        359.4,
+        228.5,
+        363.4,
+        232.5
+      ]
+    },
+    {
+      "id": "BEL",
+      "n": "Belgia",
+      "code": "BE",
+      "flag": "🇧🇪",
+      "r": "eu",
+      "cap": "Bruksela",
+      "caplabel": "Stolica",
+      "area": 30528,
+      "description": "Belgia — państwo w Europie Zachodniej. Stolica: Bruksela.",
+      "extra": "",
+      "borders": [
+        "FRA",
+        "DEU",
+        "LUX",
+        "NLD"
+      ],
+      "independent": true,
+      "x": 554.4,
+      "y": 117.64,
+      "mapped": true,
+      "b": [
+        547.54,
+        115.57,
+        558.47,
+        121.41
+      ]
+    },
+    {
+      "id": "BLZ",
+      "n": "Belize",
+      "code": "BZ",
+      "flag": "🇧🇿",
+      "r": "na",
+      "cap": "Belmopan",
+      "caplabel": "Stolica",
+      "area": 22966,
+      "description": "Belize — państwo w Ameryce Środkowej. Stolica: Belmopan.",
+      "extra": "",
+      "borders": [
+        "GTM",
+        "MEX"
+      ],
+      "independent": true,
+      "x": 273.86,
+      "y": 218.39,
+      "mapped": true,
+      "b": [
+        272.31,
+        214.5,
+        275.68,
+        222.34
+      ]
+    },
+    {
+      "id": "BEN",
+      "n": "Benin",
+      "code": "BJ",
+      "flag": "🇧🇯",
+      "r": "af",
+      "cap": "Porto-Novo",
+      "caplabel": "Stolica",
+      "area": 112622,
+      "description": "Benin — państwo w Afryce Zachodniej. Stolica: Porto-Novo.",
+      "extra": "",
+      "borders": [
+        "BFA",
+        "NER",
+        "NGA",
+        "TGO"
+      ],
+      "independent": true,
+      "x": 547.06,
+      "y": 239.03,
+      "mapped": true,
+      "b": [
+        542.32,
+        233.29,
+        551.39,
+        251.57
+      ]
+    },
+    {
+      "id": "BMU",
+      "n": "Bermudy",
+      "code": "BM",
+      "flag": "🇧🇲",
+      "r": "na",
+      "cap": "Hamilton",
+      "caplabel": "Stolica",
+      "area": 54,
+      "description": "Bermudy — miejsce w Ameryce Północnej. Stolica: Hamilton.",
+      "extra": "",
+      "borders": [],
+      "independent": false,
+      "x": 345.75,
+      "y": 173.0,
+      "mapped": false,
+      "b": [
+        343.75,
+        171.0,
+        347.75,
+        175.0
+      ]
+    },
+    {
+      "id": "BTN",
+      "n": "Bhutan",
+      "code": "BT",
+      "flag": "🇧🇹",
+      "r": "as",
+      "cap": "Thimphu",
+      "caplabel": "Stolica",
+      "area": 38394,
+      "description": "Bhutan — państwo w Azji Południowej. Stolica: Thimphu. To kraj bez dostępu do morza.",
+      "extra": "",
+      "borders": [
+        "CHN",
+        "IND"
+      ],
+      "independent": true,
+      "x": 810.12,
+      "y": 187.39,
+      "mapped": true,
+      "b": [
+        806.44,
+        185.11,
+        816.31,
+        189.84
+      ]
+    },
+    {
+      "id": "BLR",
+      "n": "Białoruś",
+      "code": "BY",
+      "flag": "🇧🇾",
+      "r": "eu",
+      "cap": "Mińsk",
+      "caplabel": "Stolica",
+      "area": 207600,
+      "description": "Białoruś — państwo w Europie Wschodniej. Stolica: Mińsk. To kraj bez dostępu do morza.",
+      "extra": "",
+      "borders": [
+        "LVA",
+        "LTU",
+        "POL",
+        "RUS",
+        "UKR"
+      ],
+      "independent": true,
+      "x": 625.25,
+      "y": 108.53,
+      "mapped": true,
+      "b": [
+        609.6,
+        101.49,
+        638.08,
+        116.04
+      ]
+    },
+    {
+      "id": "BOL",
+      "n": "Boliwia",
+      "code": "BO",
+      "flag": "🇧🇴",
+      "r": "sa",
+      "cap": "Sucre",
+      "caplabel": "Stolica",
+      "area": 1098581,
+      "description": "Boliwia — państwo w Ameryce Południowej. Stolica: Sucre. To kraj bez dostępu do morza.",
+      "extra": "",
+      "borders": [
+        "ARG",
+        "BRA",
+        "CHL",
+        "PRY",
+        "PER"
+      ],
+      "independent": true,
+      "x": 346.22,
+      "y": 320.0,
+      "mapped": true,
+      "b": [
+        331.23,
+        299.29,
+        367.5,
+        338.62
+      ]
+    },
+    {
+      "id": "BES",
+      "n": "Bonaire, Sint Eustatius i Saba",
+      "code": "BQ",
+      "flag": "🇧🇶",
+      "r": "na",
+      "cap": "Kralendijk, Oranjestad, The Bottom",
+      "caplabel": "Stolice",
+      "area": 328,
+      "description": "Bonaire, Sint Eustatius i Saba — miejsce na Karaibach. Stolice: Kralendijk, Oranjestad, The Bottom.",
+      "extra": "",
+      "borders": [],
+      "independent": false,
+      "x": 335.25,
+      "y": 233.46,
+      "mapped": false,
+      "b": [
+        333.25,
+        231.46,
+        337.25,
+        235.46
+      ]
+    },
+    {
+      "id": "BWA",
+      "n": "Botswana",
+      "code": "BW",
+      "flag": "🇧🇼",
+      "r": "af",
+      "cap": "Gaborone",
+      "caplabel": "Stolica",
+      "area": 582000,
+      "description": "Botswana — państwo w południowej części Afryki. Stolica: Gaborone. To kraj bez dostępu do morza.",
+      "extra": "",
+      "borders": [
+        "NAM",
+        "ZAF",
+        "ZMB",
+        "ZWE"
+      ],
+      "independent": true,
+      "x": 612.54,
+      "y": 336.31,
+      "mapped": true,
+      "b": [
+        599.69,
+        322.99,
+        628.3,
+        350.49
+      ]
+    },
+    {
+      "id": "BIH",
+      "n": "Bośnia i Hercegowina",
+      "code": "BA",
+      "flag": "🇧🇦",
+      "r": "eu",
+      "cap": "Sarajewo",
+      "caplabel": "Stolica",
+      "area": 51209,
+      "description": "Bośnia i Hercegowina — państwo w Europie Południowo-Wschodniej. Stolica: Sarajewo.",
+      "extra": "",
+      "borders": [
+        "HRV",
+        "MNE",
+        "SRB"
+      ],
+      "independent": true,
+      "x": 594.21,
+      "y": 137.73,
+      "mapped": true,
+      "b": [
+        587.25,
+        134.3,
+        598.8,
+        142.05
+      ]
+    },
+    {
+      "id": "BRA",
+      "n": "Brazylia",
+      "code": "BR",
+      "flag": "🇧🇷",
+      "r": "sa",
+      "cap": "Brasília",
+      "caplabel": "Stolica",
+      "area": 8515767,
+      "description": "Brazylia — państwo w Ameryce Południowej. Stolica: Brasília.",
+      "extra": "Przez Brazylię płynie Amazonka. W północnej części kraju rozciągają się rozległe lasy równikowe.",
+      "borders": [
+        "ARG",
+        "BOL",
+        "COL",
+        "GUF",
+        "GUY",
+        "PRY",
+        "PER",
+        "SUR",
+        "URY",
+        "VEN"
+      ],
+      "independent": true,
+      "x": 391.32,
+      "y": 306.3,
+      "mapped": true,
+      "b": [
+        318.04,
+        254.27,
+        435.81,
+        371.31
+      ]
+    },
+    {
+      "id": "BRN",
+      "n": "Brunei",
+      "code": "BN",
+      "flag": "🇧🇳",
+      "r": "as",
+      "cap": "Bandar Seri Begawan",
+      "caplabel": "Stolica",
+      "area": 5765,
+      "description": "Brunei — państwo w Azji Południowo-Wschodniej. Stolica: Bandar Seri Begawan.",
+      "extra": "",
+      "borders": [
+        "MYS"
+      ],
+      "independent": true,
+      "x": 883.66,
+      "y": 256.66,
+      "mapped": true,
+      "b": [
+        882.61,
+        253.66,
+        886.35,
+        257.98
+      ]
+    },
+    {
+      "id": "IOT",
+      "n": "Brytyjskie Terytorium Oceanu Indyjskiego",
+      "code": "IO",
+      "flag": "🇮🇴",
+      "r": "af",
+      "cap": "Diego Garcia",
+      "caplabel": "Stolica",
+      "area": 60,
+      "description": "Brytyjskie Terytorium Oceanu Indyjskiego — miejsce w Afryce Wschodniej. Stolica: Diego Garcia.",
+      "extra": "",
+      "borders": [],
+      "independent": false,
+      "x": 754.5,
+      "y": 288,
+      "mapped": false,
+      "b": [
+        752.5,
+        286,
+        756.5,
+        290
+      ]
+    },
+    {
+      "id": "VGB",
+      "n": "Brytyjskie Wyspy Dziewicze",
+      "code": "VG",
+      "flag": "🇻🇬",
+      "r": "na",
+      "cap": "Road Town",
+      "caplabel": "Stolica",
+      "area": 151,
+      "description": "Brytyjskie Wyspy Dziewicze — miejsce na Karaibach. Stolica: Road Town.",
+      "extra": "",
+      "borders": [],
+      "independent": false,
+      "x": 346.13,
+      "y": 214.71,
+      "mapped": false,
+      "b": [
+        344.13,
+        212.71,
+        348.13,
+        216.71
+      ]
+    },
+    {
+      "id": "BFA",
+      "n": "Burkina Faso",
+      "code": "BF",
+      "flag": "🇧🇫",
+      "r": "af",
+      "cap": "Ouagadougou",
+      "caplabel": "Stolica",
+      "area": 272967,
+      "description": "Burkina Faso — państwo w Afryce Zachodniej. Stolica: Ouagadougou. To kraj bez dostępu do morza.",
+      "extra": "",
+      "borders": [
+        "BEN",
+        "CIV",
+        "GHA",
+        "MLI",
+        "NER",
+        "TGO"
+      ],
+      "independent": true,
+      "x": 535.91,
+      "y": 231.98,
+      "mapped": true,
+      "b": [
+        523.59,
+        224.65,
+        546.53,
+        241.17
+      ]
+    },
+    {
+      "id": "BDI",
+      "n": "Burundi",
+      "code": "BI",
+      "flag": "🇧🇮",
+      "r": "af",
+      "cap": "Gitega",
+      "caplabel": "Stolica",
+      "area": 27834,
+      "description": "Burundi — państwo w Afryce Wschodniej. Stolica: Gitega. To kraj bez dostępu do morza.",
+      "extra": "",
+      "borders": [
+        "COD",
+        "RWA",
+        "TZA"
+      ],
+      "independent": true,
+      "x": 629.75,
+      "y": 280.0,
+      "mapped": true,
+      "b": [
+        627.07,
+        277.05,
+        632.26,
+        283.5
+      ]
+    },
+    {
+      "id": "BGR",
+      "n": "Bułgaria",
+      "code": "BG",
+      "flag": "🇧🇬",
+      "r": "eu",
+      "cap": "Sofia",
+      "caplabel": "Stolica",
+      "area": 110879,
+      "description": "Bułgaria — państwo w Europie Południowo-Wschodniej. Stolica: Sofia.",
+      "extra": "",
+      "borders": [
+        "GRC",
+        "MKD",
+        "ROU",
+        "SRB",
+        "TUR"
+      ],
+      "independent": true,
+      "x": 615.47,
+      "y": 142.47,
+      "mapped": true,
+      "b": [
+        607.14,
+        137.3,
+        625.67,
+        146.3
+      ]
+    },
+    {
+      "id": "CHL",
+      "n": "Chile",
+      "code": "CL",
+      "flag": "🇨🇱",
+      "r": "sa",
+      "cap": "Santiago",
+      "caplabel": "Stolica",
+      "area": 756102,
+      "description": "Chile — państwo w Ameryce Południowej. Stolica: Santiago.",
+      "extra": "",
+      "borders": [
+        "ARG",
+        "BOL",
+        "PER"
+      ],
+      "independent": true,
+      "x": 323.04,
+      "y": 384.46,
+      "mapped": true,
+      "b": [
+        313.07,
+        322.74,
+        339.04,
+        431.57
+      ]
+    },
+    {
+      "id": "CHN",
+      "n": "Chiny",
+      "code": "CN",
+      "flag": "🇨🇳",
+      "r": "as",
+      "cap": "Pekin",
+      "caplabel": "Stolica",
+      "area": 9706961,
+      "description": "Chiny — państwo w Azji Wschodniej. Stolica: Pekin.",
+      "extra": "",
+      "borders": [
+        "AFG",
+        "BTN",
+        "MMR",
+        "HKG",
+        "IND",
+        "KAZ",
+        "NPL",
+        "PRK",
+        "KGZ",
+        "LAO",
+        "MAC",
+        "MNG",
+        "PAK",
+        "RUS",
+        "TJK",
+        "VNM"
+      ],
+      "independent": true,
+      "x": 859.01,
+      "y": 172.51,
+      "mapped": true,
+      "b": [
+        761.03,
+        109.62,
+        945.08,
+        209.15
+      ]
+    },
+    {
+      "id": "HRV",
+      "n": "Chorwacja",
+      "code": "HR",
+      "flag": "🇭🇷",
+      "r": "eu",
+      "cap": "Zagrzeb",
+      "caplabel": "Stolica",
+      "area": 56594,
+      "description": "Chorwacja — państwo w Europie Południowo-Wschodniej. Stolica: Zagrzeb.",
+      "extra": "",
+      "borders": [
+        "BIH",
+        "HUN",
+        "MNE",
+        "SRB",
+        "SVN"
+      ],
+      "independent": true,
+      "x": 589.12,
+      "y": 132.58,
+      "mapped": true,
+      "b": [
+        580.97,
+        130.49,
+        598.17,
+        142.56
+      ]
+    },
+    {
+      "id": "CUW",
+      "n": "Curaçao",
+      "code": "CW",
+      "flag": "🇨🇼",
+      "r": "na",
+      "cap": "Willemstad",
+      "caplabel": "Stolica",
+      "area": 444,
+      "description": "Curaçao — miejsce na Karaibach. Stolica: Willemstad.",
+      "extra": "",
+      "borders": [],
+      "independent": false,
+      "x": 333.2,
+      "y": 233.65,
+      "mapped": false,
+      "b": [
+        331.2,
+        231.65,
+        335.2,
+        235.65
+      ]
+    },
+    {
+      "id": "CYP",
+      "n": "Cypr",
+      "code": "CY",
+      "flag": "🇨🇾",
+      "r": "eu",
+      "cap": "Nikozja",
+      "caplabel": "Stolica",
+      "area": 9251,
+      "description": "Cypr — państwo w Europie Południowej. Stolica: Nikozja.",
+      "extra": "",
+      "borders": [],
+      "independent": true,
+      "x": 639.25,
+      "y": 165.26,
+      "mapped": true,
+      "b": [
+        636.77,
+        164.48,
+        642.01,
+        166.28
+      ]
+    },
+    {
+      "id": "CYN",
+      "n": "Cypr Północny",
+      "code": "",
+      "flag": "🌍",
+      "r": "as",
+      "cap": "",
+      "caplabel": "Stolica",
+      "area": 0,
+      "description": "Cypr Północny — obszar na mapie. Region: Azja.",
+      "extra": "",
+      "borders": [],
+      "independent": false,
+      "x": 641.08,
+      "y": 164.35,
+      "mapped": true,
+      "b": [
+        638.2,
+        162.99,
+        643.73,
+        165.0
+      ]
+    },
+    {
+      "id": "TCD",
+      "n": "Czad",
+      "code": "TD",
+      "flag": "🇹🇩",
+      "r": "af",
+      "cap": "N'Djamena",
+      "caplabel": "Stolica",
+      "area": 1284000,
+      "description": "Czad — państwo w Afryce Środkowej. Stolica: N'Djamena. To kraj bez dostępu do morza.",
+      "extra": "",
+      "borders": [
+        "CMR",
+        "CAF",
+        "LBY",
+        "NER",
+        "NGA",
+        "SDN"
+      ],
+      "independent": true,
+      "x": 595.94,
+      "y": 224.57,
+      "mapped": true,
+      "b": [
+        580.62,
+        199.77,
+        611.66,
+        247.73
+      ]
+    },
+    {
+      "id": "MNE",
+      "n": "Czarnogóra",
+      "code": "ME",
+      "flag": "🇲🇪",
+      "r": "eu",
+      "cap": "Podgorica",
+      "caplabel": "Stolica",
+      "area": 13812,
+      "description": "Czarnogóra — państwo w Europie Południowo-Wschodniej. Stolica: Podgorica.",
+      "extra": "",
+      "borders": [
+        "ALB",
+        "BIH",
+        "HRV",
+        "UNK",
+        "SRB"
+      ],
+      "independent": true,
+      "x": 597.43,
+      "y": 141.59,
+      "mapped": true,
+      "b": [
+        595.35,
+        139.43,
+        601.02,
+        144.37
+      ]
+    },
+    {
+      "id": "CZE",
+      "n": "Czechy",
+      "code": "CZ",
+      "flag": "🇨🇿",
+      "r": "eu",
+      "cap": "Praga",
+      "caplabel": "Stolica",
+      "area": 78865,
+      "description": "Czechy — państwo w Europie Środkowej. Stolica: Praga. To kraj bez dostępu do morza.",
+      "extra": "",
+      "borders": [
+        "AUT",
+        "DEU",
+        "POL",
+        "SVK"
+      ],
+      "independent": true,
+      "x": 586.13,
+      "y": 120.35,
+      "mapped": true,
+      "b": [
+        576.72,
+        116.65,
+        596.56,
+        124.33
+      ]
+    },
+    {
+      "id": "UMI",
+      "n": "Dalekie Wyspy Mniejsze Stanów Zjednoczonych",
+      "code": "UM",
+      "flag": "🇺🇲",
+      "r": "na",
+      "cap": "",
+      "caplabel": "Stolica",
+      "area": 34.2,
+      "description": "Dalekie Wyspy Mniejsze Stanów Zjednoczonych — miejsce w Ameryce Północnej.",
+      "extra": "",
+      "borders": [],
+      "independent": false,
+      "x": 1039.9,
+      "y": 212.1,
+      "mapped": false,
+      "b": [
+        1037.9,
+        210.1,
+        1041.9,
+        214.1
+      ]
+    },
+    {
+      "id": "DNK",
+      "n": "Dania",
+      "code": "DK",
+      "flag": "🇩🇰",
+      "r": "eu",
+      "cap": "Kopenhaga",
+      "caplabel": "Stolica",
+      "area": 43094,
+      "description": "Dania — państwo w Europie Północnej. Stolica: Kopenhaga.",
+      "extra": "",
+      "borders": [
+        "DEU"
+      ],
+      "independent": true,
+      "x": 567.05,
+      "y": 102.1,
+      "mapped": true,
+      "b": [
+        564.27,
+        96.81,
+        572.74,
+        105.51
+      ]
+    },
+    {
+      "id": "COD",
+      "n": "Demokratyczna Republika Konga",
+      "code": "CD",
+      "flag": "🇨🇩",
+      "r": "af",
+      "cap": "Kinshasa",
+      "caplabel": "Stolica",
+      "area": 2344858,
+      "description": "Demokratyczna Republika Konga — państwo w Afryce Środkowej. Stolica: Kinshasa.",
+      "extra": "",
+      "borders": [
+        "AGO",
+        "BDI",
+        "CAF",
+        "COG",
+        "RWA",
+        "SSD",
+        "TZA",
+        "UGA",
+        "ZMB"
+      ],
+      "independent": true,
+      "x": 610.38,
+      "y": 275.57,
+      "mapped": true,
+      "b": [
+        576.55,
+        254.23,
+        633.52,
+        309.77
+      ]
+    },
+    {
+      "id": "DMA",
+      "n": "Dominika",
+      "code": "DM",
+      "flag": "🇩🇲",
+      "r": "na",
+      "cap": "Roseau",
+      "caplabel": "Stolica",
+      "area": 751,
+      "description": "Dominika — państwo na Karaibach. Stolica: Roseau.",
+      "extra": "",
+      "borders": [],
+      "independent": true,
+      "x": 356.0,
+      "y": 223.75,
+      "mapped": false,
+      "b": [
+        354.0,
+        221.75,
+        358.0,
+        225.75
+      ]
+    },
+    {
+      "id": "DOM",
+      "n": "Dominikana",
+      "code": "DO",
+      "flag": "🇩🇴",
+      "r": "na",
+      "cap": "Santo Domingo",
+      "caplabel": "Stolica",
+      "area": 48671,
+      "description": "Dominikana — państwo na Karaibach. Stolica: Santo Domingo.",
+      "extra": "",
+      "borders": [
+        "HTI"
+      ],
+      "independent": true,
+      "x": 328.04,
+      "y": 212.69,
+      "mapped": true,
+      "b": [
+        324.16,
+        210.35,
+        335.05,
+        217.2
+      ]
+    },
+    {
+      "id": "DJI",
+      "n": "Dżibuti",
+      "code": "DJ",
+      "flag": "🇩🇯",
+      "r": "af",
+      "cap": "Djibouti",
+      "caplabel": "Stolica",
+      "area": 23200,
+      "description": "Dżibuti — państwo w Afryce Wschodniej. Stolica: Djibouti.",
+      "extra": "",
+      "borders": [
+        "ERI",
+        "ETH",
+        "SOM"
+      ],
+      "independent": true,
+      "x": 667.5,
+      "y": 234.07,
+      "mapped": true,
+      "b": [
+        664.99,
+        231.9,
+        669.95,
+        237.22
+      ]
+    },
+    {
+      "id": "EGY",
+      "n": "Egipt",
+      "code": "EG",
+      "flag": "🇪🇬",
+      "r": "af",
+      "cap": "Kair",
+      "caplabel": "Stolica",
+      "area": 1002450,
+      "description": "Egipt — państwo w Afryce Północnej. Stolica: Kair.",
+      "extra": "Egipt leży głównie w Afryce, a jego półwysep Synaj znajduje się w Azji. Przez kraj przepływa Nil.",
+      "borders": [
+        "ISR",
+        "LBY",
+        "PSE",
+        "SDN"
+      ],
+      "independent": true,
+      "x": 628.34,
+      "y": 191.44,
+      "mapped": true,
+      "b": [
+        614.1,
+        175.24,
+        650.6,
+        204
+      ]
+    },
+    {
+      "id": "ECU",
+      "n": "Ekwador",
+      "code": "EC",
+      "flag": "🇪🇨",
+      "r": "sa",
+      "cap": "Quito",
+      "caplabel": "Stolica",
+      "area": 276841,
+      "description": "Ekwador — państwo w Ameryce Południowej. Stolica: Quito.",
+      "extra": "",
+      "borders": [
+        "COL",
+        "PER"
+      ],
+      "independent": true,
+      "x": 305.43,
+      "y": 273.78,
+      "mapped": true,
+      "b": [
+        297.1,
+        265.86,
+        314.3,
+        284.88
+      ]
+    },
+    {
+      "id": "ERI",
+      "n": "Erytrea",
+      "code": "ER",
+      "flag": "🇪🇷",
+      "r": "af",
+      "cap": "Asmara",
+      "caplabel": "Stolica",
+      "area": 117600,
+      "description": "Erytrea — państwo w Afryce Wschodniej. Stolica: Asmara.",
+      "extra": "",
+      "borders": [
+        "DJI",
+        "ETH",
+        "SDN"
+      ],
+      "independent": true,
+      "x": 654.86,
+      "y": 222.64,
+      "mapped": true,
+      "b": [
+        648.97,
+        216.01,
+        669.24,
+        232.63
+      ]
+    },
+    {
+      "id": "EST",
+      "n": "Estonia",
+      "code": "EE",
+      "flag": "🇪🇪",
+      "r": "eu",
+      "cap": "Tallinn",
+      "caplabel": "Stolica",
+      "area": 45227,
+      "description": "Estonia — państwo w Europie Północnej. Stolica: Tallinn.",
+      "extra": "",
+      "borders": [
+        "LVA",
+        "RUS"
+      ],
+      "independent": true,
+      "x": 617.6,
+      "y": 93.83,
+      "mapped": true,
+      "b": [
+        610.02,
+        91.17,
+        624.4,
+        97.58
+      ]
+    },
+    {
+      "id": "SWZ",
+      "n": "Eswatini",
+      "code": "SZ",
+      "flag": "🇸🇿",
+      "r": "af",
+      "cap": "Lobamba",
+      "caplabel": "Stolica",
+      "area": 17364,
+      "description": "Eswatini — państwo w południowej części Afryki. Stolica: Lobamba. To kraj bez dostępu do morza.",
+      "extra": "",
+      "borders": [
+        "MOZ",
+        "ZAF"
+      ],
+      "independent": true,
+      "x": 634.4,
+      "y": 349.6,
+      "mapped": true,
+      "b": [
+        632.03,
+        346.98,
+        636.21,
+        351.86
+      ]
+    },
+    {
+      "id": "ETH",
+      "n": "Etiopia",
+      "code": "ET",
+      "flag": "🇪🇹",
+      "r": "af",
+      "cap": "Addis Ababa",
+      "caplabel": "Stolica",
+      "area": 1104300,
+      "description": "Etiopia — państwo w Afryce Wschodniej. Stolica: Addis Ababa. To kraj bez dostępu do morza.",
+      "extra": "",
+      "borders": [
+        "DJI",
+        "ERI",
+        "KEN",
+        "SOM",
+        "SSD",
+        "SDN"
+      ],
+      "independent": true,
+      "x": 657.27,
+      "y": 245.9,
+      "mapped": true,
+      "b": [
+        638.86,
+        225.12,
+        683.37,
+        259.73
+      ]
+    },
+    {
+      "id": "FLK",
+      "n": "Falklandy",
+      "code": "FK",
+      "flag": "🇫🇰",
+      "r": "sa",
+      "cap": "Stanley",
+      "caplabel": "Stolica",
+      "area": 12173,
+      "description": "Falklandy — miejsce w Ameryce Południowej. Stolica: Stanley.",
+      "extra": "",
+      "borders": [],
+      "independent": false,
+      "x": 363.78,
+      "y": 424.83,
+      "mapped": true,
+      "b": [
+        356.4,
+        423.3,
+        366.75,
+        426.9
+      ]
+    },
+    {
+      "id": "FJI",
+      "n": "Fidżi",
+      "code": "FJ",
+      "flag": "🇫🇯",
+      "r": "oc",
+      "cap": "Suva",
+      "caplabel": "Stolica",
+      "area": 18272,
+      "description": "Fidżi — państwo w Melanezji, w Oceanii. Stolica: Suva.",
+      "extra": "",
+      "borders": [],
+      "independent": true,
+      "x": 1073.93,
+      "y": 323.48,
+      "mapped": true,
+      "b": [
+        1071.86,
+        322.02,
+        1076.15,
+        324.86
+      ]
+    },
+    {
+      "id": "PHL",
+      "n": "Filipiny",
+      "code": "PH",
+      "flag": "🇵🇭",
+      "r": "as",
+      "cap": "Manila",
+      "caplabel": "Stolica",
+      "area": 342353,
+      "description": "Filipiny — państwo w Azji Południowo-Wschodniej. Stolica: Manila.",
+      "extra": "",
+      "borders": [],
+      "independent": true,
+      "x": 907.4,
+      "y": 236.41,
+      "mapped": true,
+      "b": [
+        905.65,
+        234.32,
+        909.36,
+        238.68
+      ]
+    },
+    {
+      "id": "FIN",
+      "n": "Finlandia",
+      "code": "FI",
+      "flag": "🇫🇮",
+      "r": "eu",
+      "cap": "Helsinki",
+      "caplabel": "Stolica",
+      "area": 338424,
+      "description": "Finlandia — państwo w Europie Północnej. Stolica: Helsinki.",
+      "extra": "",
+      "borders": [
+        "NOR",
+        "SWE",
+        "RUS"
+      ],
+      "independent": true,
+      "x": 621.83,
+      "y": 80.24,
+      "mapped": true,
+      "b": [
+        601.94,
+        59.51,
+        634.55,
+        90.46
+      ]
+    },
+    {
+      "id": "FRA",
+      "n": "Francja",
+      "code": "FR",
+      "flag": "🇫🇷",
+      "r": "eu",
+      "cap": "Paryż",
+      "caplabel": "Stolica",
+      "area": 551695,
+      "description": "Francja — państwo w Europie Zachodniej. Stolica: Paryż.",
+      "extra": "",
+      "borders": [
+        "AND",
+        "BEL",
+        "DEU",
+        "ITA",
+        "LUX",
+        "MCO",
+        "ESP",
+        "CHE"
+      ],
+      "independent": true,
+      "x": 547.66,
+      "y": 129.91,
+      "mapped": true,
+      "b": [
+        526.22,
+        116.55,
+        564.3,
+        142.97
+      ]
+    },
+    {
+      "id": "ATF",
+      "n": "Francuskie Terytoria Południowe i Antarktyczne",
+      "code": "TF",
+      "flag": "🇹🇫",
+      "r": "an",
+      "cap": "Port-aux-Français",
+      "caplabel": "Stolica",
+      "area": 7747,
+      "description": "Francuskie Terytoria Południowe i Antarktyczne — miejsce w Antarktyda. Stolica: Port-aux-Français.",
+      "extra": "",
+      "borders": [],
+      "independent": false,
+      "x": 747.37,
+      "y": 417.91,
+      "mapped": true,
+      "b": [
+        746.16,
+        415.88,
+        751.68,
+        419.33
+      ]
+    },
+    {
+      "id": "GAB",
+      "n": "Gabon",
+      "code": "GA",
+      "flag": "🇬🇦",
+      "r": "af",
+      "cap": "Libreville",
+      "caplabel": "Stolica",
+      "area": 267668,
+      "description": "Gabon — państwo w Afryce Środkowej. Stolica: Libreville.",
+      "extra": "",
+      "borders": [
+        "CMR",
+        "COG",
+        "GNQ"
+      ],
+      "independent": true,
+      "x": 575.51,
+      "y": 271.31,
+      "mapped": true,
+      "b": [
+        566.39,
+        263.02,
+        583.28,
+        281.94
+      ]
+    },
+    {
+      "id": "GMB",
+      "n": "Gambia",
+      "code": "GM",
+      "flag": "🇬🇲",
+      "r": "af",
+      "cap": "Banjul",
+      "caplabel": "Stolica",
+      "area": 10689,
+      "description": "Gambia — państwo w Afryce Zachodniej. Stolica: Banjul.",
+      "extra": "",
+      "borders": [
+        "SEN"
+      ],
+      "independent": true,
+      "x": 495.01,
+      "y": 229.07,
+      "mapped": true,
+      "b": [
+        489.48,
+        228.37,
+        498.47,
+        230.61
+      ]
+    },
+    {
+      "id": "SGS",
+      "n": "Georgia Południowa i Sandwich Południowy",
+      "code": "GS",
+      "flag": "🇬🇸",
+      "r": "an",
+      "cap": "King Edward Point",
+      "caplabel": "Stolica",
+      "area": 3903,
+      "description": "Georgia Południowa i Sandwich Południowy — miejsce w Antarktyda. Stolica: King Edward Point.",
+      "extra": "",
+      "borders": [],
+      "independent": false,
+      "x": 429,
+      "y": 433.5,
+      "mapped": false,
+      "b": [
+        427,
+        431.5,
+        431,
+        435.5
+      ]
+    },
+    {
+      "id": "GHA",
+      "n": "Ghana",
+      "code": "GH",
+      "flag": "🇬🇭",
+      "r": "af",
+      "cap": "Accra",
+      "caplabel": "Stolica",
+      "area": 238533,
+      "description": "Ghana — państwo w Afryce Zachodniej. Stolica: Accra.",
+      "extra": "",
+      "borders": [
+        "BFA",
+        "CIV",
+        "TGO"
+      ],
+      "independent": true,
+      "x": 536.89,
+      "y": 246.85,
+      "mapped": true,
+      "b": [
+        530.27,
+        236.7,
+        543.18,
+        255.87
+      ]
+    },
+    {
+      "id": "GIB",
+      "n": "Gibraltar",
+      "code": "GI",
+      "flag": "🇬🇮",
+      "r": "eu",
+      "cap": "Gibraltar",
+      "caplabel": "Stolica",
+      "area": 6,
+      "description": "Gibraltar — miejsce w Europie Południowej. Stolica: Gibraltar.",
+      "extra": "",
+      "borders": [
+        "ESP"
+      ],
+      "independent": false,
+      "x": 523.95,
+      "y": 161.6,
+      "mapped": false,
+      "b": [
+        521.95,
+        159.6,
+        525.95,
+        163.6
+      ]
+    },
+    {
+      "id": "GRC",
+      "n": "Grecja",
+      "code": "GR",
+      "flag": "🇬🇷",
+      "r": "eu",
+      "cap": "Ateny",
+      "caplabel": "Stolica",
+      "area": 131990,
+      "description": "Grecja — państwo w Europie Południowej. Stolica: Ateny.",
+      "extra": "",
+      "borders": [
+        "ALB",
+        "BGR",
+        "TUR",
+        "MKD"
+      ],
+      "independent": true,
+      "x": 605.18,
+      "y": 151.52,
+      "mapped": true,
+      "b": [
+        600.45,
+        144.52,
+        619.81,
+        160.77
+      ]
+    },
+    {
+      "id": "GRD",
+      "n": "Grenada",
+      "code": "GD",
+      "flag": "🇬🇩",
+      "r": "na",
+      "cap": "St. George's",
+      "caplabel": "Stolica",
+      "area": 344,
+      "description": "Grenada — państwo na Karaibach. Stolica: St. George's.",
+      "extra": "",
+      "borders": [],
+      "independent": true,
+      "x": 355.0,
+      "y": 233.65,
+      "mapped": false,
+      "b": [
+        353.0,
+        231.65,
+        357.0,
+        235.65
+      ]
+    },
+    {
+      "id": "GRL",
+      "n": "Grenlandia",
+      "code": "GL",
+      "flag": "🇬🇱",
+      "r": "na",
+      "cap": "Nuuk",
+      "caplabel": "Stolica",
+      "area": 2166086,
+      "description": "Grenlandia — miejsce w Ameryce Północnej. Stolica: Nuuk.",
+      "extra": "",
+      "borders": [],
+      "independent": false,
+      "x": 421.99,
+      "y": 47.04,
+      "mapped": true,
+      "b": [
+        320.11,
+        19.06,
+        503.37,
+        89.89
+      ]
+    },
+    {
+      "id": "GEO",
+      "n": "Gruzja",
+      "code": "GE",
+      "flag": "🇬🇪",
+      "r": "as",
+      "cap": "Tbilisi",
+      "caplabel": "Stolica",
+      "area": 69700,
+      "description": "Gruzja — państwo w Azji Zachodniej. Stolica: Tbilisi.",
+      "extra": "",
+      "borders": [
+        "ARM",
+        "AZE",
+        "RUS",
+        "TUR"
+      ],
+      "independent": true,
+      "x": 671.21,
+      "y": 144.39,
+      "mapped": true,
+      "b": [
+        659.87,
+        139.34,
+        679.91,
+        146.81
+      ]
+    },
+    {
+      "id": "GUM",
+      "n": "Guam",
+      "code": "GU",
+      "flag": "🇬🇺",
+      "r": "oc",
+      "cap": "Hagåtña",
+      "caplabel": "Stolica",
+      "area": 549,
+      "description": "Guam — miejsce w Mikronezji, w Oceanii. Stolica: Hagåtña.",
+      "extra": "",
+      "borders": [],
+      "independent": false,
+      "x": 974.35,
+      "y": 229.6,
+      "mapped": false,
+      "b": [
+        972.35,
+        227.6,
+        976.35,
+        231.6
+      ]
+    },
+    {
+      "id": "GGY",
+      "n": "Guernsey",
+      "code": "GG",
+      "flag": "🇬🇬",
+      "r": "eu",
+      "cap": "St. Peter Port",
+      "caplabel": "Stolica",
+      "area": 78,
+      "description": "Guernsey — miejsce w Europie Północnej. Stolica: St. Peter Port.",
+      "extra": "",
+      "borders": [],
+      "independent": false,
+      "x": 532.25,
+      "y": 121.6,
+      "mapped": false,
+      "b": [
+        530.25,
+        119.6,
+        534.25,
+        123.6
+      ]
+    },
+    {
+      "id": "GUY",
+      "n": "Gujana",
+      "code": "GY",
+      "flag": "🇬🇾",
+      "r": "sa",
+      "cap": "Georgetown",
+      "caplabel": "Stolica",
+      "area": 214969,
+      "description": "Gujana — państwo w Ameryce Południowej. Stolica: Georgetown.",
+      "extra": "",
+      "borders": [
+        "BRA",
+        "SUR",
+        "VEN"
+      ],
+      "independent": true,
+      "x": 363.17,
+      "y": 254.63,
+      "mapped": true,
+      "b": [
+        355.77,
+        244.9,
+        370.38,
+        266.2
+      ]
+    },
+    {
+      "id": "GUF",
+      "n": "Gujana Francuska",
+      "code": "GF",
+      "flag": "🇬🇫",
+      "r": "sa",
+      "cap": "Cayenne",
+      "caplabel": "Stolica",
+      "area": 83534,
+      "description": "Gujana Francuska — miejsce w Ameryce Południowej. Stolica: Cayenne.",
+      "extra": "",
+      "borders": [
+        "BRA",
+        "SUR"
+      ],
+      "independent": false,
+      "x": 381,
+      "y": 258,
+      "mapped": false,
+      "b": [
+        379,
+        256,
+        383,
+        260
+      ]
+    },
+    {
+      "id": "GLP",
+      "n": "Gwadelupa",
+      "code": "GP",
+      "flag": "🇬🇵",
+      "r": "na",
+      "cap": "Basse-Terre",
+      "caplabel": "Stolica",
+      "area": 1628,
+      "description": "Gwadelupa — miejsce na Karaibach. Stolica: Basse-Terre.",
+      "extra": "",
+      "borders": [],
+      "independent": false,
+      "x": 355.25,
+      "y": 221.25,
+      "mapped": false,
+      "b": [
+        353.25,
+        219.25,
+        357.25,
+        223.25
+      ]
+    },
+    {
+      "id": "GTM",
+      "n": "Gwatemala",
+      "code": "GT",
+      "flag": "🇬🇹",
+      "r": "na",
+      "cap": "Gwatemala",
+      "caplabel": "Stolica",
+      "area": 108889,
+      "description": "Gwatemala — państwo w Ameryce Środkowej. Stolica: Gwatemala.",
+      "extra": "",
+      "borders": [
+        "BLZ",
+        "SLV",
+        "HND",
+        "MEX"
+      ],
+      "independent": true,
+      "x": 268.51,
+      "y": 225.05,
+      "mapped": true,
+      "b": [
+        263.31,
+        216.54,
+        275.32,
+        228.79
+      ]
+    },
+    {
+      "id": "GIN",
+      "n": "Gwinea",
+      "code": "GN",
+      "flag": "🇬🇳",
+      "r": "af",
+      "cap": "Conakry",
+      "caplabel": "Stolica",
+      "area": 245857,
+      "description": "Gwinea — państwo w Afryce Zachodniej. Stolica: Conakry.",
+      "extra": "",
+      "borders": [
+        "CIV",
+        "GNB",
+        "LBR",
+        "MLI",
+        "SEN",
+        "SLE"
+      ],
+      "independent": true,
+      "x": 509.95,
+      "y": 238.14,
+      "mapped": true,
+      "b": [
+        494.61,
+        232.24,
+        516.5,
+        248.07
+      ]
+    },
+    {
+      "id": "GNB",
+      "n": "Gwinea Bissau",
+      "code": "GW",
+      "flag": "🇬🇼",
+      "r": "af",
+      "cap": "Bissau",
+      "caplabel": "Stolica",
+      "area": 36125,
+      "description": "Gwinea Bissau — państwo w Afryce Zachodniej. Stolica: Bissau.",
+      "extra": "",
+      "borders": [
+        "GIN",
+        "SEN"
+      ],
+      "independent": true,
+      "x": 496.43,
+      "y": 233.51,
+      "mapped": true,
+      "b": [
+        489.97,
+        232.12,
+        498.9,
+        236.88
+      ]
+    },
+    {
+      "id": "GNQ",
+      "n": "Gwinea Równikowa",
+      "code": "GQ",
+      "flag": "🇬🇶",
+      "r": "af",
+      "cap": "Ciudad de la Paz",
+      "caplabel": "Stolica",
+      "area": 28051,
+      "description": "Gwinea Równikowa — państwo w Afryce Środkowej. Stolica: Ciudad de la Paz.",
+      "extra": "",
+      "borders": [
+        "CMR",
+        "GAB"
+      ],
+      "independent": true,
+      "x": 566.97,
+      "y": 263.0,
+      "mapped": true,
+      "b": [
+        567.92,
+        263.15,
+        573.86,
+        266.97
+      ]
+    },
+    {
+      "id": "HTI",
+      "n": "Haiti",
+      "code": "HT",
+      "flag": "🇭🇹",
+      "r": "na",
+      "cap": "Port-au-Prince",
+      "caplabel": "Stolica",
+      "area": 27750,
+      "description": "Haiti — państwo na Karaibach. Stolica: Port-au-Prince.",
+      "extra": "",
+      "borders": [
+        "DOM"
+      ],
+      "independent": true,
+      "x": 323.33,
+      "y": 212.21,
+      "mapped": true,
+      "b": [
+        316.63,
+        210.25,
+        325.13,
+        215.91
+      ]
+    },
+    {
+      "id": "ESP",
+      "n": "Hiszpania",
+      "code": "ES",
+      "flag": "🇪🇸",
+      "r": "eu",
+      "cap": "Madryt",
+      "caplabel": "Stolica",
+      "area": 505992,
+      "description": "Hiszpania — państwo w Europie Południowej. Stolica: Madryt.",
+      "extra": "",
+      "borders": [
+        "AND",
+        "FRA",
+        "GIB",
+        "PRT",
+        "MAR"
+      ],
+      "independent": true,
+      "x": 529.61,
+      "y": 149.73,
+      "mapped": true,
+      "b": [
+        511.82,
+        138.75,
+        549.12,
+        162.16
+      ]
+    },
+    {
+      "id": "NLD",
+      "n": "Holandia",
+      "code": "NL",
+      "flag": "🇳🇱",
+      "r": "eu",
+      "cap": "Amsterdam",
+      "caplabel": "Stolica",
+      "area": 41850,
+      "description": "Holandia — państwo w Europie Zachodniej. Stolica: Amsterdam.",
+      "extra": "",
+      "borders": [
+        "BEL",
+        "DEU"
+      ],
+      "independent": true,
+      "x": 556.83,
+      "y": 112.73,
+      "mapped": true,
+      "b": [
+        549.94,
+        109.47,
+        561.28,
+        117.59
+      ]
+    },
+    {
+      "id": "HND",
+      "n": "Honduras",
+      "code": "HN",
+      "flag": "🇭🇳",
+      "r": "na",
+      "cap": "Tegucigalpa",
+      "caplabel": "Stolica",
+      "area": 112492,
+      "description": "Honduras — państwo w Ameryce Środkowej. Stolica: Tegucigalpa.",
+      "extra": "",
+      "borders": [
+        "GTM",
+        "SLV",
+        "NIC"
+      ],
+      "independent": true,
+      "x": 279.34,
+      "y": 225.62,
+      "mapped": true,
+      "b": [
+        271.94,
+        221.98,
+        290.56,
+        231.05
+      ]
+    },
+    {
+      "id": "HKG",
+      "n": "Hongkong",
+      "code": "HK",
+      "flag": "🇭🇰",
+      "r": "as",
+      "cap": "City of Victoria",
+      "caplabel": "Stolica",
+      "area": 1104,
+      "description": "Hongkong — miejsce w Azji Wschodniej. Stolica: City of Victoria.",
+      "extra": "",
+      "borders": [
+        "CHN"
+      ],
+      "independent": false,
+      "x": 882.56,
+      "y": 203.2,
+      "mapped": false,
+      "b": [
+        880.56,
+        201.2,
+        884.56,
+        205.2
+      ]
+    },
+    {
+      "id": "IND",
+      "n": "Indie",
+      "code": "IN",
+      "flag": "🇮🇳",
+      "r": "as",
+      "cap": "Nowe Delhi",
+      "caplabel": "Stolica",
+      "area": 3287590,
+      "description": "Indie — państwo w Azji Południowej. Stolica: Nowe Delhi.",
+      "extra": "",
+      "borders": [
+        "BGD",
+        "BTN",
+        "MMR",
+        "CHN",
+        "NPL",
+        "PAK"
+      ],
+      "independent": true,
+      "x": 778.07,
+      "y": 201.94,
+      "mapped": true,
+      "b": [
+        744.53,
+        163.52,
+        832.21,
+        246.1
+      ]
+    },
+    {
+      "id": "IDN",
+      "n": "Indonezja",
+      "code": "ID",
+      "flag": "🇮🇩",
+      "r": "as",
+      "cap": "Dżakarta",
+      "caplabel": "Stolica",
+      "area": 1904569,
+      "description": "Indonezja — państwo w Azji Południowo-Wschodniej. Stolica: Dżakarta.",
+      "extra": "",
+      "borders": [
+        "TLS",
+        "MYS",
+        "PNG"
+      ],
+      "independent": true,
+      "x": 845.68,
+      "y": 272.86,
+      "mapped": true,
+      "b": [
+        825.88,
+        253.56,
+        858.33,
+        287.62
+      ]
+    },
+    {
+      "id": "IRQ",
+      "n": "Irak",
+      "code": "IQ",
+      "flag": "🇮🇶",
+      "r": "as",
+      "cap": "Bagdad",
+      "caplabel": "Stolica",
+      "area": 438317,
+      "description": "Irak — państwo w Azji Zachodniej. Stolica: Bagdad.",
+      "extra": "",
+      "borders": [
+        "IRN",
+        "JOR",
+        "KWT",
+        "SAU",
+        "SYR",
+        "TUR"
+      ],
+      "independent": true,
+      "x": 669.79,
+      "y": 170.72,
+      "mapped": true,
+      "b": [
+        656.38,
+        157.84,
+        685.7,
+        182.7
+      ]
+    },
+    {
+      "id": "IRN",
+      "n": "Iran",
+      "code": "IR",
+      "flag": "🇮🇷",
+      "r": "as",
+      "cap": "Teheran",
+      "caplabel": "Stolica",
+      "area": 1648195,
+      "description": "Iran — państwo w Azji Południowej. Stolica: Teheran.",
+      "extra": "",
+      "borders": [
+        "AFG",
+        "ARM",
+        "AZE",
+        "IRQ",
+        "PAK",
+        "TUR",
+        "TKM"
+      ],
+      "independent": true,
+      "x": 704.79,
+      "y": 173.5,
+      "mapped": true,
+      "b": [
+        672.33,
+        150.86,
+        729.95,
+        194.77
+      ]
+    },
+    {
+      "id": "IRL",
+      "n": "Irlandia",
+      "code": "IE",
+      "flag": "🇮🇪",
+      "r": "eu",
+      "cap": "Dublin",
+      "caplabel": "Stolica",
+      "area": 70273,
+      "description": "Irlandia — państwo w Europie Północnej. Stolica: Dublin.",
+      "extra": "",
+      "borders": [
+        "GBR"
+      ],
+      "independent": true,
+      "x": 516.6,
+      "y": 110.76,
+      "mapped": true,
+      "b": [
+        510.07,
+        104.61,
+        521.9,
+        114.99
+      ]
+    },
+    {
+      "id": "ISL",
+      "n": "Islandia",
+      "code": "IS",
+      "flag": "🇮🇸",
+      "r": "eu",
+      "cap": "Reykjavik",
+      "caplabel": "Stolica",
+      "area": 103000,
+      "description": "Islandia — państwo w Europie Północnej. Stolica: Reykjavik.",
+      "extra": "",
+      "borders": [],
+      "independent": true,
+      "x": 483.98,
+      "y": 75.66,
+      "mapped": true,
+      "b": [
+        467.02,
+        70.42,
+        499.17,
+        79.51
+      ]
+    },
+    {
+      "id": "ISR",
+      "n": "Izrael",
+      "code": "IL",
+      "flag": "🇮🇱",
+      "r": "as",
+      "cap": "Jerozolima",
+      "caplabel": "Stolica",
+      "area": 20770,
+      "description": "Izrael — państwo w Azji Zachodniej. Stolica: Jerozolima.",
+      "extra": "",
+      "borders": [
+        "EGY",
+        "JOR",
+        "LBN",
+        "PSE",
+        "SYR"
+      ],
+      "independent": true,
+      "x": 644.54,
+      "y": 177.27,
+      "mapped": true,
+      "b": [
+        642.8,
+        170.17,
+        647.51,
+        181.5
+      ]
+    },
+    {
+      "id": "JAM",
+      "n": "Jamajka",
+      "code": "JM",
+      "flag": "🇯🇲",
+      "r": "na",
+      "cap": "Kingston",
+      "caplabel": "Stolica",
+      "area": 10991,
+      "description": "Jamajka — państwo na Karaibach. Stolica: Kingston.",
+      "extra": "",
+      "borders": [],
+      "independent": true,
+      "x": 308.04,
+      "y": 215.59,
+      "mapped": true,
+      "b": [
+        304.99,
+        214.43,
+        311.4,
+        216.9
+      ]
+    },
+    {
+      "id": "JPN",
+      "n": "Japonia",
+      "code": "JP",
+      "flag": "🇯🇵",
+      "r": "as",
+      "cap": "Tokio",
+      "caplabel": "Stolica",
+      "area": 377930,
+      "description": "Japonia — państwo w Azji Wschodniej. Stolica: Tokio.",
+      "extra": "Japonia to kraj wysp na Oceanie Spokojnym. Na mapie znajdziesz ją na wschód od Chin i Półwyspu Koreańskiego.",
+      "borders": [],
+      "independent": true,
+      "x": 955.33,
+      "y": 161.57,
+      "mapped": true,
+      "b": [
+        928.23,
+        145.86,
+        965.74,
+        176.91
+      ]
+    },
+    {
+      "id": "YEM",
+      "n": "Jemen",
+      "code": "YE",
+      "flag": "🇾🇪",
+      "r": "as",
+      "cap": "Sana",
+      "caplabel": "Stolica",
+      "area": 527968,
+      "description": "Jemen — państwo w Azji Zachodniej. Stolica: Sana.",
+      "extra": "",
+      "borders": [
+        "OMN",
+        "SAU"
+      ],
+      "independent": true,
+      "x": 677.62,
+      "y": 224.02,
+      "mapped": true,
+      "b": [
+        667.81,
+        213.0,
+        699.33,
+        232.24
+      ]
+    },
+    {
+      "id": "JEY",
+      "n": "Jersey",
+      "code": "JE",
+      "flag": "🇯🇪",
+      "r": "eu",
+      "cap": "Saint Helier",
+      "caplabel": "Stolica",
+      "area": 116,
+      "description": "Jersey — miejsce w Europie Północnej. Stolica: Saint Helier.",
+      "extra": "",
+      "borders": [],
+      "independent": false,
+      "x": 533.5,
+      "y": 122.25,
+      "mapped": false,
+      "b": [
+        531.5,
+        120.25,
+        535.5,
+        124.25
+      ]
+    },
+    {
+      "id": "JOR",
+      "n": "Jordania",
+      "code": "JO",
+      "flag": "🇯🇴",
+      "r": "as",
+      "cap": "Amman",
+      "caplabel": "Stolica",
+      "area": 89342,
+      "description": "Jordania — państwo w Azji Zachodniej. Stolica: Amman.",
+      "extra": "",
+      "borders": [
+        "IRQ",
+        "ISR",
+        "PSE",
+        "SAU",
+        "SYR"
+      ],
+      "independent": true,
+      "x": 649.13,
+      "y": 177.58,
+      "mapped": true,
+      "b": [
+        644.77,
+        169.86,
+        657.59,
+        182.41
+      ]
+    },
+    {
+      "id": "CYM",
+      "n": "Kajmany",
+      "code": "KY",
+      "flag": "🇰🇾",
+      "r": "na",
+      "cap": "George Town",
+      "caplabel": "Stolica",
+      "area": 264,
+      "description": "Kajmany — miejsce na Karaibach. Stolica: George Town.",
+      "extra": "",
+      "borders": [],
+      "independent": false,
+      "x": 298.5,
+      "y": 211.5,
+      "mapped": false,
+      "b": [
+        296.5,
+        209.5,
+        300.5,
+        213.5
+      ]
+    },
+    {
+      "id": "KHM",
+      "n": "Kambodża",
+      "code": "KH",
+      "flag": "🇰🇭",
+      "r": "as",
+      "cap": "Phnom Penh",
+      "caplabel": "Stolica",
+      "area": 181035,
+      "description": "Kambodża — państwo w Azji Południowo-Wschodniej. Stolica: Phnom Penh.",
+      "extra": "",
+      "borders": [
+        "LAO",
+        "THA",
+        "VNM"
+      ],
+      "independent": true,
+      "x": 853.51,
+      "y": 232.06,
+      "mapped": true,
+      "b": [
+        847.04,
+        226.29,
+        862.84,
+        238.54
+      ]
+    },
+    {
+      "id": "CMR",
+      "n": "Kamerun",
+      "code": "CM",
+      "flag": "🇨🇲",
+      "r": "af",
+      "cap": "Yaoundé",
+      "caplabel": "Stolica",
+      "area": 475442,
+      "description": "Kamerun — państwo w Afryce Środkowej. Stolica: Yaoundé.",
+      "extra": "",
+      "borders": [
+        "CAF",
+        "TCD",
+        "COG",
+        "GNQ",
+        "GAB",
+        "NGA"
+      ],
+      "independent": true,
+      "x": 577.42,
+      "y": 256.24,
+      "mapped": true,
+      "b": [
+        565.47,
+        231.42,
+        588.04,
+        264.82
+      ]
+    },
+    {
+      "id": "CAN",
+      "n": "Kanada",
+      "code": "CA",
+      "flag": "🇨🇦",
+      "r": "na",
+      "cap": "Ottawa",
+      "caplabel": "Stolica",
+      "area": 9984670,
+      "description": "Kanada — państwo w Ameryce Północnej. Stolica: Ottawa.",
+      "extra": "Kanada rozciąga się od Atlantyku po Pacyfik. Na północy ma wiele wysp na Oceanie Arktycznym.",
+      "borders": [
+        "USA"
+      ],
+      "independent": true,
+      "x": 234.27,
+      "y": 89.03,
+      "mapped": true,
+      "b": [
+        117.01,
+        54.24,
+        372.95,
+        144.97
+      ]
+    },
+    {
+      "id": "QAT",
+      "n": "Katar",
+      "code": "QA",
+      "flag": "🇶🇦",
+      "r": "as",
+      "cap": "Doha",
+      "caplabel": "Stolica",
+      "area": 11586,
+      "description": "Katar — państwo w Azji Zachodniej. Stolica: Doha.",
+      "extra": "",
+      "borders": [
+        "SAU"
+      ],
+      "independent": true,
+      "x": 693.43,
+      "y": 194.29,
+      "mapped": true,
+      "b": [
+        692.23,
+        191.66,
+        694.82,
+        196.33
+      ]
+    },
+    {
+      "id": "KAZ",
+      "n": "Kazachstan",
+      "code": "KZ",
+      "flag": "🇰🇿",
+      "r": "as",
+      "cap": "Astana",
+      "caplabel": "Stolica",
+      "area": 2724900,
+      "description": "Kazachstan — państwo w Azji Środkowej. Stolica: Astana. To kraj bez dostępu do morza.",
+      "extra": "",
+      "borders": [
+        "CHN",
+        "KGZ",
+        "RUS",
+        "TKM",
+        "UZB"
+      ],
+      "independent": true,
+      "x": 746.06,
+      "y": 122.84,
+      "mapped": true,
+      "b": [
+        679.4,
+        103.84,
+        802.08,
+        148.01
+      ]
+    },
+    {
+      "id": "KEN",
+      "n": "Kenia",
+      "code": "KE",
+      "flag": "🇰🇪",
+      "r": "af",
+      "cap": "Nairobi",
+      "caplabel": "Stolica",
+      "area": 580367,
+      "description": "Kenia — państwo w Afryce Wschodniej. Stolica: Nairobi.",
+      "extra": "",
+      "borders": [
+        "ETH",
+        "SOM",
+        "SSD",
+        "TZA",
+        "UGA"
+      ],
+      "independent": true,
+      "x": 653.72,
+      "y": 268.35,
+      "mapped": true,
+      "b": [
+        641.68,
+        253.48,
+        665.57,
+        284.03
+      ]
+    },
+    {
+      "id": "KGZ",
+      "n": "Kirgistan",
+      "code": "KG",
+      "flag": "🇰🇬",
+      "r": "as",
+      "cap": "Bishkek",
+      "caplabel": "Stolica",
+      "area": 199951,
+      "description": "Kirgistan — państwo w Azji Środkowej. Stolica: Bishkek. To kraj bez dostępu do morza.",
+      "extra": "",
+      "borders": [
+        "CHN",
+        "KAZ",
+        "TJK",
+        "UZB"
+      ],
+      "independent": true,
+      "x": 763.6,
+      "y": 144.99,
+      "mapped": true,
+      "b": [
+        748.39,
+        140.1,
+        780.78,
+        152.16
+      ]
+    },
+    {
+      "id": "KIR",
+      "n": "Kiribati",
+      "code": "KI",
+      "flag": "🇰🇮",
+      "r": "oc",
+      "cap": "South Tarawa",
+      "caplabel": "Stolica",
+      "area": 811,
+      "description": "Kiribati — państwo w Mikronezji, w Oceanii. Stolica: South Tarawa.",
+      "extra": "",
+      "borders": [],
+      "independent": true,
+      "x": 1059,
+      "y": 265.75,
+      "mapped": false,
+      "b": [
+        1057,
+        263.75,
+        1061,
+        267.75
+      ]
+    },
+    {
+      "id": "COL",
+      "n": "Kolumbia",
+      "code": "CO",
+      "flag": "🇨🇴",
+      "r": "sa",
+      "cap": "Bogota",
+      "caplabel": "Stolica",
+      "area": 1141748,
+      "description": "Kolumbia — państwo w Ameryce Południowej. Stolica: Bogota.",
+      "extra": "",
+      "borders": [
+        "BRA",
+        "ECU",
+        "PAN",
+        "PER",
+        "VEN"
+      ],
+      "independent": true,
+      "x": 320.48,
+      "y": 259.88,
+      "mapped": true,
+      "b": [
+        303.03,
+        232.69,
+        339.37,
+        282.89
+      ]
+    },
+    {
+      "id": "COM",
+      "n": "Komory",
+      "code": "KM",
+      "flag": "🇰🇲",
+      "r": "af",
+      "cap": "Moroni",
+      "caplabel": "Stolica",
+      "area": 1862,
+      "description": "Komory — państwo w Afryce Wschodniej. Stolica: Moroni.",
+      "extra": "",
+      "borders": [],
+      "independent": true,
+      "x": 672.75,
+      "y": 306.5,
+      "mapped": false,
+      "b": [
+        670.75,
+        304.5,
+        674.75,
+        308.5
+      ]
+    },
+    {
+      "id": "COG",
+      "n": "Kongo",
+      "code": "CG",
+      "flag": "🇨🇬",
+      "r": "af",
+      "cap": "Brazzaville",
+      "caplabel": "Stolica",
+      "area": 342000,
+      "description": "Kongo — państwo w Afryce Środkowej. Stolica: Brazzaville.",
+      "extra": "",
+      "borders": [
+        "AGO",
+        "CMR",
+        "CAF",
+        "COD",
+        "GAB"
+      ],
+      "independent": true,
+      "x": 587.7,
+      "y": 269.57,
+      "mapped": true,
+      "b": [
+        573.28,
+        258.82,
+        595.36,
+        285.11
+      ]
+    },
+    {
+      "id": "KOR",
+      "n": "Korea Południowa",
+      "code": "KR",
+      "flag": "🇰🇷",
+      "r": "as",
+      "cap": "Seul",
+      "caplabel": "Stolica",
+      "area": 100210,
+      "description": "Korea Południowa — państwo w Azji Wschodniej. Stolica: Seul.",
+      "extra": "",
+      "borders": [
+        "PRK"
+      ],
+      "independent": true,
+      "x": 924.39,
+      "y": 160.85,
+      "mapped": true,
+      "b": [
+        918.35,
+        154.16,
+        928.4,
+        166.83
+      ]
+    },
+    {
+      "id": "PRK",
+      "n": "Korea Północna",
+      "code": "KP",
+      "flag": "🇰🇵",
+      "r": "as",
+      "cap": "Pjongjang",
+      "caplabel": "Stolica",
+      "area": 120538,
+      "description": "Korea Północna — państwo w Azji Wschodniej. Stolica: Pjongjang.",
+      "extra": "",
+      "borders": [
+        "CHN",
+        "KOR",
+        "RUS"
+      ],
+      "independent": true,
+      "x": 919.33,
+      "y": 150.34,
+      "mapped": true,
+      "b": [
+        912.8,
+        141.04,
+        932.34,
+        156.99
+      ]
+    },
+    {
+      "id": "UNK",
+      "n": "Kosowo",
+      "code": "XK",
+      "flag": "🇽🇰",
+      "r": "eu",
+      "cap": "Pristina",
+      "caplabel": "Stolica",
+      "area": 10908,
+      "description": "Kosowo — miejsce w Europie Południowo-Wschodniej. Stolica: Pristina.",
+      "extra": "",
+      "borders": [
+        "ALB",
+        "MKD",
+        "MNE",
+        "SRB"
+      ],
+      "independent": false,
+      "x": 602.58,
+      "y": 142.22,
+      "mapped": true,
+      "b": [
+        600.21,
+        140.18,
+        605.33,
+        144.46
+      ]
+    },
+    {
+      "id": "CRI",
+      "n": "Kostaryka",
+      "code": "CR",
+      "flag": "🇨🇷",
+      "r": "na",
+      "cap": "San José",
+      "caplabel": "Stolica",
+      "area": 51100,
+      "description": "Kostaryka — państwo w Ameryce Środkowej. Stolica: San José.",
+      "extra": "",
+      "borders": [
+        "NIC",
+        "PAN"
+      ],
+      "independent": true,
+      "x": 287.77,
+      "y": 239.8,
+      "mapped": true,
+      "b": [
+        282.17,
+        236.35,
+        292.36,
+        245.32
+      ]
+    },
+    {
+      "id": "CUB",
+      "n": "Kuba",
+      "code": "CU",
+      "flag": "🇨🇺",
+      "r": "na",
+      "cap": "Hawana",
+      "caplabel": "Stolica",
+      "area": 109884,
+      "description": "Kuba — państwo na Karaibach. Stolica: Hawana.",
+      "extra": "",
+      "borders": [],
+      "independent": true,
+      "x": 306.07,
+      "y": 206.0,
+      "mapped": true,
+      "b": [
+        285.08,
+        200.43,
+        317.47,
+        210.43
+      ]
+    },
+    {
+      "id": "KWT",
+      "n": "Kuwejt",
+      "code": "KW",
+      "flag": "🇰🇼",
+      "r": "as",
+      "cap": "Kuwejt",
+      "caplabel": "Stolica",
+      "area": 17818,
+      "description": "Kuwejt — państwo w Azji Zachodniej. Stolica: Kuwejt.",
+      "extra": "",
+      "borders": [
+        "IRQ",
+        "SAU"
+      ],
+      "independent": true,
+      "x": 681.94,
+      "y": 181.76,
+      "mapped": true,
+      "b": [
+        679.71,
+        179.82,
+        685.25,
+        184.42
+      ]
+    },
+    {
+      "id": "LAO",
+      "n": "Laos",
+      "code": "LA",
+      "flag": "🇱🇦",
+      "r": "as",
+      "cap": "Vientiane",
+      "caplabel": "Stolica",
+      "area": 236800,
+      "description": "Laos — państwo w Azji Południowo-Wschodniej. Stolica: Vientiane. To kraj bez dostępu do morza.",
+      "extra": "",
+      "borders": [
+        "MMR",
+        "KHM",
+        "CHN",
+        "THA",
+        "VNM"
+      ],
+      "independent": true,
+      "x": 847.6,
+      "y": 211.7,
+      "mapped": true,
+      "b": [
+        840.35,
+        202.61,
+        862.69,
+        228.36
+      ]
+    },
+    {
+      "id": "LSO",
+      "n": "Lesotho",
+      "code": "LS",
+      "flag": "🇱🇸",
+      "r": "af",
+      "cap": "Maseru",
+      "caplabel": "Stolica",
+      "area": 30355,
+      "description": "Lesotho — państwo w południowej części Afryki. Stolica: Maseru. To kraj bez dostępu do morza.",
+      "extra": "",
+      "borders": [
+        "ZAF"
+      ],
+      "independent": true,
+      "x": 624.74,
+      "y": 358.44,
+      "mapped": true,
+      "b": [
+        621.0,
+        355.94,
+        627.98,
+        361.94
+      ]
+    },
+    {
+      "id": "LBN",
+      "n": "Liban",
+      "code": "LB",
+      "flag": "🇱🇧",
+      "r": "as",
+      "cap": "Beirut",
+      "caplabel": "Stolica",
+      "area": 10452,
+      "description": "Liban — państwo w Azji Zachodniej. Stolica: Beirut.",
+      "extra": "",
+      "borders": [
+        "ISR",
+        "SYR"
+      ],
+      "independent": true,
+      "x": 647.98,
+      "y": 167.6,
+      "mapped": true,
+      "b": [
+        645.38,
+        166.07,
+        649.84,
+        170.73
+      ]
+    },
+    {
+      "id": "LBR",
+      "n": "Liberia",
+      "code": "LR",
+      "flag": "🇱🇷",
+      "r": "af",
+      "cap": "Monrovia",
+      "caplabel": "Stolica",
+      "area": 111369,
+      "description": "Liberia — państwo w Afryce Zachodniej. Stolica: Monrovia.",
+      "extra": "",
+      "borders": [
+        "GIN",
+        "CIV",
+        "SLE"
+      ],
+      "independent": true,
+      "x": 511.62,
+      "y": 250.66,
+      "mapped": true,
+      "b": [
+        505.68,
+        244.38,
+        517.38,
+        256.93
+      ]
+    },
+    {
+      "id": "LBY",
+      "n": "Libia",
+      "code": "LY",
+      "flag": "🇱🇾",
+      "r": "af",
+      "cap": "Trypolis",
+      "caplabel": "Stolica",
+      "area": 1759540,
+      "description": "Libia — państwo w Afryce Północnej. Stolica: Trypolis.",
+      "extra": "",
+      "borders": [
+        "DZA",
+        "TCD",
+        "EGY",
+        "NER",
+        "SDN",
+        "TUN"
+      ],
+      "independent": true,
+      "x": 594.03,
+      "y": 190.08,
+      "mapped": true,
+      "b": [
+        567.96,
+        170.59,
+        615.49,
+        211.26
+      ]
+    },
+    {
+      "id": "LIE",
+      "n": "Liechtenstein",
+      "code": "LI",
+      "flag": "🇱🇮",
+      "r": "eu",
+      "cap": "Vaduz",
+      "caplabel": "Stolica",
+      "area": 160,
+      "description": "Liechtenstein — państwo w Europie Zachodniej. Stolica: Vaduz. To kraj bez dostępu do morza.",
+      "extra": "",
+      "borders": [
+        "AUT",
+        "CHE"
+      ],
+      "independent": true,
+      "x": 568.6,
+      "y": 128.2,
+      "mapped": false,
+      "b": [
+        566.6,
+        126.19999999999999,
+        570.6,
+        130.2
+      ]
+    },
+    {
+      "id": "LTU",
+      "n": "Litwa",
+      "code": "LT",
+      "flag": "🇱🇹",
+      "r": "eu",
+      "cap": "Wilno",
+      "caplabel": "Stolica",
+      "area": 65300,
+      "description": "Litwa — państwo w Europie Północnej. Stolica: Wilno.",
+      "extra": "",
+      "borders": [
+        "BLR",
+        "LVA",
+        "POL",
+        "RUS"
+      ],
+      "independent": true,
+      "x": 612.27,
+      "y": 104.69,
+      "mapped": true,
+      "b": [
+        603.17,
+        100.88,
+        619.76,
+        108.28
+      ]
+    },
+    {
+      "id": "LUX",
+      "n": "Luksemburg",
+      "code": "LU",
+      "flag": "🇱🇺",
+      "r": "eu",
+      "cap": "Luksemburg",
+      "caplabel": "Stolica",
+      "area": 2586,
+      "description": "Luksemburg — państwo w Europie Zachodniej. Stolica: Luksemburg. To kraj bez dostępu do morza.",
+      "extra": "",
+      "borders": [
+        "BEL",
+        "FRA",
+        "DEU"
+      ],
+      "independent": true,
+      "x": 558.23,
+      "y": 120.8,
+      "mapped": true,
+      "b": [
+        557.02,
+        119.62,
+        558.73,
+        121.67
+      ]
+    },
+    {
+      "id": "MKD",
+      "n": "Macedonia Północna",
+      "code": "MK",
+      "flag": "🇲🇰",
+      "r": "eu",
+      "cap": "Skopje",
+      "caplabel": "Stolica",
+      "area": 25713,
+      "description": "Macedonia Północna — państwo w Europie Południowo-Wschodniej. Stolica: Skopje. To kraj bez dostępu do morza.",
+      "extra": "",
+      "borders": [
+        "ALB",
+        "BGR",
+        "GRC",
+        "UNK",
+        "SRB"
+      ],
+      "independent": true,
+      "x": 604.67,
+      "y": 145.33,
+      "mapped": true,
+      "b": [
+        601.39,
+        143.04,
+        608.86,
+        147.47
+      ]
+    },
+    {
+      "id": "MDG",
+      "n": "Madagaskar",
+      "code": "MG",
+      "flag": "🇲🇬",
+      "r": "af",
+      "cap": "Antananarivo",
+      "caplabel": "Stolica",
+      "area": 587041,
+      "description": "Madagaskar — państwo w Afryce Wschodniej. Stolica: Antananarivo.",
+      "extra": "",
+      "borders": [],
+      "independent": true,
+      "x": 680.11,
+      "y": 325.88,
+      "mapped": true,
+      "b": [
+        669.76,
+        306.12,
+        691.43,
+        346.8
+      ]
+    },
+    {
+      "id": "MYT",
+      "n": "Majotta",
+      "code": "YT",
+      "flag": "🇾🇹",
+      "r": "af",
+      "cap": "Mamoudzou",
+      "caplabel": "Stolica",
+      "area": 374,
+      "description": "Majotta — miejsce w Afryce Wschodniej. Stolica: Mamoudzou.",
+      "extra": "",
+      "borders": [],
+      "independent": false,
+      "x": 675.5,
+      "y": 308.5,
+      "mapped": false,
+      "b": [
+        673.5,
+        306.5,
+        677.5,
+        310.5
+      ]
+    },
+    {
+      "id": "MAC",
+      "n": "Makau",
+      "code": "MO",
+      "flag": "🇲🇴",
+      "r": "as",
+      "cap": "",
+      "caplabel": "Stolica",
+      "area": 30,
+      "description": "Makau — miejsce w Azji Wschodniej.",
+      "extra": "",
+      "borders": [
+        "CHN"
+      ],
+      "independent": false,
+      "x": 880.65,
+      "y": 203.5,
+      "mapped": false,
+      "b": [
+        878.65,
+        201.5,
+        882.65,
+        205.5
+      ]
+    },
+    {
+      "id": "MWI",
+      "n": "Malawi",
+      "code": "MW",
+      "flag": "🇲🇼",
+      "r": "af",
+      "cap": "Lilongwe",
+      "caplabel": "Stolica",
+      "area": 118484,
+      "description": "Malawi — państwo w Afryce Wschodniej. Stolica: Lilongwe. To kraj bez dostępu do morza.",
+      "extra": "",
+      "borders": [
+        "MOZ",
+        "TZA",
+        "ZMB"
+      ],
+      "independent": true,
+      "x": 640.82,
+      "y": 310.16,
+      "mapped": true,
+      "b": [
+        638.06,
+        297.69,
+        647.32,
+        320.4
+      ]
+    },
+    {
+      "id": "MDV",
+      "n": "Malediwy",
+      "code": "MV",
+      "flag": "🇲🇻",
+      "r": "as",
+      "cap": "Malé",
+      "caplabel": "Stolica",
+      "area": 300,
+      "description": "Malediwy — państwo w Azji Południowej. Stolica: Malé.",
+      "extra": "",
+      "borders": [],
+      "independent": true,
+      "x": 759,
+      "y": 260.25,
+      "mapped": false,
+      "b": [
+        757,
+        258.25,
+        761,
+        262.25
+      ]
+    },
+    {
+      "id": "MYS",
+      "n": "Malezja",
+      "code": "MY",
+      "flag": "🇲🇾",
+      "r": "as",
+      "cap": "Kuala Lumpur",
+      "caplabel": "Stolica",
+      "area": 330803,
+      "description": "Malezja — państwo w Azji Południowo-Wschodniej. Stolica: Kuala Lumpur.",
+      "extra": "",
+      "borders": [
+        "BRN",
+        "IDN",
+        "THA"
+      ],
+      "independent": true,
+      "x": 881.51,
+      "y": 262.41,
+      "mapped": true,
+      "b": [
+        868.99,
+        249.22,
+        897.55,
+        267.68
+      ]
+    },
+    {
+      "id": "MLI",
+      "n": "Mali",
+      "code": "ML",
+      "flag": "🇲🇱",
+      "r": "af",
+      "cap": "Bamako",
+      "caplabel": "Stolica",
+      "area": 1240192,
+      "description": "Mali — państwo w Afryce Zachodniej. Stolica: Bamako. To kraj bez dostępu do morza.",
+      "extra": "",
+      "borders": [
+        "DZA",
+        "BFA",
+        "GIN",
+        "CIV",
+        "MRT",
+        "NER",
+        "SEN"
+      ],
+      "independent": true,
+      "x": 533.88,
+      "y": 213.92,
+      "mapped": true,
+      "b": [
+        503.49,
+        195.08,
+        552.81,
+        239.71
+      ]
+    },
+    {
+      "id": "MLT",
+      "n": "Malta",
+      "code": "MT",
+      "flag": "🇲🇹",
+      "r": "eu",
+      "cap": "Valletta",
+      "caplabel": "Stolica",
+      "area": 316,
+      "description": "Malta — państwo w Europie Południowej. Stolica: Valletta.",
+      "extra": "",
+      "borders": [],
+      "independent": true,
+      "x": 583.75,
+      "y": 162.5,
+      "mapped": false,
+      "b": [
+        581.75,
+        160.5,
+        585.75,
+        164.5
+      ]
+    },
+    {
+      "id": "MNP",
+      "n": "Mariany Północne",
+      "code": "MP",
+      "flag": "🇲🇵",
+      "r": "oc",
+      "cap": "Saipan",
+      "caplabel": "Stolica",
+      "area": 464,
+      "description": "Mariany Północne — miejsce w Mikronezji, w Oceanii. Stolica: Saipan.",
+      "extra": "",
+      "borders": [],
+      "independent": false,
+      "x": 977.25,
+      "y": 224.4,
+      "mapped": false,
+      "b": [
+        975.25,
+        222.4,
+        979.25,
+        226.4
+      ]
+    },
+    {
+      "id": "MAR",
+      "n": "Maroko",
+      "code": "MA",
+      "flag": "🇲🇦",
+      "r": "af",
+      "cap": "Rabat",
+      "caplabel": "Stolica",
+      "area": 446550,
+      "description": "Maroko — państwo w Afryce Północnej. Stolica: Rabat.",
+      "extra": "",
+      "borders": [
+        "DZA",
+        "ESH",
+        "ESP"
+      ],
+      "independent": true,
+      "x": 518.44,
+      "y": 175.05,
+      "mapped": true,
+      "b": [
+        488.94,
+        162.72,
+        536.63,
+        205.74
+      ]
+    },
+    {
+      "id": "MTQ",
+      "n": "Martynika",
+      "code": "MQ",
+      "flag": "🇲🇶",
+      "r": "na",
+      "cap": "Fort-de-France",
+      "caplabel": "Stolica",
+      "area": 1128,
+      "description": "Martynika — miejsce na Karaibach. Stolica: Fort-de-France.",
+      "extra": "",
+      "borders": [],
+      "independent": false,
+      "x": 357,
+      "y": 226.0,
+      "mapped": false,
+      "b": [
+        355,
+        224.0,
+        359,
+        228.0
+      ]
+    },
+    {
+      "id": "MRT",
+      "n": "Mauretania",
+      "code": "MR",
+      "flag": "🇲🇷",
+      "r": "af",
+      "cap": "Nouakchott",
+      "caplabel": "Stolica",
+      "area": 1030700,
+      "description": "Mauretania — państwo w Afryce Zachodniej. Stolica: Nouakchott.",
+      "extra": "",
+      "borders": [
+        "DZA",
+        "MLI",
+        "SEN",
+        "ESH"
+      ],
+      "independent": true,
+      "x": 510.78,
+      "y": 211.24,
+      "mapped": true,
+      "b": [
+        488.81,
+        187.81,
+        525.23,
+        226.15
+      ]
+    },
+    {
+      "id": "MUS",
+      "n": "Mauritius",
+      "code": "MU",
+      "flag": "🇲🇺",
+      "r": "af",
+      "cap": "Port Louis",
+      "caplabel": "Stolica",
+      "area": 2040,
+      "description": "Mauritius — państwo w Afryce Wschodniej. Stolica: Port Louis.",
+      "extra": "",
+      "borders": [],
+      "independent": true,
+      "x": 712.65,
+      "y": 330.85,
+      "mapped": false,
+      "b": [
+        710.65,
+        328.85,
+        714.65,
+        332.85
+      ]
+    },
+    {
+      "id": "MEX",
+      "n": "Meksyk",
+      "code": "MX",
+      "flag": "🇲🇽",
+      "r": "na",
+      "cap": "Meksyk",
+      "caplabel": "Stolica",
+      "area": 1964375,
+      "description": "Meksyk — państwo w Ameryce Północnej. Stolica: Meksyk.",
+      "extra": "",
+      "borders": [
+        "BLZ",
+        "GTM",
+        "USA"
+      ],
+      "independent": true,
+      "x": 233.13,
+      "y": 198.24,
+      "mapped": true,
+      "b": [
+        188.62,
+        171.84,
+        279.56,
+        226.38
+      ]
+    },
+    {
+      "id": "FSM",
+      "n": "Mikronezja",
+      "code": "FM",
+      "flag": "🇫🇲",
+      "r": "oc",
+      "cap": "Palikir",
+      "caplabel": "Stolica",
+      "area": 702,
+      "description": "Mikronezja — państwo w Mikronezji, w Oceanii. Stolica: Palikir.",
+      "extra": "",
+      "borders": [],
+      "independent": true,
+      "x": 1014.75,
+      "y": 249.25,
+      "mapped": false,
+      "b": [
+        1012.75,
+        247.25,
+        1016.75,
+        251.25
+      ]
+    },
+    {
+      "id": "MMR",
+      "n": "Mjanma",
+      "code": "MM",
+      "flag": "🇲🇲",
+      "r": "as",
+      "cap": "Naypyidaw",
+      "caplabel": "Stolica",
+      "area": 676578,
+      "description": "Mjanma — państwo w Azji Południowo-Wschodniej. Stolica: Naypyidaw.",
+      "extra": "",
+      "borders": [
+        "BGD",
+        "CHN",
+        "IND",
+        "LAO",
+        "THA"
+      ],
+      "independent": true,
+      "x": 827.41,
+      "y": 205.28,
+      "mapped": true,
+      "b": [
+        816.91,
+        184.99,
+        843.54,
+        240.2
+      ]
+    },
+    {
+      "id": "MCO",
+      "n": "Monako",
+      "code": "MC",
+      "flag": "🇲🇨",
+      "r": "eu",
+      "cap": "Monaco",
+      "caplabel": "Stolica",
+      "area": 2.02,
+      "description": "Monako — państwo w Europie Zachodniej. Stolica: Monaco.",
+      "extra": "",
+      "borders": [
+        "FRA"
+      ],
+      "independent": true,
+      "x": 562.2,
+      "y": 138.8,
+      "mapped": false,
+      "b": [
+        560.2,
+        136.8,
+        564.2,
+        140.8
+      ]
+    },
+    {
+      "id": "MNG",
+      "n": "Mongolia",
+      "code": "MN",
+      "flag": "🇲🇳",
+      "r": "as",
+      "cap": "Ulan Bator",
+      "caplabel": "Stolica",
+      "area": 1564110,
+      "description": "Mongolia — państwo w Azji Wschodniej. Stolica: Ulan Bator. To kraj bez dostępu do morza.",
+      "extra": "",
+      "borders": [
+        "CHN",
+        "RUS"
+      ],
+      "independent": true,
+      "x": 852.45,
+      "y": 132.01,
+      "mapped": true,
+      "b": [
+        803.25,
+        113.86,
+        899.32,
+        145.21
+      ]
+    },
+    {
+      "id": "MSR",
+      "n": "Montserrat",
+      "code": "MS",
+      "flag": "🇲🇸",
+      "r": "na",
+      "cap": "Plymouth",
+      "caplabel": "Stolica",
+      "area": 102,
+      "description": "Montserrat — miejsce na Karaibach. Stolica: Plymouth.",
+      "extra": "",
+      "borders": [],
+      "independent": false,
+      "x": 353.4,
+      "y": 219.75,
+      "mapped": false,
+      "b": [
+        351.4,
+        217.75,
+        355.4,
+        221.75
+      ]
+    },
+    {
+      "id": "MOZ",
+      "n": "Mozambik",
+      "code": "MZ",
+      "flag": "🇲🇿",
+      "r": "af",
+      "cap": "Maputo",
+      "caplabel": "Stolica",
+      "area": 801590,
+      "description": "Mozambik — państwo w Afryce Wschodniej. Stolica: Maputo.",
+      "extra": "",
+      "borders": [
+        "MWI",
+        "ZAF",
+        "SWZ",
+        "TZA",
+        "ZMB",
+        "ZWE"
+      ],
+      "independent": true,
+      "x": 653.51,
+      "y": 311.83,
+      "mapped": true,
+      "b": [
+        630.54,
+        300.95,
+        662.33,
+        350.23
+      ]
+    },
+    {
+      "id": "MDA",
+      "n": "Mołdawia",
+      "code": "MD",
+      "flag": "🇲🇩",
+      "r": "eu",
+      "cap": "Chișinău",
+      "caplabel": "Stolica",
+      "area": 33846,
+      "description": "Mołdawia — państwo w Europie Wschodniej. Stolica: Chișinău. To kraj bez dostępu do morza.",
+      "extra": "",
+      "borders": [
+        "ROU",
+        "UKR"
+      ],
+      "independent": true,
+      "x": 625.46,
+      "y": 127.7,
+      "mapped": true,
+      "b": [
+        619.86,
+        124.6,
+        630.07,
+        133.54
+      ]
+    },
+    {
+      "id": "NAM",
+      "n": "Namibia",
+      "code": "NA",
+      "flag": "🇳🇦",
+      "r": "af",
+      "cap": "Windhoek",
+      "caplabel": "Stolica",
+      "area": 825615,
+      "description": "Namibia — państwo w południowej części Afryki. Stolica: Windhoek.",
+      "extra": "",
+      "borders": [
+        "AGO",
+        "BWA",
+        "ZAF",
+        "ZMB"
+      ],
+      "independent": true,
+      "x": 591.32,
+      "y": 331.73,
+      "mapped": true,
+      "b": [
+        575.2,
+        320.82,
+        615.25,
+        357.14
+      ]
+    },
+    {
+      "id": "NRU",
+      "n": "Nauru",
+      "code": "NR",
+      "flag": "🇳🇷",
+      "r": "oc",
+      "cap": "Yaren (brak oficjalnej stolicy)",
+      "caplabel": "Ośrodek administracyjny",
+      "area": 21,
+      "description": "Nauru — państwo w Mikronezji, w Oceanii. Ośrodek administracyjny: Yaren (brak oficjalnej stolicy).",
+      "extra": "",
+      "borders": [],
+      "independent": true,
+      "x": 1040.75,
+      "y": 271.6,
+      "mapped": false,
+      "b": [
+        1038.75,
+        269.6,
+        1042.75,
+        273.6
+      ]
+    },
+    {
+      "id": "NPL",
+      "n": "Nepal",
+      "code": "NP",
+      "flag": "🇳🇵",
+      "r": "as",
+      "cap": "Katmandu",
+      "caplabel": "Stolica",
+      "area": 147181,
+      "description": "Nepal — państwo w Azji Południowej. Stolica: Katmandu. To kraj bez dostępu do morza.",
+      "extra": "",
+      "borders": [
+        "CHN",
+        "IND"
+      ],
+      "independent": true,
+      "x": 790.92,
+      "y": 185.11,
+      "mapped": true,
+      "b": [
+        780.27,
+        178.73,
+        804.52,
+        190.81
+      ]
+    },
+    {
+      "id": "DEU",
+      "n": "Niemcy",
+      "code": "DE",
+      "flag": "🇩🇪",
+      "r": "eu",
+      "cap": "Berlin",
+      "caplabel": "Stolica",
+      "area": 357114,
+      "description": "Niemcy — państwo w Europie Zachodniej. Stolica: Berlin.",
+      "extra": "",
+      "borders": [
+        "AUT",
+        "BEL",
+        "CZE",
+        "DNK",
+        "FRA",
+        "LUX",
+        "NLD",
+        "POL",
+        "CHE"
+      ],
+      "independent": true,
+      "x": 569.04,
+      "y": 117.11,
+      "mapped": true,
+      "b": [
+        557.97,
+        105.05,
+        585.05,
+        128.09
+      ]
+    },
+    {
+      "id": "NER",
+      "n": "Niger",
+      "code": "NE",
+      "flag": "🇳🇪",
+      "r": "af",
+      "cap": "Niamey",
+      "caplabel": "Stolica",
+      "area": 1267000,
+      "description": "Niger — państwo w Afryce Zachodniej. Stolica: Niamey. To kraj bez dostępu do morza.",
+      "extra": "",
+      "borders": [
+        "DZA",
+        "BEN",
+        "BFA",
+        "TCD",
+        "LBY",
+        "MLI",
+        "NGA"
+      ],
+      "independent": true,
+      "x": 568.51,
+      "y": 217.66,
+      "mapped": true,
+      "b": [
+        540.89,
+        199.58,
+        587.71,
+        235.02
+      ]
+    },
+    {
+      "id": "NGA",
+      "n": "Nigeria",
+      "code": "NG",
+      "flag": "🇳🇬",
+      "r": "af",
+      "cap": "Abuja",
+      "caplabel": "Stolica",
+      "area": 923768,
+      "description": "Nigeria — państwo w Afryce Zachodniej. Stolica: Abuja.",
+      "extra": "",
+      "borders": [
+        "BEN",
+        "CMR",
+        "TCD",
+        "NER"
+      ],
+      "independent": true,
+      "x": 562.51,
+      "y": 241.68,
+      "mapped": true,
+      "b": [
+        548.08,
+        228.4,
+        583.73,
+        257.28
+      ]
+    },
+    {
+      "id": "NIC",
+      "n": "Nikaragua",
+      "code": "NI",
+      "flag": "🇳🇮",
+      "r": "na",
+      "cap": "Managua",
+      "caplabel": "Stolica",
+      "area": 130373,
+      "description": "Nikaragua — państwo w Ameryce Środkowej. Stolica: Managua.",
+      "extra": "",
+      "borders": [
+        "CRI",
+        "HND"
+      ],
+      "independent": true,
+      "x": 284.79,
+      "y": 231.99,
+      "mapped": true,
+      "b": [
+        276.99,
+        224.95,
+        290.56,
+        237.82
+      ]
+    },
+    {
+      "id": "NIU",
+      "n": "Niue",
+      "code": "NU",
+      "flag": "🇳🇺",
+      "r": "oc",
+      "cap": "Alofi",
+      "caplabel": "Stolica",
+      "area": 260,
+      "description": "Niue — miejsce w Polinezji, w Oceanii. Stolica: Alofi.",
+      "extra": "",
+      "borders": [],
+      "independent": false,
+      "x": 30.4,
+      "y": 327.1,
+      "mapped": false,
+      "b": [
+        28.4,
+        325.1,
+        32.4,
+        329.1
+      ]
+    },
+    {
+      "id": "NOR",
+      "n": "Norwegia",
+      "code": "NO",
+      "flag": "🇳🇴",
+      "r": "eu",
+      "cap": "Oslo",
+      "caplabel": "Stolica",
+      "area": 323802,
+      "description": "Norwegia — państwo w Europie Północnej. Stolica: Oslo.",
+      "extra": "",
+      "borders": [
+        "FIN",
+        "SWE",
+        "RUS"
+      ],
+      "independent": true,
+      "x": 569.04,
+      "y": 85.93,
+      "mapped": true,
+      "b": [
+        554.98,
+        56.44,
+        633.88,
+        95.76
+      ]
+    },
+    {
+      "id": "NCL",
+      "n": "Nowa Kaledonia",
+      "code": "NC",
+      "flag": "🇳🇨",
+      "r": "oc",
+      "cap": "Nouméa",
+      "caplabel": "Stolica",
+      "area": 18575,
+      "description": "Nowa Kaledonia — miejsce w Melanezji, w Oceanii. Stolica: Nouméa.",
+      "extra": "",
+      "borders": [],
+      "independent": false,
+      "x": 1035.25,
+      "y": 333.19,
+      "mapped": true,
+      "b": [
+        1032.09,
+        330.32,
+        1041.36,
+        337.2
+      ]
+    },
+    {
+      "id": "NZL",
+      "n": "Nowa Zelandia",
+      "code": "NZ",
+      "flag": "🇳🇿",
+      "r": "oc",
+      "cap": "Wellington",
+      "caplabel": "Stolica",
+      "area": 270467,
+      "description": "Nowa Zelandia — państwo w Oceanii. Stolica: Wellington.",
+      "extra": "Nowa Zelandia leży na południowo-zachodnim Pacyfiku. Jej dwie główne wyspy to Wyspa Północna i Wyspa Południowa.",
+      "borders": [],
+      "independent": true,
+      "x": 1058.36,
+      "y": 389.28,
+      "mapped": true,
+      "b": [
+        1057.91,
+        373.35,
+        1075.55,
+        395.06
+      ]
+    },
+    {
+      "id": "OMN",
+      "n": "Oman",
+      "code": "OM",
+      "flag": "🇴🇲",
+      "r": "as",
+      "cap": "Muscat",
+      "caplabel": "Stolica",
+      "area": 309500,
+      "description": "Oman — państwo w Azji Zachodniej. Stolica: Muscat.",
+      "extra": "",
+      "borders": [
+        "SAU",
+        "ARE",
+        "YEM"
+      ],
+      "independent": true,
+      "x": 712.01,
+      "y": 203.64,
+      "mapped": true,
+      "b": [
+        696.0,
+        195.23,
+        719.42,
+        220.05
+      ]
+    },
+    {
+      "id": "PAK",
+      "n": "Pakistan",
+      "code": "PK",
+      "flag": "🇵🇰",
+      "r": "as",
+      "cap": "Islamabad",
+      "caplabel": "Stolica",
+      "area": 881912,
+      "description": "Pakistan — państwo w Azji Południowej. Stolica: Islamabad.",
+      "extra": "",
+      "borders": [
+        "AFG",
+        "CHN",
+        "IND",
+        "IRN"
+      ],
+      "independent": true,
+      "x": 745.64,
+      "y": 182.01,
+      "mapped": true,
+      "b": [
+        722.62,
+        158.6,
+        773.51,
+        198.92
+      ]
+    },
+    {
+      "id": "PLW",
+      "n": "Palau",
+      "code": "PW",
+      "flag": "🇵🇼",
+      "r": "oc",
+      "cap": "Ngerulmud",
+      "caplabel": "Stolica",
+      "area": 459,
+      "description": "Palau — państwo w Mikronezji, w Oceanii. Stolica: Ngerulmud.",
+      "extra": "",
+      "borders": [],
+      "independent": true,
+      "x": 943.5,
+      "y": 247.5,
+      "mapped": false,
+      "b": [
+        941.5,
+        245.5,
+        945.5,
+        249.5
+      ]
+    },
+    {
+      "id": "PSE",
+      "n": "Palestyna",
+      "code": "PS",
+      "flag": "🇵🇸",
+      "r": "as",
+      "cap": "Ramallah",
+      "caplabel": "Ośrodek administracyjny",
+      "area": 6220,
+      "description": "Palestyna — miejsce w Azji Zachodniej. Ośrodek administracyjny: Ramallah.",
+      "extra": "",
+      "borders": [
+        "ISR",
+        "EGY",
+        "JOR"
+      ],
+      "independent": false,
+      "x": 645.87,
+      "y": 173.86,
+      "mapped": true,
+      "b": [
+        644.78,
+        172.4,
+        646.64,
+        175.94
+      ]
+    },
+    {
+      "id": "PAN",
+      "n": "Panama",
+      "code": "PA",
+      "flag": "🇵🇦",
+      "r": "na",
+      "cap": "Panama",
+      "caplabel": "Stolica",
+      "area": 75417,
+      "description": "Panama — państwo w Ameryce Środkowej. Stolica: Panama.",
+      "extra": "",
+      "borders": [
+        "COL",
+        "CRI"
+      ],
+      "independent": true,
+      "x": 298.94,
+      "y": 243.83,
+      "mapped": true,
+      "b": [
+        291.1,
+        241.17,
+        308.27,
+        248.34
+      ]
+    },
+    {
+      "id": "PNG",
+      "n": "Papua-Nowa Gwinea",
+      "code": "PG",
+      "flag": "🇵🇬",
+      "r": "oc",
+      "cap": "Port Moresby",
+      "caplabel": "Stolica",
+      "area": 462840,
+      "description": "Papua-Nowa Gwinea — państwo w Melanezji, w Oceanii. Stolica: Port Moresby.",
+      "extra": "",
+      "borders": [
+        "IDN"
+      ],
+      "independent": true,
+      "x": 971.73,
+      "y": 287.09,
+      "mapped": true,
+      "b": [
+        963.0,
+        277.8,
+        992.4,
+        301.96
+      ]
+    },
+    {
+      "id": "PRY",
+      "n": "Paragwaj",
+      "code": "PY",
+      "flag": "🇵🇾",
+      "r": "sa",
+      "cap": "Asunción",
+      "caplabel": "Stolica",
+      "area": 406752,
+      "description": "Paragwaj — państwo w Ameryce Południowej. Stolica: Asunción. To kraj bez dostępu do morza.",
+      "extra": "",
+      "borders": [
+        "ARG",
+        "BOL",
+        "BRA"
+      ],
+      "independent": true,
+      "x": 359.56,
+      "y": 335.02,
+      "mapped": true,
+      "b": [
+        351.94,
+        328.03,
+        377.12,
+        352.65
+      ]
+    },
+    {
+      "id": "PER",
+      "n": "Peru",
+      "code": "PE",
+      "flag": "🇵🇪",
+      "r": "sa",
+      "cap": "Lima",
+      "caplabel": "Stolica",
+      "area": 1285216,
+      "description": "Peru — państwo w Ameryce Południowej. Stolica: Lima.",
+      "extra": "",
+      "borders": [
+        "BOL",
+        "BRA",
+        "CHL",
+        "COL",
+        "ECU"
+      ],
+      "independent": true,
+      "x": 321.3,
+      "y": 308.93,
+      "mapped": true,
+      "b": [
+        295.77,
+        270.17,
+        334.0,
+        325.04
+      ]
+    },
+    {
+      "id": "PCN",
+      "n": "Pitcairn",
+      "code": "PN",
+      "flag": "🇵🇳",
+      "r": "oc",
+      "cap": "Adamstown",
+      "caplabel": "Stolica",
+      "area": 47,
+      "description": "Pitcairn — miejsce w Polinezji, w Oceanii. Stolica: Adamstown.",
+      "extra": "",
+      "borders": [],
+      "independent": false,
+      "x": 149.7,
+      "y": 345.2,
+      "mapped": false,
+      "b": [
+        147.7,
+        343.2,
+        151.7,
+        347.2
+      ]
+    },
+    {
+      "id": "PYF",
+      "n": "Polinezja Francuska",
+      "code": "PF",
+      "flag": "🇵🇫",
+      "r": "oc",
+      "cap": "Papeetē",
+      "caplabel": "Stolica",
+      "area": 4167,
+      "description": "Polinezja Francuska — miejsce w Polinezji, w Oceanii. Stolica: Papeetē.",
+      "extra": "",
+      "borders": [],
+      "independent": false,
+      "x": 120,
+      "y": 315,
+      "mapped": false,
+      "b": [
+        118,
+        313,
+        122,
+        317
+      ]
+    },
+    {
+      "id": "POL",
+      "n": "Polska",
+      "code": "PL",
+      "flag": "🇵🇱",
+      "r": "eu",
+      "cap": "Warszawa",
+      "caplabel": "Stolica",
+      "area": 312679,
+      "description": "Polska — państwo w Europie Środkowej. Stolica: Warszawa.",
+      "extra": "Od Bałtyku na północy aż po góry na południu — Polska ma wiele różnych krajobrazów. Przez kraj płynie Wisła.",
+      "borders": [
+        "BLR",
+        "CZE",
+        "DEU",
+        "LTU",
+        "RUS",
+        "SVK",
+        "UKR"
+      ],
+      "independent": true,
+      "x": 598.47,
+      "y": 114.03,
+      "mapped": true,
+      "b": [
+        582.22,
+        105.45,
+        612.09,
+        122.92
+      ]
+    },
+    {
+      "id": "PRI",
+      "n": "Portoryko",
+      "code": "PR",
+      "flag": "🇵🇷",
+      "r": "na",
+      "cap": "San Juan",
+      "caplabel": "Stolica",
+      "area": 8870,
+      "description": "Portoryko — miejsce na Karaibach. Stolica: San Juan.",
+      "extra": "",
+      "borders": [],
+      "independent": false,
+      "x": 340.56,
+      "y": 215.3,
+      "mapped": true,
+      "b": [
+        338.27,
+        214.44,
+        343.23,
+        216.16
+      ]
+    },
+    {
+      "id": "PRT",
+      "n": "Portugalia",
+      "code": "PT",
+      "flag": "🇵🇹",
+      "r": "eu",
+      "cap": "Lizbona",
+      "caplabel": "Stolica",
+      "area": 92090,
+      "description": "Portugalia — państwo w Europie Południowej. Stolica: Lizbona.",
+      "extra": "",
+      "borders": [
+        "ESP"
+      ],
+      "independent": true,
+      "x": 515.18,
+      "y": 151.18,
+      "mapped": true,
+      "b": [
+        511.42,
+        143.16,
+        520.83,
+        159.49
+      ]
+    },
+    {
+      "id": "ZAF",
+      "n": "Republika Południowej Afryki (RPA)",
+      "code": "ZA",
+      "flag": "🇿🇦",
+      "r": "af",
+      "cap": "Pretoria, Bloemfontein, Kapsztad",
+      "caplabel": "Stolice",
+      "area": 1221037,
+      "description": "Republika Południowej Afryki (RPA) — państwo w południowej części Afryki. Stolice: Pretoria, Bloemfontein, Kapsztad.",
+      "extra": "",
+      "borders": [
+        "BWA",
+        "LSO",
+        "MOZ",
+        "NAM",
+        "SWZ",
+        "ZWE"
+      ],
+      "independent": true,
+      "x": 611.0,
+      "y": 359.13,
+      "mapped": true,
+      "b": [
+        589.03,
+        336.27,
+        638.49,
+        374.46
+      ]
+    },
+    {
+      "id": "CPV",
+      "n": "Republika Zielonego Przylądka",
+      "code": "CV",
+      "flag": "🇨🇻",
+      "r": "af",
+      "cap": "Praia",
+      "caplabel": "Stolica",
+      "area": 4033,
+      "description": "Republika Zielonego Przylądka — państwo w Afryce Zachodniej. Stolica: Praia.",
+      "extra": "",
+      "borders": [],
+      "independent": true,
+      "x": 468,
+      "y": 222,
+      "mapped": false,
+      "b": [
+        466,
+        220,
+        470,
+        224
+      ]
+    },
+    {
+      "id": "CAF",
+      "n": "Republika Środkowoafrykańska",
+      "code": "CF",
+      "flag": "🇨🇫",
+      "r": "af",
+      "cap": "Bangui",
+      "caplabel": "Stolica",
+      "area": 622984,
+      "description": "Republika Środkowoafrykańska — państwo w Afryce Środkowej. Stolica: Bangui. To kraj bez dostępu do morza.",
+      "extra": "",
+      "borders": [
+        "CMR",
+        "TCD",
+        "COD",
+        "COG",
+        "SSD",
+        "SDN"
+      ],
+      "independent": true,
+      "x": 602.72,
+      "y": 249.03,
+      "mapped": true,
+      "b": [
+        583.38,
+        236.57,
+        622.12,
+        263.2
+      ]
+    },
+    {
+      "id": "REU",
+      "n": "Reunion",
+      "code": "RE",
+      "flag": "🇷🇪",
+      "r": "af",
+      "cap": "Saint-Denis",
+      "caplabel": "Stolica",
+      "area": 2511,
+      "description": "Reunion — miejsce w Afryce Wschodniej. Stolica: Saint-Denis.",
+      "extra": "",
+      "borders": [],
+      "independent": false,
+      "x": 706.5,
+      "y": 333.45,
+      "mapped": false,
+      "b": [
+        704.5,
+        331.45,
+        708.5,
+        335.45
+      ]
+    },
+    {
+      "id": "RUS",
+      "n": "Rosja",
+      "code": "RU",
+      "flag": "🇷🇺",
+      "r": "eu",
+      "cap": "Moskwa",
+      "caplabel": "Stolica",
+      "area": 17098242,
+      "description": "Rosja — państwo w Europie Wschodniej. Stolica: Moskwa.",
+      "extra": "",
+      "borders": [
+        "AZE",
+        "BLR",
+        "CHN",
+        "EST",
+        "FIN",
+        "GEO",
+        "KAZ",
+        "PRK",
+        "LVA",
+        "LTU",
+        "MNG",
+        "NOR",
+        "POL",
+        "UKR"
+      ],
+      "independent": true,
+      "x": 674.06,
+      "y": 95.25,
+      "mapped": true,
+      "b": [
+        621.86,
+        36.91,
+        1080,
+        146.55
+      ]
+    },
+    {
+      "id": "ROU",
+      "n": "Rumunia",
+      "code": "RO",
+      "flag": "🇷🇴",
+      "r": "eu",
+      "cap": "Bukareszt",
+      "caplabel": "Stolica",
+      "area": 238391,
+      "description": "Rumunia — państwo w Europie Południowo-Wschodniej. Stolica: Bukareszt.",
+      "extra": "",
+      "borders": [
+        "BGR",
+        "HUN",
+        "MDA",
+        "SRB",
+        "UKR"
+      ],
+      "independent": true,
+      "x": 614.92,
+      "y": 132.8,
+      "mapped": true,
+      "b": [
+        600.66,
+        125.34,
+        628.88,
+        138.93
+      ]
+    },
+    {
+      "id": "RWA",
+      "n": "Rwanda",
+      "code": "RW",
+      "flag": "🇷🇼",
+      "r": "af",
+      "cap": "Kigali",
+      "caplabel": "Stolica",
+      "area": 26338,
+      "description": "Rwanda — państwo w Afryce Wschodniej. Stolica: Kigali. To kraj bez dostępu do morza.",
+      "extra": "",
+      "borders": [
+        "BDI",
+        "COD",
+        "TZA",
+        "UGA"
+      ],
+      "independent": true,
+      "x": 630.31,
+      "y": 275.69,
+      "mapped": true,
+      "b": [
+        627.07,
+        273.4,
+        632.45,
+        278.75
+      ]
+    },
+    {
+      "id": "ESH",
+      "n": "Sahara Zachodnia",
+      "code": "EH",
+      "flag": "🇪🇭",
+      "r": "af",
+      "cap": "El Aaiún",
+      "caplabel": "Stolica",
+      "area": 266000,
+      "description": "Sahara Zachodnia — miejsce w Afryce Północnej. Stolica: El Aaiún.",
+      "extra": "",
+      "borders": [
+        "DZA",
+        "MRT",
+        "MAR"
+      ],
+      "independent": false,
+      "x": 502.11,
+      "y": 198.1,
+      "mapped": true,
+      "b": [
+        488.81,
+        187.03,
+        514.0,
+        207.0
+      ]
+    },
+    {
+      "id": "KNA",
+      "n": "Saint Kitts i Nevis",
+      "code": "KN",
+      "flag": "🇰🇳",
+      "r": "na",
+      "cap": "Basseterre",
+      "caplabel": "Stolica",
+      "area": 261,
+      "description": "Saint Kitts i Nevis — państwo na Karaibach. Stolica: Basseterre.",
+      "extra": "",
+      "borders": [],
+      "independent": true,
+      "x": 351.75,
+      "y": 218.0,
+      "mapped": false,
+      "b": [
+        349.75,
+        216.0,
+        353.75,
+        220.0
+      ]
+    },
+    {
+      "id": "LCA",
+      "n": "Saint Lucia",
+      "code": "LC",
+      "flag": "🇱🇨",
+      "r": "na",
+      "cap": "Castries",
+      "caplabel": "Stolica",
+      "area": 616,
+      "description": "Saint Lucia — państwo na Karaibach. Stolica: Castries.",
+      "extra": "",
+      "borders": [],
+      "independent": true,
+      "x": 357.1,
+      "y": 228.35,
+      "mapped": false,
+      "b": [
+        355.1,
+        226.35,
+        359.1,
+        230.35
+      ]
+    },
+    {
+      "id": "VCT",
+      "n": "Saint Vincent i Grenadyny",
+      "code": "VC",
+      "flag": "🇻🇨",
+      "r": "na",
+      "cap": "Kingstown",
+      "caplabel": "Stolica",
+      "area": 389,
+      "description": "Saint Vincent i Grenadyny — państwo na Karaibach. Stolica: Kingstown.",
+      "extra": "",
+      "borders": [],
+      "independent": true,
+      "x": 356.4,
+      "y": 230.25,
+      "mapped": false,
+      "b": [
+        354.4,
+        228.25,
+        358.4,
+        232.25
+      ]
+    },
+    {
+      "id": "BLM",
+      "n": "Saint-Barthélemy",
+      "code": "BL",
+      "flag": "🇧🇱",
+      "r": "na",
+      "cap": "Gustavia",
+      "caplabel": "Stolica",
+      "area": 21,
+      "description": "Saint-Barthélemy — miejsce na Karaibach. Stolica: Gustavia.",
+      "extra": "",
+      "borders": [],
+      "independent": false,
+      "x": 349.75,
+      "y": 214.5,
+      "mapped": false,
+      "b": [
+        347.75,
+        212.5,
+        351.75,
+        216.5
+      ]
+    },
+    {
+      "id": "MAF",
+      "n": "Saint-Martin",
+      "code": "MF",
+      "flag": "🇲🇫",
+      "r": "na",
+      "cap": "Marigot",
+      "caplabel": "Stolica",
+      "area": 53,
+      "description": "Saint-Martin — miejsce na Karaibach. Stolica: Marigot.",
+      "extra": "",
+      "borders": [
+        "SXM"
+      ],
+      "independent": false,
+      "x": 348.15,
+      "y": 215.75,
+      "mapped": false,
+      "b": [
+        346.15,
+        213.75,
+        350.15,
+        217.75
+      ]
+    },
+    {
+      "id": "SPM",
+      "n": "Saint-Pierre i Miquelon",
+      "code": "PM",
+      "flag": "🇵🇲",
+      "r": "na",
+      "cap": "Saint-Pierre",
+      "caplabel": "Stolica",
+      "area": 242,
+      "description": "Saint-Pierre i Miquelon — miejsce w Ameryce Północnej. Stolica: Saint-Pierre.",
+      "extra": "",
+      "borders": [],
+      "independent": false,
+      "x": 371.0,
+      "y": 129.5,
+      "mapped": false,
+      "b": [
+        369.0,
+        127.5,
+        373.0,
+        131.5
+      ]
+    },
+    {
+      "id": "SLV",
+      "n": "Salwador",
+      "code": "SV",
+      "flag": "🇸🇻",
+      "r": "na",
+      "cap": "San Salvador",
+      "caplabel": "Stolica",
+      "area": 21041,
+      "description": "Salwador — państwo w Ameryce Środkowej. Stolica: San Salvador.",
+      "extra": "",
+      "borders": [
+        "GTM",
+        "HND"
+      ],
+      "independent": true,
+      "x": 273.33,
+      "y": 228.94,
+      "mapped": true,
+      "b": [
+        269.71,
+        226.73,
+        276.83,
+        230.55
+      ]
+    },
+    {
+      "id": "WSM",
+      "n": "Samoa",
+      "code": "WS",
+      "flag": "🇼🇸",
+      "r": "oc",
+      "cap": "Apia",
+      "caplabel": "Stolica",
+      "area": 2842,
+      "description": "Samoa — państwo w Polinezji, w Oceanii. Stolica: Apia.",
+      "extra": "",
+      "borders": [],
+      "independent": true,
+      "x": 23.0,
+      "y": 310.75,
+      "mapped": false,
+      "b": [
+        21.0,
+        308.75,
+        25.0,
+        312.75
+      ]
+    },
+    {
+      "id": "ASM",
+      "n": "Samoa Amerykańskie",
+      "code": "AS",
+      "flag": "🇦🇸",
+      "r": "oc",
+      "cap": "Pago Pago",
+      "caplabel": "Stolica",
+      "area": 199,
+      "description": "Samoa Amerykańskie — miejsce w Polinezji, w Oceanii. Stolica: Pago Pago.",
+      "extra": "",
+      "borders": [],
+      "independent": false,
+      "x": 30,
+      "y": 313.0,
+      "mapped": false,
+      "b": [
+        28,
+        311.0,
+        32,
+        315.0
+      ]
+    },
+    {
+      "id": "SMR",
+      "n": "San Marino",
+      "code": "SM",
+      "flag": "🇸🇲",
+      "r": "eu",
+      "cap": "City of San Marino",
+      "caplabel": "Stolica",
+      "area": 61,
+      "description": "San Marino — państwo w Europie Południowej. Stolica: City of San Marino. To kraj bez dostępu do morza.",
+      "extra": "",
+      "borders": [
+        "ITA"
+      ],
+      "independent": true,
+      "x": 577.25,
+      "y": 138.7,
+      "mapped": false,
+      "b": [
+        575.25,
+        136.7,
+        579.25,
+        140.7
+      ]
+    },
+    {
+      "id": "SEN",
+      "n": "Senegal",
+      "code": "SN",
+      "flag": "🇸🇳",
+      "r": "af",
+      "cap": "Dakar",
+      "caplabel": "Stolica",
+      "area": 196722,
+      "description": "Senegal — państwo w Afryce Zachodniej. Stolica: Dakar.",
+      "extra": "",
+      "borders": [
+        "GMB",
+        "GIN",
+        "GNB",
+        "MLI",
+        "MRT"
+      ],
+      "independent": true,
+      "x": 495.66,
+      "y": 224.59,
+      "mapped": true,
+      "b": [
+        487.12,
+        220.21,
+        505.6,
+        233.0
+      ]
+    },
+    {
+      "id": "SRB",
+      "n": "Serbia",
+      "code": "RS",
+      "flag": "🇷🇸",
+      "r": "eu",
+      "cap": "Belgrad",
+      "caplabel": "Stolica",
+      "area": 88361,
+      "description": "Serbia — państwo w Europie Południowo-Wschodniej. Stolica: Belgrad. To kraj bez dostępu do morza.",
+      "extra": "",
+      "borders": [
+        "BIH",
+        "BGR",
+        "HRV",
+        "HUN",
+        "UNK",
+        "MKD",
+        "MNE",
+        "ROU"
+      ],
+      "independent": true,
+      "x": 602.36,
+      "y": 137.43,
+      "mapped": true,
+      "b": [
+        596.49,
+        131.48,
+        608.96,
+        143.26
+      ]
+    },
+    {
+      "id": "SYC",
+      "n": "Seszele",
+      "code": "SC",
+      "flag": "🇸🇨",
+      "r": "af",
+      "cap": "Victoria",
+      "caplabel": "Stolica",
+      "area": 452,
+      "description": "Seszele — państwo w Afryce Wschodniej. Stolica: Victoria.",
+      "extra": "",
+      "borders": [],
+      "independent": true,
+      "x": 707.0,
+      "y": 283.75,
+      "mapped": false,
+      "b": [
+        705.0,
+        281.75,
+        709.0,
+        285.75
+      ]
+    },
+    {
+      "id": "SLE",
+      "n": "Sierra Leone",
+      "code": "SL",
+      "flag": "🇸🇱",
+      "r": "af",
+      "cap": "Freetown",
+      "caplabel": "Stolica",
+      "area": 71740,
+      "description": "Sierra Leone — państwo w Afryce Zachodniej. Stolica: Freetown.",
+      "extra": "",
+      "borders": [
+        "GIN",
+        "LBR"
+      ],
+      "independent": true,
+      "x": 504.71,
+      "y": 244.15,
+      "mapped": true,
+      "b": [
+        500.26,
+        239.86,
+        509.31,
+        249.64
+      ]
+    },
+    {
+      "id": "SGP",
+      "n": "Singapur",
+      "code": "SG",
+      "flag": "🇸🇬",
+      "r": "as",
+      "cap": "Singapur",
+      "caplabel": "Stolica",
+      "area": 710,
+      "description": "Singapur — państwo w Azji Południowo-Wschodniej. Stolica: Singapur.",
+      "extra": "",
+      "borders": [],
+      "independent": true,
+      "x": 851.4,
+      "y": 265.9,
+      "mapped": false,
+      "b": [
+        849.4,
+        263.9,
+        853.4,
+        267.9
+      ]
+    },
+    {
+      "id": "SXM",
+      "n": "Sint Maarten",
+      "code": "SX",
+      "flag": "🇸🇽",
+      "r": "na",
+      "cap": "Philipsburg",
+      "caplabel": "Stolica",
+      "area": 34,
+      "description": "Sint Maarten — miejsce na Karaibach. Stolica: Philipsburg.",
+      "extra": "",
+      "borders": [
+        "MAF"
+      ],
+      "independent": false,
+      "x": 350.85,
+      "y": 215.9,
+      "mapped": false,
+      "b": [
+        348.85,
+        213.9,
+        352.85,
+        217.9
+      ]
+    },
+    {
+      "id": "SOM",
+      "n": "Somalia",
+      "code": "SO",
+      "flag": "🇸🇴",
+      "r": "af",
+      "cap": "Mogadishu",
+      "caplabel": "Stolica",
+      "area": 637657,
+      "description": "Somalia — państwo w Afryce Wschodniej. Stolica: Mogadishu.",
+      "extra": "",
+      "borders": [
+        "DJI",
+        "ETH",
+        "KEN"
+      ],
+      "independent": true,
+      "x": 675.58,
+      "y": 259.29,
+      "mapped": true,
+      "b": [
+        662.94,
+        233.93,
+        693.4,
+        275.05
+      ]
+    },
+    {
+      "id": "SOL",
+      "n": "Somaliland",
+      "code": "",
+      "flag": "🌍",
+      "r": "af",
+      "cap": "",
+      "caplabel": "Stolica",
+      "area": 0,
+      "description": "Somaliland — obszar na mapie. Region: Afryka.",
+      "extra": "",
+      "borders": [],
+      "independent": false,
+      "x": 680.19,
+      "y": 241.67,
+      "mapped": true,
+      "b": [
+        667.68,
+        235.61,
+        686.84,
+        246.01
+      ]
+    },
+    {
+      "id": "LKA",
+      "n": "Sri Lanka",
+      "code": "LK",
+      "flag": "🇱🇰",
+      "r": "as",
+      "cap": "Sri Jayawardenepura Kotte",
+      "caplabel": "Stolica",
+      "area": 65610,
+      "description": "Sri Lanka — państwo w Azji Południowej. Stolica: Sri Jayawardenepura Kotte.",
+      "extra": "",
+      "borders": [
+        "IND"
+      ],
+      "independent": true,
+      "x": 782.11,
+      "y": 247.26,
+      "mapped": true,
+      "b": [
+        779.09,
+        240.53,
+        785.36,
+        252.09
+      ]
+    },
+    {
+      "id": "USA",
+      "n": "Stany Zjednoczone",
+      "code": "US",
+      "flag": "🇺🇸",
+      "r": "na",
+      "cap": "Waszyngton",
+      "caplabel": "Stolica",
+      "area": 9372610,
+      "description": "Stany Zjednoczone — państwo w Ameryce Północnej. Stolica: Waszyngton.",
+      "extra": "",
+      "borders": [
+        "CAN",
+        "MEX"
+      ],
+      "independent": true,
+      "x": 247.55,
+      "y": 151.38,
+      "mapped": true,
+      "b": [
+        165.94,
+        121.83,
+        339.11,
+        194.76
+      ]
+    },
+    {
+      "id": "SDN",
+      "n": "Sudan",
+      "code": "SD",
+      "flag": "🇸🇩",
+      "r": "af",
+      "cap": "Chartum",
+      "caplabel": "Stolica",
+      "area": 1886068,
+      "description": "Sudan — państwo w Afryce Północnej. Stolica: Chartum.",
+      "extra": "",
+      "borders": [
+        "CAF",
+        "TCD",
+        "EGY",
+        "ERI",
+        "ETH",
+        "LBY",
+        "SSD"
+      ],
+      "independent": true,
+      "x": 627.78,
+      "y": 221.01,
+      "mapped": true,
+      "b": [
+        605.81,
+        204,
+        655.23,
+        245.31
+      ]
+    },
+    {
+      "id": "SSD",
+      "n": "Sudan Południowy",
+      "code": "SS",
+      "flag": "🇸🇸",
+      "r": "af",
+      "cap": "Juba",
+      "caplabel": "Stolica",
+      "area": 619745,
+      "description": "Sudan Południowy — państwo w Afryce Środkowej. Stolica: Juba. To kraj bez dostępu do morza.",
+      "extra": "",
+      "borders": [
+        "CAF",
+        "COD",
+        "ETH",
+        "KEN",
+        "SDN",
+        "UGA"
+      ],
+      "independent": true,
+      "x": 631.17,
+      "y": 248.31,
+      "mapped": true,
+      "b": [
+        611.66,
+        233.26,
+        645.89,
+        259.47
+      ]
+    },
+    {
+      "id": "SUR",
+      "n": "Surinam",
+      "code": "SR",
+      "flag": "🇸🇷",
+      "r": "sa",
+      "cap": "Paramaribo",
+      "caplabel": "Stolica",
+      "area": 163820,
+      "description": "Surinam — państwo w Ameryce Południowej. Stolica: Paramaribo.",
+      "extra": "",
+      "borders": [
+        "BRA",
+        "GUF",
+        "GUY"
+      ],
+      "independent": true,
+      "x": 372.27,
+      "y": 257.57,
+      "mapped": true,
+      "b": [
+        365.87,
+        251.92,
+        378.13,
+        264.55
+      ]
+    },
+    {
+      "id": "SJM",
+      "n": "Svalbard i Jan Mayen",
+      "code": "SJ",
+      "flag": "🇸🇯",
+      "r": "eu",
+      "cap": "Longyearbyen",
+      "caplabel": "Stolica",
+      "area": -1,
+      "description": "Svalbard i Jan Mayen — miejsce w Europie Północnej. Stolica: Longyearbyen.",
+      "extra": "",
+      "borders": [],
+      "independent": false,
+      "x": 600,
+      "y": 36,
+      "mapped": false,
+      "b": [
+        598,
+        34,
+        602,
+        38
+      ]
+    },
+    {
+      "id": "SYR",
+      "n": "Syria",
+      "code": "SY",
+      "flag": "🇸🇾",
+      "r": "as",
+      "cap": "Damaszek",
+      "caplabel": "Stolica",
+      "area": 185180,
+      "description": "Syria — państwo w Azji Zachodniej. Stolica: Damaszek.",
+      "extra": "",
+      "borders": [
+        "IRQ",
+        "ISR",
+        "JOR",
+        "LBN",
+        "TUR"
+      ],
+      "independent": true,
+      "x": 654.83,
+      "y": 164.98,
+      "mapped": true,
+      "b": [
+        647.1,
+        158.31,
+        667.05,
+        173.06
+      ]
+    },
+    {
+      "id": "CHE",
+      "n": "Szwajcaria",
+      "code": "CH",
+      "flag": "🇨🇭",
+      "r": "eu",
+      "cap": "Berno",
+      "caplabel": "Siedziba władz federalnych",
+      "area": 41284,
+      "description": "Szwajcaria — państwo w Europie Zachodniej. Siedziba władz federalnych: Berno. To kraj bez dostępu do morza.",
+      "extra": "",
+      "borders": [
+        "AUT",
+        "FRA",
+        "ITA",
+        "LIE",
+        "DEU"
+      ],
+      "independent": true,
+      "x": 562.39,
+      "y": 129.84,
+      "mapped": true,
+      "b": [
+        558.07,
+        126.51,
+        571.33,
+        132.67
+      ]
+    },
+    {
+      "id": "SWE",
+      "n": "Szwecja",
+      "code": "SE",
+      "flag": "🇸🇪",
+      "r": "eu",
+      "cap": "Sztokholm",
+      "caplabel": "Stolica",
+      "area": 450295,
+      "description": "Szwecja — państwo w Europie Północnej. Stolica: Sztokholm.",
+      "extra": "",
+      "borders": [
+        "FIN",
+        "NOR"
+      ],
+      "independent": true,
+      "x": 597.05,
+      "y": 72.42,
+      "mapped": true,
+      "b": [
+        573.08,
+        62.68,
+        611.71,
+        103.91
+      ]
+    },
+    {
+      "id": "SVK",
+      "n": "Słowacja",
+      "code": "SK",
+      "flag": "🇸🇰",
+      "r": "eu",
+      "cap": "Bratysława",
+      "caplabel": "Stolica",
+      "area": 49037,
+      "description": "Słowacja — państwo w Europie Środkowej. Stolica: Bratysława. To kraj bez dostępu do morza.",
+      "extra": "",
+      "borders": [
+        "AUT",
+        "CZE",
+        "HUN",
+        "POL",
+        "UKR"
+      ],
+      "independent": true,
+      "x": 597.15,
+      "y": 123.8,
+      "mapped": true,
+      "b": [
+        590.64,
+        121.29,
+        607.67,
+        126.72
+      ]
+    },
+    {
+      "id": "SVN",
+      "n": "Słowenia",
+      "code": "SI",
+      "flag": "🇸🇮",
+      "r": "eu",
+      "cap": "Ljubljana",
+      "caplabel": "Stolica",
+      "area": 20273,
+      "description": "Słowenia — państwo w Europie Środkowej. Stolica: Ljubljana.",
+      "extra": "",
+      "borders": [
+        "AUT",
+        "HRV",
+        "ITA",
+        "HUN"
+      ],
+      "independent": true,
+      "x": 584.75,
+      "y": 131.82,
+      "mapped": true,
+      "b": [
+        581.09,
+        129.44,
+        589.69,
+        133.64
+      ]
+    },
+    {
+      "id": "TJK",
+      "n": "Tadżykistan",
+      "code": "TJ",
+      "flag": "🇹🇯",
+      "r": "as",
+      "cap": "Dushanbe",
+      "caplabel": "Stolica",
+      "area": 143100,
+      "description": "Tadżykistan — państwo w Azji Środkowej. Stolica: Dushanbe. To kraj bez dostępu do morza.",
+      "extra": "",
+      "borders": [
+        "AFG",
+        "CHN",
+        "KGZ",
+        "UZB"
+      ],
+      "independent": true,
+      "x": 757.76,
+      "y": 155.4,
+      "mapped": true,
+      "b": [
+        742.33,
+        147.12,
+        764.94,
+        159.79
+      ]
+    },
+    {
+      "id": "THA",
+      "n": "Tajlandia",
+      "code": "TH",
+      "flag": "🇹🇭",
+      "r": "as",
+      "cap": "Bangkok",
+      "caplabel": "Stolica",
+      "area": 513120,
+      "description": "Tajlandia — państwo w Azji Południowo-Wschodniej. Stolica: Bangkok.",
+      "extra": "",
+      "borders": [
+        "MMR",
+        "KHM",
+        "LAO",
+        "MYS"
+      ],
+      "independent": true,
+      "x": 843.22,
+      "y": 223.62,
+      "mapped": true,
+      "b": [
+        832.13,
+        208.75,
+        856.77,
+        252.93
+      ]
+    },
+    {
+      "id": "TWN",
+      "n": "Tajwan",
+      "code": "TW",
+      "flag": "🇹🇼",
+      "r": "as",
+      "cap": "Tajpej",
+      "caplabel": "Stolica",
+      "area": 36193,
+      "description": "Tajwan — miejsce w Azji Wschodniej. Stolica: Tajpej.",
+      "extra": "",
+      "borders": [],
+      "independent": false,
+      "x": 902.6,
+      "y": 199.04,
+      "mapped": true,
+      "b": [
+        900.32,
+        194.11,
+        905.85,
+        204.09
+      ]
+    },
+    {
+      "id": "TZA",
+      "n": "Tanzania",
+      "code": "TZ",
+      "flag": "🇹🇿",
+      "r": "af",
+      "cap": "Dodoma",
+      "caplabel": "Stolica",
+      "area": 945087,
+      "description": "Tanzania — państwo w Afryce Wschodniej. Stolica: Dodoma.",
+      "extra": "",
+      "borders": [
+        "BDI",
+        "COD",
+        "KEN",
+        "MWI",
+        "MOZ",
+        "RWA",
+        "UGA",
+        "ZMB"
+      ],
+      "independent": true,
+      "x": 644.88,
+      "y": 288.16,
+      "mapped": true,
+      "b": [
+        628.02,
+        272.85,
+        660.95,
+        305.16
+      ]
+    },
+    {
+      "id": "TLS",
+      "n": "Timor Wschodni",
+      "code": "TL",
+      "flag": "🇹🇱",
+      "r": "as",
+      "cap": "Dili",
+      "caplabel": "Stolica",
+      "area": 14874,
+      "description": "Timor Wschodni — państwo w Azji Południowo-Wschodniej. Stolica: Dili.",
+      "extra": "",
+      "borders": [
+        "IDN"
+      ],
+      "independent": true,
+      "x": 917.56,
+      "y": 296.41,
+      "mapped": true,
+      "b": [
+        914.91,
+        294.82,
+        922.01,
+        298.18
+      ]
+    },
+    {
+      "id": "TGO",
+      "n": "Togo",
+      "code": "TG",
+      "flag": "🇹🇬",
+      "r": "af",
+      "cap": "Lomé",
+      "caplabel": "Stolica",
+      "area": 56785,
+      "description": "Togo — państwo w Afryce Zachodniej. Stolica: Lomé.",
+      "extra": "",
+      "borders": [
+        "BEN",
+        "BFA",
+        "GHA"
+      ],
+      "independent": true,
+      "x": 543.17,
+      "y": 243.58,
+      "mapped": true,
+      "b": [
+        539.85,
+        236.94,
+        545.6,
+        252.21
+      ]
+    },
+    {
+      "id": "TKL",
+      "n": "Tokelau",
+      "code": "TK",
+      "flag": "🇹🇰",
+      "r": "oc",
+      "cap": "Fakaofo",
+      "caplabel": "Stolica",
+      "area": 12,
+      "description": "Tokelau — miejsce w Polinezji, w Oceanii. Stolica: Fakaofo.",
+      "extra": "",
+      "borders": [],
+      "independent": false,
+      "x": 24,
+      "y": 297,
+      "mapped": false,
+      "b": [
+        22,
+        295,
+        26,
+        299
+      ]
+    },
+    {
+      "id": "TON",
+      "n": "Tonga",
+      "code": "TO",
+      "flag": "🇹🇴",
+      "r": "oc",
+      "cap": "Nuku'alofa",
+      "caplabel": "Stolica",
+      "area": 747,
+      "description": "Tonga — państwo w Polinezji, w Oceanii. Stolica: Nuku'alofa.",
+      "extra": "",
+      "borders": [],
+      "independent": true,
+      "x": 15,
+      "y": 330,
+      "mapped": false,
+      "b": [
+        13,
+        328,
+        17,
+        332
+      ]
+    },
+    {
+      "id": "TTO",
+      "n": "Trynidad i Tobago",
+      "code": "TT",
+      "flag": "🇹🇹",
+      "r": "na",
+      "cap": "Port of Spain",
+      "caplabel": "Stolica",
+      "area": 5130,
+      "description": "Trynidad i Tobago — państwo na Karaibach. Stolica: Port of Spain.",
+      "extra": "",
+      "borders": [],
+      "independent": true,
+      "x": 357.24,
+      "y": 237.0,
+      "mapped": true,
+      "b": [
+        354.15,
+        237.33,
+        357.31,
+        240
+      ]
+    },
+    {
+      "id": "TUN",
+      "n": "Tunezja",
+      "code": "TN",
+      "flag": "🇹🇳",
+      "r": "af",
+      "cap": "Tunis",
+      "caplabel": "Stolica",
+      "area": 163610,
+      "description": "Tunezja — państwo w Afryce Północnej. Stolica: Tunis.",
+      "extra": "",
+      "borders": [
+        "DZA",
+        "LBY"
+      ],
+      "independent": true,
+      "x": 567.02,
+      "y": 168.94,
+      "mapped": true,
+      "b": [
+        562.57,
+        157.95,
+        574.47,
+        179.08
+      ]
+    },
+    {
+      "id": "TUR",
+      "n": "Turcja",
+      "code": "TR",
+      "flag": "🇹🇷",
+      "r": "as",
+      "cap": "Ankara",
+      "caplabel": "Stolica",
+      "area": 783562,
+      "description": "Turcja — państwo w Azji Zachodniej. Stolica: Ankara.",
+      "extra": "",
+      "borders": [
+        "ARM",
+        "AZE",
+        "BGR",
+        "GEO",
+        "GRC",
+        "IRN",
+        "IRQ",
+        "SYR"
+      ],
+      "independent": true,
+      "x": 643.52,
+      "y": 151.96,
+      "mapped": true,
+      "b": [
+        618.51,
+        143.88,
+        674.38,
+        162.54
+      ]
+    },
+    {
+      "id": "TKM",
+      "n": "Turkmenistan",
+      "code": "TM",
+      "flag": "🇹🇲",
+      "r": "as",
+      "cap": "Ashgabat",
+      "caplabel": "Stolica",
+      "area": 488100,
+      "description": "Turkmenistan — państwo w Azji Środkowej. Stolica: Ashgabat. To kraj bez dostępu do morza.",
+      "extra": "",
+      "borders": [
+        "AFG",
+        "IRN",
+        "KAZ",
+        "UZB"
+      ],
+      "independent": true,
+      "x": 716.03,
+      "y": 150.43,
+      "mapped": true,
+      "b": [
+        697.51,
+        141.75,
+        739.64,
+        164.19
+      ]
+    },
+    {
+      "id": "TCA",
+      "n": "Turks i Caicos",
+      "code": "TC",
+      "flag": "🇹🇨",
+      "r": "na",
+      "cap": "Cockburn Town",
+      "caplabel": "Stolica",
+      "area": 948,
+      "description": "Turks i Caicos — miejsce na Karaibach. Stolica: Cockburn Town.",
+      "extra": "",
+      "borders": [],
+      "independent": false,
+      "x": 325.25,
+      "y": 204.75,
+      "mapped": false,
+      "b": [
+        323.25,
+        202.75,
+        327.25,
+        206.75
+      ]
+    },
+    {
+      "id": "TUV",
+      "n": "Tuvalu",
+      "code": "TV",
+      "flag": "🇹🇻",
+      "r": "oc",
+      "cap": "Funafuti",
+      "caplabel": "Stolica",
+      "area": 26,
+      "description": "Tuvalu — państwo w Polinezji, w Oceanii. Stolica: Funafuti.",
+      "extra": "",
+      "borders": [],
+      "independent": true,
+      "x": 1074,
+      "y": 294,
+      "mapped": false,
+      "b": [
+        1072,
+        292,
+        1076,
+        296
+      ]
+    },
+    {
+      "id": "UGA",
+      "n": "Uganda",
+      "code": "UG",
+      "flag": "🇺🇬",
+      "r": "af",
+      "cap": "Kampala",
+      "caplabel": "Stolica",
+      "area": 241550,
+      "description": "Uganda — państwo w Afryce Wschodniej. Stolica: Kampala. To kraj bez dostępu do morza.",
+      "extra": "",
+      "borders": [
+        "COD",
+        "KEN",
+        "RWA",
+        "SSD",
+        "TZA"
+      ],
+      "independent": true,
+      "x": 638.85,
+      "y": 264.08,
+      "mapped": true,
+      "b": [
+        628.74,
+        257.25,
+        645.11,
+        274.33
+      ]
+    },
+    {
+      "id": "UKR",
+      "n": "Ukraina",
+      "code": "UA",
+      "flag": "🇺🇦",
+      "r": "eu",
+      "cap": "Kijów",
+      "caplabel": "Stolica",
+      "area": 603500,
+      "description": "Ukraina — państwo w Europie Wschodniej. Stolica: Kijów.",
+      "extra": "",
+      "borders": [
+        "BLR",
+        "HUN",
+        "MDA",
+        "POL",
+        "ROU",
+        "RUS",
+        "SVK"
+      ],
+      "independent": true,
+      "x": 636.42,
+      "y": 120.83,
+      "mapped": true,
+      "b": [
+        606.26,
+        112.99,
+        660.24,
+        134.12
+      ]
+    },
+    {
+      "id": "URY",
+      "n": "Urugwaj",
+      "code": "UY",
+      "flag": "🇺🇾",
+      "r": "sa",
+      "cap": "Montevideo",
+      "caplabel": "Stolica",
+      "area": 181034,
+      "description": "Urugwaj — państwo w Ameryce Południowej. Stolica: Montevideo.",
+      "extra": "",
+      "borders": [
+        "ARG",
+        "BRA"
+      ],
+      "independent": true,
+      "x": 372.1,
+      "y": 368.88,
+      "mapped": true,
+      "b": [
+        364.72,
+        360.33,
+        380.37,
+        374.86
+      ]
+    },
+    {
+      "id": "UZB",
+      "n": "Uzbekistan",
+      "code": "UZ",
+      "flag": "🇺🇿",
+      "r": "as",
+      "cap": "Tashkent",
+      "caplabel": "Stolica",
+      "area": 447400,
+      "description": "Uzbekistan — państwo w Azji Środkowej. Stolica: Tashkent. To kraj bez dostępu do morza.",
+      "extra": "",
+      "borders": [
+        "AFG",
+        "KAZ",
+        "KGZ",
+        "TJK",
+        "TKM"
+      ],
+      "independent": true,
+      "x": 732.02,
+      "y": 144.92,
+      "mapped": true,
+      "b": [
+        707.79,
+        133.24,
+        759.17,
+        158.57
+      ]
+    },
+    {
+      "id": "VUT",
+      "n": "Vanuatu",
+      "code": "VU",
+      "flag": "🇻🇺",
+      "r": "oc",
+      "cap": "Port Vila",
+      "caplabel": "Stolica",
+      "area": 12189,
+      "description": "Vanuatu — państwo w Melanezji, w Oceanii. Stolica: Port Vila.",
+      "extra": "",
+      "borders": [],
+      "independent": true,
+      "x": 1040.73,
+      "y": 316.11,
+      "mapped": true,
+      "b": [
+        1039.89,
+        313.88,
+        1041.81,
+        317.22
+      ]
+    },
+    {
+      "id": "WLF",
+      "n": "Wallis i Futuna",
+      "code": "WF",
+      "flag": "🇼🇫",
+      "r": "oc",
+      "cap": "Mata-Utu",
+      "caplabel": "Stolica",
+      "area": 142,
+      "description": "Wallis i Futuna — miejsce w Polinezji, w Oceanii. Stolica: Mata-Utu.",
+      "extra": "",
+      "borders": [],
+      "independent": false,
+      "x": 11.4,
+      "y": 309.9,
+      "mapped": false,
+      "b": [
+        9.4,
+        307.9,
+        13.4,
+        311.9
+      ]
+    },
+    {
+      "id": "VAT",
+      "n": "Watykan",
+      "code": "VA",
+      "flag": "🇻🇦",
+      "r": "eu",
+      "cap": "Watykan",
+      "caplabel": "Stolica",
+      "area": 0.44,
+      "description": "Watykan — państwo w Europie Południowej. Stolica: Watykan. To kraj bez dostępu do morza.",
+      "extra": "",
+      "borders": [
+        "ITA"
+      ],
+      "independent": true,
+      "x": 577.35,
+      "y": 144.3,
+      "mapped": false,
+      "b": [
+        575.35,
+        142.3,
+        579.35,
+        146.3
+      ]
+    },
+    {
+      "id": "VEN",
+      "n": "Wenezuela",
+      "code": "VE",
+      "flag": "🇻🇪",
+      "r": "sa",
+      "cap": "Caracas",
+      "caplabel": "Stolica",
+      "area": 916445,
+      "description": "Wenezuela — państwo w Ameryce Południowej. Stolica: Caracas.",
+      "extra": "",
+      "borders": [
+        "BRA",
+        "COL",
+        "GUY"
+      ],
+      "independent": true,
+      "x": 346.2,
+      "y": 248.45,
+      "mapped": true,
+      "b": [
+        320.09,
+        233.51,
+        360.73,
+        267.83
+      ]
+    },
+    {
+      "id": "GBR",
+      "n": "Wielka Brytania",
+      "code": "GB",
+      "flag": "🇬🇧",
+      "r": "eu",
+      "cap": "Londyn",
+      "caplabel": "Stolica",
+      "area": 242900,
+      "description": "Wielka Brytania — państwo w Europie Północnej. Stolica: Londyn.",
+      "extra": "",
+      "borders": [
+        "IRL"
+      ],
+      "independent": true,
+      "x": 533.65,
+      "y": 106.79,
+      "mapped": true,
+      "b": [
+        521.55,
+        94.09,
+        545.04,
+        120.12
+      ]
+    },
+    {
+      "id": "VNM",
+      "n": "Wietnam",
+      "code": "VN",
+      "flag": "🇻🇳",
+      "r": "as",
+      "cap": "Hanoi",
+      "caplabel": "Stolica",
+      "area": 331212,
+      "description": "Wietnam — państwo w Azji Południowo-Wschodniej. Stolica: Hanoi.",
+      "extra": "",
+      "borders": [
+        "KHM",
+        "CHN",
+        "LAO"
+      ],
+      "independent": true,
+      "x": 856.16,
+      "y": 204.85,
+      "mapped": true,
+      "b": [
+        846.51,
+        199.94,
+        868.01,
+        244.2
+      ]
+    },
+    {
+      "id": "CIV",
+      "n": "Wybrzeże Kości Słoniowej",
+      "code": "CI",
+      "flag": "🇨🇮",
+      "r": "af",
+      "cap": "Yamoussoukro",
+      "caplabel": "Stolica",
+      "area": 322463,
+      "description": "Wybrzeże Kości Słoniowej — państwo w Afryce Zachodniej. Stolica: Yamoussoukro.",
+      "extra": "",
+      "borders": [
+        "BFA",
+        "GHA",
+        "GIN",
+        "LBR",
+        "MLI"
+      ],
+      "independent": true,
+      "x": 523.29,
+      "y": 247.53,
+      "mapped": true,
+      "b": [
+        514.19,
+        238.43,
+        532.31,
+        256.99
+      ]
+    },
+    {
+      "id": "BVT",
+      "n": "Wyspa Bouveta",
+      "code": "BV",
+      "flag": "🇧🇻",
+      "r": "an",
+      "cap": "",
+      "caplabel": "Stolica",
+      "area": 49,
+      "description": "Wyspa Bouveta — miejsce w Antarktyda.",
+      "extra": "",
+      "borders": [],
+      "independent": false,
+      "x": 550.2,
+      "y": 433.3,
+      "mapped": false,
+      "b": [
+        548.2,
+        431.3,
+        552.2,
+        435.3
+      ]
+    },
+    {
+      "id": "CXR",
+      "n": "Wyspa Bożego Narodzenia",
+      "code": "CX",
+      "flag": "🇨🇽",
+      "r": "oc",
+      "cap": "Flying Fish Cove",
+      "caplabel": "Stolica",
+      "area": 135,
+      "description": "Wyspa Bożego Narodzenia — miejsce w Oceanii. Stolica: Flying Fish Cove.",
+      "extra": "",
+      "borders": [],
+      "independent": false,
+      "x": 857.0,
+      "y": 301.5,
+      "mapped": false,
+      "b": [
+        855.0,
+        299.5,
+        859.0,
+        303.5
+      ]
+    },
+    {
+      "id": "IMN",
+      "n": "Wyspa Man",
+      "code": "IM",
+      "flag": "🇮🇲",
+      "r": "eu",
+      "cap": "Douglas",
+      "caplabel": "Stolica",
+      "area": 572,
+      "description": "Wyspa Man — miejsce w Europie Północnej. Stolica: Douglas.",
+      "extra": "",
+      "borders": [],
+      "independent": false,
+      "x": 526.5,
+      "y": 107.25,
+      "mapped": false,
+      "b": [
+        524.5,
+        105.25,
+        528.5,
+        109.25
+      ]
+    },
+    {
+      "id": "NFK",
+      "n": "Wyspa Norfolk",
+      "code": "NF",
+      "flag": "🇳🇫",
+      "r": "oc",
+      "cap": "Kingston",
+      "caplabel": "Stolica",
+      "area": 36,
+      "description": "Wyspa Norfolk — miejsce w Oceanii. Stolica: Kingston.",
+      "extra": "",
+      "borders": [],
+      "independent": false,
+      "x": 1043.85,
+      "y": 357.1,
+      "mapped": false,
+      "b": [
+        1041.85,
+        355.1,
+        1045.85,
+        359.1
+      ]
+    },
+    {
+      "id": "SHN",
+      "n": "Wyspa Świętej Heleny, Wyspa Wniebowstąpienia i Tristan da Cunha",
+      "code": "SH",
+      "flag": "🇸🇭",
+      "r": "af",
+      "cap": "Jamestown",
+      "caplabel": "Stolica",
+      "area": 394,
+      "description": "Wyspa Świętej Heleny, Wyspa Wniebowstąpienia i Tristan da Cunha — miejsce w Afryce Zachodniej. Stolica: Jamestown.",
+      "extra": "",
+      "borders": [],
+      "independent": false,
+      "x": 522.84,
+      "y": 317.85,
+      "mapped": false,
+      "b": [
+        520.84,
+        315.85,
+        524.84,
+        319.85
+      ]
+    },
+    {
+      "id": "ALA",
+      "n": "Wyspy Alandzkie",
+      "code": "AX",
+      "flag": "🇦🇽",
+      "r": "eu",
+      "cap": "Mariehamn",
+      "caplabel": "Stolica",
+      "area": 1580,
+      "description": "Wyspy Alandzkie — miejsce w Europie Północnej. Stolica: Mariehamn.",
+      "extra": "",
+      "borders": [],
+      "independent": false,
+      "x": 599.7,
+      "y": 89.65,
+      "mapped": false,
+      "b": [
+        597.7,
+        87.65,
+        601.7,
+        91.65
+      ]
+    },
+    {
+      "id": "COK",
+      "n": "Wyspy Cooka",
+      "code": "CK",
+      "flag": "🇨🇰",
+      "r": "oc",
+      "cap": "Avarua",
+      "caplabel": "Stolica",
+      "area": 236,
+      "description": "Wyspy Cooka — miejsce w Polinezji, w Oceanii. Stolica: Avarua.",
+      "extra": "",
+      "borders": [],
+      "independent": false,
+      "x": 60.7,
+      "y": 333.7,
+      "mapped": false,
+      "b": [
+        58.7,
+        331.7,
+        62.7,
+        335.7
+      ]
+    },
+    {
+      "id": "VIR",
+      "n": "Wyspy Dziewicze Stanów Zjednoczonych",
+      "code": "VI",
+      "flag": "🇻🇮",
+      "r": "na",
+      "cap": "Charlotte Amalie",
+      "caplabel": "Stolica",
+      "area": 347,
+      "description": "Wyspy Dziewicze Stanów Zjednoczonych — miejsce na Karaibach. Stolica: Charlotte Amalie.",
+      "extra": "",
+      "borders": [],
+      "independent": false,
+      "x": 345.2,
+      "y": 214.95,
+      "mapped": false,
+      "b": [
+        343.2,
+        212.95,
+        347.2,
+        216.95
+      ]
+    },
+    {
+      "id": "HMD",
+      "n": "Wyspy Heard i McDonalda",
+      "code": "HM",
+      "flag": "🇭🇲",
+      "r": "an",
+      "cap": "",
+      "caplabel": "Stolica",
+      "area": 412,
+      "description": "Wyspy Heard i McDonalda — miejsce w Antarktyda.",
+      "extra": "",
+      "borders": [],
+      "independent": false,
+      "x": 757.55,
+      "y": 429.3,
+      "mapped": false,
+      "b": [
+        755.55,
+        427.3,
+        759.55,
+        431.3
+      ]
+    },
+    {
+      "id": "CCK",
+      "n": "Wyspy Kokosowe",
+      "code": "CC",
+      "flag": "🇨🇨",
+      "r": "oc",
+      "cap": "West Island",
+      "caplabel": "Stolica",
+      "area": 14,
+      "description": "Wyspy Kokosowe — miejsce w Oceanii. Stolica: West Island.",
+      "extra": "",
+      "borders": [],
+      "independent": false,
+      "x": 830.5,
+      "y": 307.5,
+      "mapped": false,
+      "b": [
+        828.5,
+        305.5,
+        832.5,
+        309.5
+      ]
+    },
+    {
+      "id": "MHL",
+      "n": "Wyspy Marshalla",
+      "code": "MH",
+      "flag": "🇲🇭",
+      "r": "oc",
+      "cap": "Majuro",
+      "caplabel": "Stolica",
+      "area": 181,
+      "description": "Wyspy Marshalla — państwo w Mikronezji, w Oceanii. Stolica: Majuro.",
+      "extra": "",
+      "borders": [],
+      "independent": true,
+      "x": 1044,
+      "y": 243,
+      "mapped": false,
+      "b": [
+        1042,
+        241,
+        1046,
+        245
+      ]
+    },
+    {
+      "id": "FRO",
+      "n": "Wyspy Owcze",
+      "code": "FO",
+      "flag": "🇫🇴",
+      "r": "eu",
+      "cap": "Tórshavn",
+      "caplabel": "Stolica",
+      "area": 1393,
+      "description": "Wyspy Owcze — miejsce w Europie Północnej. Stolica: Tórshavn.",
+      "extra": "",
+      "borders": [],
+      "independent": false,
+      "x": 519,
+      "y": 84,
+      "mapped": false,
+      "b": [
+        517,
+        82,
+        521,
+        86
+      ]
+    },
+    {
+      "id": "SLB",
+      "n": "Wyspy Salomona",
+      "code": "SB",
+      "flag": "🇸🇧",
+      "r": "oc",
+      "cap": "Honiara",
+      "caplabel": "Stolica",
+      "area": 28896,
+      "description": "Wyspy Salomona — państwo w Melanezji, w Oceanii. Stolica: Honiara.",
+      "extra": "",
+      "borders": [],
+      "independent": true,
+      "x": 1017.51,
+      "y": 294.09,
+      "mapped": true,
+      "b": [
+        1014.63,
+        291.96,
+        1019.75,
+        295.61
+      ]
+    },
+    {
+      "id": "STP",
+      "n": "Wyspy Świętego Tomasza i Książęca",
+      "code": "ST",
+      "flag": "🇸🇹",
+      "r": "af",
+      "cap": "São Tomé",
+      "caplabel": "Stolica",
+      "area": 964,
+      "description": "Wyspy Świętego Tomasza i Książęca — państwo w Afryce Środkowej. Stolica: São Tomé.",
+      "extra": "",
+      "borders": [],
+      "independent": true,
+      "x": 561,
+      "y": 267,
+      "mapped": false,
+      "b": [
+        559,
+        265,
+        563,
+        269
+      ]
+    },
+    {
+      "id": "HUN",
+      "n": "Węgry",
+      "code": "HU",
+      "flag": "🇭🇺",
+      "r": "eu",
+      "cap": "Budapeszt",
+      "caplabel": "Stolica",
+      "area": 93028,
+      "description": "Węgry — państwo w Europie Środkowej. Stolica: Budapeszt. To kraj bez dostępu do morza.",
+      "extra": "",
+      "borders": [
+        "AUT",
+        "HRV",
+        "ROU",
+        "SRB",
+        "SVK",
+        "SVN",
+        "UKR"
+      ],
+      "independent": true,
+      "x": 598.34,
+      "y": 128.74,
+      "mapped": true,
+      "b": [
+        588.61,
+        124.13,
+        608.13,
+        132.72
+      ]
+    },
+    {
+      "id": "ITA",
+      "n": "Włochy",
+      "code": "IT",
+      "flag": "🇮🇹",
+      "r": "eu",
+      "cap": "Rzym",
+      "caplabel": "Stolica",
+      "area": 301336,
+      "description": "Włochy — państwo w Europie Południowej. Stolica: Rzym.",
+      "extra": "Na mapie Włochy przypominają but. Do kraju należą też wyspy, między innymi Sycylia i Sardynia.",
+      "borders": [
+        "AUT",
+        "FRA",
+        "SMR",
+        "SVN",
+        "CHE",
+        "VAT"
+      ],
+      "independent": true,
+      "x": 573.23,
+      "y": 135.8,
+      "mapped": true,
+      "b": [
+        560.25,
+        128.65,
+        595.44,
+        156.27
+      ]
+    },
+    {
+      "id": "ZMB",
+      "n": "Zambia",
+      "code": "ZM",
+      "flag": "🇿🇲",
+      "r": "af",
+      "cap": "Lusaka",
+      "caplabel": "Stolica",
+      "area": 752612,
+      "description": "Zambia — państwo w Afryce Wschodniej. Stolica: Lusaka. To kraj bez dostępu do morza.",
+      "extra": "",
+      "borders": [
+        "AGO",
+        "BWA",
+        "COD",
+        "MWI",
+        "MOZ",
+        "NAM",
+        "TZA",
+        "ZWE"
+      ],
+      "independent": true,
+      "x": 619.19,
+      "y": 313.98,
+      "mapped": true,
+      "b": [
+        605.66,
+        294.71,
+        640.46,
+        323.88
+      ]
+    },
+    {
+      "id": "ZWE",
+      "n": "Zimbabwe",
+      "code": "ZW",
+      "flag": "🇿🇼",
+      "r": "af",
+      "cap": "Harare",
+      "caplabel": "Stolica",
+      "area": 390757,
+      "description": "Zimbabwe — państwo w Afryce Wschodniej. Stolica: Harare. To kraj bez dostępu do morza.",
+      "extra": "",
+      "borders": [
+        "BWA",
+        "MOZ",
+        "ZAF",
+        "ZMB"
+      ],
+      "independent": true,
+      "x": 629.78,
+      "y": 326.73,
+      "mapped": true,
+      "b": [
+        615.79,
+        316.52,
+        638.55,
+        336.81
+      ]
+    },
+    {
+      "id": "ARE",
+      "n": "Zjednoczone Emiraty Arabskie",
+      "code": "AE",
+      "flag": "🇦🇪",
+      "r": "as",
+      "cap": "Abu Dhabi",
+      "caplabel": "Stolica",
+      "area": 83600,
+      "description": "Zjednoczone Emiraty Arabskie — państwo w Azji Zachodniej. Stolica: Abu Dhabi.",
+      "extra": "",
+      "borders": [
+        "OMN",
+        "SAU"
+      ],
+      "independent": true,
+      "x": 703.64,
+      "y": 199.6,
+      "mapped": true,
+      "b": [
+        694.74,
+        191.83,
+        709.19,
+        202.51
+      ]
+    },
+    {
+      "id": "LVA",
+      "n": "Łotwa",
+      "code": "LV",
+      "flag": "🇱🇻",
+      "r": "eu",
+      "cap": "Ryga",
+      "caplabel": "Stolica",
+      "area": 64559,
+      "description": "Łotwa — państwo w Europie Północnej. Stolica: Ryga.",
+      "extra": "",
+      "borders": [
+        "BLR",
+        "EST",
+        "LTU",
+        "RUS"
+      ],
+      "independent": true,
+      "x": 616.38,
+      "y": 98.8,
+      "mapped": true,
+      "b": [
+        603.17,
+        96.09,
+        624.53,
+        103.15
+      ]
+    }
+  ]
+}

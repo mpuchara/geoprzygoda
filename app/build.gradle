@@ -1,0 +1,34 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'pl.mpuchara.geoprzygoda'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId 'pl.mpuchara.geoprzygoda'
+        minSdk 26
+        targetSdk 35
+        versionCode providers.environmentVariable('GITHUB_RUN_NUMBER').orElse('1').get().toInteger()
+        versionName providers.environmentVariable('GEOPRZYGODA_VERSION_NAME').orElse('1.0.0').get()
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    buildFeatures {
+        buildConfig true
+    }
+
+    lint {
+        abortOnError true
+        checkReleaseBuilds true
+    }
+}
+
+dependencies {
+    implementation 'androidx.webkit:webkit:1.12.1'
+}
