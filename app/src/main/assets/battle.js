@@ -111,36 +111,41 @@
     lastSaved = game;
     try { localStorage.setItem(key, JSON.stringify(game)); } catch { /* offline storage optional */ }
   }
+  // Color every disconnected piece of a country (including islands).
+  function countryPieces(id) {
+    const primary = $('land-' + id);
+    return primary ? primary.parentElement.querySelectorAll('path.land') : [];
+  }
   function restoreOriginalColors() {
     for (const c of regions) {
-      const shape = $('land-' + c.id);
-      if (!shape) continue;
-      const showFlag = map.classList.contains('flag-fill') && c.code;
-      if (showFlag) shape.style.fill = 'url(#flag-pattern-' + c.id + ')';
-      else shape.style.removeProperty('fill');
-      shape.classList.remove('battle-owned');
+      for (const shape of countryPieces(c.id)) {
+        const showFlag = map.classList.contains('flag-fill') && c.code;
+        if (showFlag) shape.style.fill = 'url(#flag-pattern-' + c.id + ')';
+        else shape.style.removeProperty('fill');
+        shape.classList.remove('battle-owned');
+      }
     }
     map.querySelectorAll('.battle-target-country').forEach(n => n.classList.remove('battle-target-country'));
   }
   function refreshOwnership() {
     if (!game) return;
     for (const c of regions) {
-      const shape = $('land-' + c.id);
-      if (!shape) continue;
       const holder = ownerOf(c.id);
-      const holderCountry = playable.get(holder);
-      const showFlag = map.classList.contains('flag-fill') && holderCountry && holderCountry.code;
-      if (showFlag) shape.style.fill = 'url(#flag-pattern-' + holder + ')';
-      else if (holder !== c.id) {
-        const parent = $('land-' + holder);
-        shape.style.fill = parent ? parent.getAttribute('fill') : '#b7d8a8';
-      } else shape.style.removeProperty('fill');
-      shape.classList.toggle('battle-owned', holder !== c.id);
+      const owner = playable.get(holder);
+      const showFlag = map.classList.contains('flag-fill') && owner && owner.code;
+      for (const shape of countryPieces(c.id)) {
+        if (showFlag) shape.style.fill = 'url(#flag-pattern-' + holder + ')';
+        else if (holder !== c.id) {
+          const parent = $('land-' + holder);
+          shape.style.fill = parent ? parent.getAttribute('fill') : '#b7d8a8';
+        } else shape.style.removeProperty('fill');
+        shape.classList.toggle('battle-owned', holder !== c.id);
+      }
     }
-    for (const node of map.querySelectorAll('.battle-target-country')) node.classList.remove('battle-target-country');
+    map.querySelectorAll('.battle-target-country').forEach(n => n.classList.remove('battle-target-country'));
     if (selectedTarget) {
-      const targetShape = $('land-' + selectedTarget);
-      if (targetShape && targetShape.parentNode) targetShape.parentNode.classList.add('battle-target-country');
+      const target = $('land-' + selectedTarget);
+      if (target && target.parentNode) target.parentNode.classList.add('battle-target-country');
     }
   }
   function countryLabel(id) {
