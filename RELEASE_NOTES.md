@@ -1,11 +1,13 @@
-GeoPrzygoda — flagi jak na mapie i widoczna muzyka 🌍🎵
+GeoPrzygoda – nowy tryb Bitwa o terytoria! ⚔️🏰
 
-- Flagi wypełniają rzeczywiste kształty państw zamiast wyświetlać się jako małe emoji.
-- Pakiet 238 wektorowych flag dołączony offline.
-- Nazwy krajów mają jasny tekst z ciemnym obrysem, żeby można je było przeczytać na flagach.
-- Dolny przycisk 🎵/🎶 pozwala włączyć i wyłączyć delikatną, wyraźniejszą melodię.
-- W ustawieniach dostępna jest regulacja głośności.
-- Usunięto przykład „np. tadzio340” z pola nazwy gracza.
-- Granice i mechanika quizu pozostają bez zmian.
+- W karcie państwa wybierz Rywalizacja → Start: Bitwa o terytoria.
+- Wskaż sąsiedni kraj na mapie lub z listy i rozpocznij bitwę żołnierską.
+- Animowane starcie oddziałów kończy się wynikiem, a zwycięzca może przejąć całe terytorium kraju w grze.
+- Kolory zdobytego terenu zmieniają się na barwy zdobywcy; można zdobywać kolejne sąsiednie tereny.
+- Przycisk Historia zapisuje kolejne bitwy na tym urządzeniu i umożliwia wznowienie gry.
+- Scenariusz „Rzeczpospolita Obojga Narodów”: sojusz Polski i Litwy oraz cel geograficzny oparty na współczesnej mapie.
+- Zachowane mapy, flagi, muzyka, quiz i gra offline.
 
-**Instalacja:** pobierz GeoPrzygoda.apk z najnowszego wydania na Androidzie i zainstaluj.
+Bitwy są fikcyjną grą planszową z losowymi punktami oddziałów, a scenariusz historyczny jest celowo uproszczony. Nie odtwarza prawdziwych konfliktów ani granic historycznych.
+
+**Instalacja:** pobierz GeoPrzygoda.apk z najnowszego wydania i zainstaluj na Androidzie.

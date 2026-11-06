@@ -65,3 +65,12 @@ Kod aplikacji jest na licencji MIT. Dane pochodzą z Natural Earth (domena publi
 - Wszystkie 238 flag SVG są dołączone do APK w katalogu \`app/src/main/assets/flags/\` i działają bez internetu.
 - Na dolnym pasku jest bezpośredni przycisk **🎵/🎶** do włączania i wyłączania łagodnej melodii, a w Ustawieniach pozostaje suwak głośności.
 - Ekran wyboru nazwy nie narzuca już przykładowego nicku w polu.
+
+
+## Bitwa o terytoria i Historia 🏰
+
+Po kliknięciu państwa otwórz **Rywalizacja** i wybierz **Start: Bitwa o terytoria**. Wystarczy wskazać sąsiednie państwo na mapie lub w polu wyboru, a potem nacisnąć **Bitwa żołnierska**. Krótka animacja pokazuje starcie umownych oddziałów. Zwycięstwo zmienia barwy terenu na barwy zwycięskiego państwa. Można zdobywać kolejne tereny, sąsiadujące z posiadanymi.
+
+**Historia** zapisuje przebieg gry lokalnie na telefonie; można wznowić rozgrywkę. W Historii jest również scenariusz **Rzeczpospolita Obojga Narodów**: w uproszczonej zabawie Polska i Litwa zaczynają jako jeden sojusz, a celem jest zdobycie obszarów Białorusi i Ukrainy na współczesnej mapie. Nie jest to historyczna rekonstrukcja granic ani prawdziwa symulacja walk. Podbijamy całe kraje, ponieważ atlas nie zawiera prowincji.
+
+Punkty oddziałów są liczbami wymyślonymi do zabawy; gra nie używa statystyk wojskowych. Wszystkie efekty działają offline, bez dostępu do internetu i bez konta.
