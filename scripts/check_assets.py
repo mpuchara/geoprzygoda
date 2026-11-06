@@ -73,6 +73,16 @@ for code in flag_codes:
 features = (ROOT / 'app/src/main/assets/features.js').read_text(encoding='utf-8')
 assert 'flag-pattern-' in features and 'quick-music' in features, 'New map/audio controls missing'
 assert 'flags/' in features, 'Map flags must be loaded from offline assets'
+assert 'battle.js' in text and 'battle.css' in text, 'Battle resources missing from HTML'
+battle = (ROOT / 'app/src/main/assets/battle.js').read_text(encoding='utf-8')
+for token in ('rival-start-map', 'battle-history-overlay', 'battle-commonwealth', 'battle-target', 'geo-territory-battle-v1'):
+    assert token in battle, f'Missing battle capability: {token}'
+assert (ROOT / 'app/src/main/assets/battle.css').is_file(), 'Missing battle style'
+countries_by_id = {c['id']: c for c in data['countries']}
+assert {'POL', 'LTU', 'BLR', 'UKR'} <= countries_by_id.keys(), 'Historical game scenario needs four countries'
+assert 'LTU' in countries_by_id['POL']['borders'], 'Poland/Lithuania should be neighbors in game atlas'
+assert 'BLR' in countries_by_id['LTU']['borders'] or 'BLR' in countries_by_id['POL']['borders'], 'Commonwealth has no Belarus frontier'
+assert 'UKR' in countries_by_id['POL']['borders'], 'Commonwealth has no Ukraine frontier'
 
 manifest = ET.parse(ROOT / 'app/src/main/AndroidManifest.xml').getroot()
 assert not manifest.findall('uses-permission'), 'Offline game should not request permissions'

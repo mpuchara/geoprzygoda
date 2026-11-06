@@ -1,0 +1,41 @@
+/* Mobile-first animated geography board game */
+.territory-game{position:absolute;bottom:calc(86px + env(safe-area-inset-bottom));left:12px;z-index:12;width:min(385px,calc(100vw - 24px));max-height:min(59dvh,530px);overflow:auto;border-radius:23px;padding:17px 17px 13px;color:#163d40;background:#f4f9f1;box-shadow:0 14px 48px #031d2aa3;border:2px solid #bfdac4;color-scheme:light}
+.battle-head{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:17px}
+.battle-head button{flex-shrink:0;font-size:24px;background:#e2eee0;width:32px;height:32px;border-radius:50%;color:#31554e}
+.battle-title{font-size:12px;font-weight:800;margin-top:8px;line-height:1.4}
+.battle-stats{font-size:11px;color:#608078;line-height:1.5;margin:9px 0 12px}
+.territory-game label{display:block;font-size:11px;font-weight:700;margin-bottom:6px}
+.battle-select{width:100%;min-height:42px;max-width:100%;border-radius:12px;background:white;color:#244b46;border:1px solid #c4d9ca;padding:9px;font-size:12px}
+.battle-actions{display:flex;gap:9px;margin-top:11px}
+.battle-actions button{flex:1;min-width:0;font-size:11px;min-height:43px;padding:10px 8px;border-radius:12px;font-weight:800}
+.battle-primary{background:#2f7157;color:#fff;border-radius:12px;font-weight:800;border:none}
+.battle-secondary{background:#e0eddf;color:#25513f;border-radius:12px;font-weight:800;border:none}
+.battle-message{font-size:11px;font-weight:700;line-height:1.6;margin-top:12px;padding:10px;border-radius:12px;background:#e5f2e5;color:#2d6348}
+.battle-disclaimer{font-size:9px!important;line-height:1.5;color:#6c8980!important;margin:10px 0 0}
+.battlefield{background:linear-gradient(125deg,#e5e8d5,#b9d2b6);border:1px solid #abc7ab;border-radius:14px;padding:13px 10px 9px;margin-top:10px;overflow:hidden}
+.battle-soldiers{display:flex;align-items:center;justify-content:space-between;font-size:24px;min-height:36px;gap:5px}
+.army-left,.army-right{white-space:nowrap;display:inline-block;font-size:20px}
+.army-middle{font-size:23px}
+.battlefield.running .army-left{animation:battle-left 1.55s ease-in-out infinite alternate}
+.battlefield.running .army-right{animation:battle-right 1.55s ease-in-out infinite alternate}
+.battlefield.running .army-middle{animation:battle-clash .32s ease-in-out infinite alternate}
+.battle-balance{text-align:center;font-size:10px;color:#33584e;margin-top:6px;font-weight:800}
+@keyframes battle-left{from{transform:translateX(-12px)}to{transform:translateX(19px)}}
+@keyframes battle-right{from{transform:translateX(12px)}to{transform:translateX(-19px)}}
+@keyframes battle-clash{from{transform:scale(.8) rotate(-15deg)}to{transform:scale(1.25) rotate(15deg)}}
+#world-map .battle-target-country .land{stroke:#fff4ad!important;stroke-width:3!important;stroke-dasharray:5 3;vector-effect:non-scaling-stroke}
+#world-map .land.battle-owned{stroke:#304b37;stroke-width:1.6}
+.rival-start-map{margin-top:8px;background:#1d5f51!important;color:#fff!important}
+.rival-history-button{display:block;width:100%;padding:10px;margin-top:7px;border-radius:12px;background:#e2eddc;color:#244b43;font-size:12px;font-weight:800}
+.battle-history-panel h3{margin:14px 0 5px;font-size:17px}
+.battle-history-panel p{line-height:1.55}
+.battle-history-panel b{color:#fff}
+.battle-history-list{max-height:28dvh;overflow:auto;background:#0f293d;border-radius:14px;padding:8px 12px;margin:12px 0}
+.battle-history-list p{font-size:11px;margin:8px 0}
+.battle-history-list .battle-history-entry{border-bottom:1px solid #ffffff18;padding-bottom:9px}
+.battle-history-list .battle-history-entry:last-child{border:0}
+.battle-history-action{display:block;min-height:43px;width:100%;padding:11px;margin:9px 0}
+.battle-divider{border:0;border-top:1px solid #ffffff2b;margin:20px 0}
+@media(max-width:650px){.territory-game{bottom:calc(78px + env(safe-area-inset-bottom));max-height:53dvh;left:9px;width:calc(100vw - 18px);padding:13px;border-radius:19px}.battle-head{font-size:15px}.battle-stats{font-size:10px;margin:7px 0}.battle-soldiers{font-size:20px}.army-left,.army-right{font-size:18px}.battle-history-list{max-height:24dvh}}
+@media(max-height:500px) and (orientation:landscape){.territory-game{bottom:10px;left:10px;width:325px;max-height:calc(100dvh - 22px)}.battle-history-list{max-height:17dvh}}
+@media(prefers-reduced-motion:reduce){.battlefield.running .army-left,.battlefield.running .army-right,.battlefield.running .army-middle{animation:none}}

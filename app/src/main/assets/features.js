@@ -135,6 +135,7 @@
       if (enabled) path.style.fill = fill;
       else path.style.removeProperty('fill');
     }
+    if (window.GeoPrzygodaBattle && window.GeoPrzygodaBattle.active) window.GeoPrzygodaBattle.refresh();
   }
   const originalLabelMap = labelMap;
   labelMap = function () { originalLabelMap(); renderFlags(); };
@@ -351,6 +352,7 @@
     activeOrigin = id;
     const c = byId.get(id);
     $('rival-first').textContent = 'Pierwszy kraj: ' + c.flag + ' ' + c.n;
+    $('rival-first').dataset.country = id;
     const firstNeighbor = c.borders.find(code => code !== id && [...opponentList.options].some(o => o.value === code));
     opponentList.value = firstNeighbor || (id !== 'POL' ? 'POL' : 'DEU');
     $('rival-disadvantage').value = '0';
