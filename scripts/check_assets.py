@@ -59,6 +59,20 @@ assert poland_path.count('L') >= 250, 'Poland must retain the detailed boundary'
 
 assert 'np. tadzio340' not in text, 'Example username should not be shown'
 
+# Flag patterns must fit mainland France, continental USA and Australia.
+for code, minimum in (('FRA', 3), ('USA', 4), ('AUS', 3)):
+    match = re.search(r'<a href="#info-' + code + r'" class="country-link" data-country="' +
+                      code + r'" aria-label="[^"]+">(.*?)</a>', text, flags=re.S)
+    assert match, f'Missing selectable map shape: {code}'
+    country_html = match.group(1)
+    assert len(re.findall(r'<path class="land(?: flag-fragment)?"', country_html)) >= minimum, (
+        f'{code} map fragments were accidentally merged')
+    assert country_html.count(f'id="land-{code}"') == 1
+features_text = (ROOT / 'app/src/main/assets/features.js').read_text()
+battle_text = (ROOT / 'app/src/main/assets/battle.js').read_text()
+assert "path.parentElement.querySelectorAll('path.land')" in features_text
+assert "function countryPieces(id)" in battle_text
+
 
 # All mapped countries with ISO alpha-2 codes must ship their vector flag.
 flag_dir = ROOT / 'app/src/main/assets/flags'

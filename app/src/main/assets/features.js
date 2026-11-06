@@ -121,7 +121,10 @@
     image.setAttribute('preserveAspectRatio', 'none');
     pattern.append(image);
     flagDefs.append(pattern);
-    flagPaths.push([path, 'url(#' + pattern.id + ')']);
+    // Each disconnected island gets its own flag, scaled to that polygon.
+    for (const piece of path.parentElement.querySelectorAll('path.land')) {
+      flagPaths.push([piece, 'url(#' + pattern.id + ')']);
+    }
   }
   let flagsApplied = null;
   function renderFlags() {

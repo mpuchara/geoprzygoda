@@ -11,6 +11,8 @@ DATABASE = ROOT / 'data/countries.json'
 WORLD_SIZE = 1080
 MAX_LATITUDE = math.degrees(math.atan(math.sinh(math.pi)))
 PALETTE = ['#a8d77e', '#74cdb1', '#edca77', '#9bc9e5', '#bcb1df', '#d8b88b', '#8cc8a3']
+# Parts of these countries are too far apart for one SVG flag pattern.
+SPLIT_FLAG_COUNTRIES = {'FRA', 'USA', 'AUS'}
 
 
 def project(lon, lat):
@@ -92,13 +94,31 @@ def rebuild():
             c['b'] = [round(n, 3) for n in box]
         c['mapped'] = True
         fill = PALETTE[(p['MAPCOLOR7'] - 1) % len(PALETTE)]
-        shape = shapes.setdefault(c['id'], {'paths': [], 'fill': fill})
+        shape = shapes.setdefault(c['id'], {'paths': [], 'parts': [], 'fill': fill})
         shape['paths'].append(d)
+        if c['id'] in SPLIT_FLAG_COUNTRIES:
+            shape['parts'].extend((svg_path([poly]), box) for poly, box in zip(polygons, boxes))
 
     paths = []
     for key, shape in shapes.items():
         name, d, fill = html.escape(by_id[key]['n'], quote=True), ''.join(shape['paths']), shape['fill']
-        paths.append(f'<a href="#info-{key}" class="country-link" data-country="{key}" aria-label="{name}"><path class="land" id="land-{key}" d="{d}" fill="{fill}" fill-rule="evenodd"><title>{name}</title></path></a>')
+        if key not in SPLIT_FLAG_COUNTRIES:
+            paths.append(f'<a href="#info-{key}" class="country-link" data-country="{key}" aria-label="{name}"><path class="land" id="land-{key}" d="{d}" fill="{fill}" fill-rule="evenodd"><title>{name}</title></path></a>')
+            continue
+        parts = shape['parts']
+        c = by_id[key]
+        def part_rank(part):
+            b = part[1]
+            return (b[0] <= c['x'] <= b[2] and b[1] <= c['y'] <= b[3],
+                    (b[2] - b[0]) * (b[3] - b[1]))
+        primary = max(range(len(parts)), key=lambda i: part_rank(parts[i]))
+        ordered = [parts[primary]] + [part for i, part in enumerate(parts) if i != primary]
+        components = []
+        for i, (part_d, _) in enumerate(ordered):
+            id_attr = f' id="land-{key}"' if i == 0 else ''
+            class_attr = 'land' if i == 0 else 'land flag-fragment'
+            components.append(f'<path class="{class_attr}"{id_attr} d="{part_d}" fill="{fill}" fill-rule="evenodd"><title>{name}</title></path>')
+        paths.append(f'<a href="#info-{key}" class="country-link" data-country="{key}" aria-label="{name}">{"".join(components)}</a>')
 
     markers, labels = [], []
     for c in countries:

@@ -74,3 +74,7 @@ Po kliknięciu państwa otwórz **Rywalizacja** i wybierz **Start: Bitwa o teryt
 **Historia** zapisuje przebieg gry lokalnie na telefonie; można wznowić rozgrywkę. W Historii jest również scenariusz **Rzeczpospolita Obojga Narodów**: w uproszczonej zabawie Polska i Litwa zaczynają jako jeden sojusz, a celem jest zdobycie obszarów Białorusi i Ukrainy na współczesnej mapie. Nie jest to historyczna rekonstrukcja granic ani prawdziwa symulacja walk. Podbijamy całe kraje, ponieważ atlas nie zawiera prowincji.
 
 Punkty oddziałów są liczbami wymyślonymi do zabawy; gra nie używa statystyk wojskowych. Wszystkie efekty działają offline, bez dostępu do internetu i bez konta.
+
+## Flagi Francji, Stanów Zjednoczonych i Australii
+
+Każda geograficznie oddzielona część tych państw ma teraz własne dopasowanie flagi w swoich dokładnych granicach. To poprawia wygląd Francji europejskiej (niezależnie od Gujany Francuskiej), kontynentalnych USA (niezależnie od Alaski i Hawajów), a także kontynentalnej Australii (niezależnie od Tasmanii). Wszystkie części państwa nadal działają wspólnie w trybie podbojów.
