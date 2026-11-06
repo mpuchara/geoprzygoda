@@ -1,10 +1,11 @@
-GeoPrzygoda – przyjemniejsze odkrywanie świata 🌍
+GeoPrzygoda — flagi jak na mapie i widoczna muzyka 🌍🎵
 
-- Nowe ustawienia ⚙: flagi na państwach, spokojne dźwięki tła i regulacja głośności.
-- Więcej ciekawostek w karcie każdego kraju: sąsiedzi, kod kraju i porównanie powierzchni z Polską.
-- Rywalizacja 🏁: porównywanie dwóch krajów z opcjonalnymi utrudnieniami.
-- Rywalizacja jest fikcyjną grą geograficzną; nie przedstawia ani nie ocenia liczebności armii.
-- Poprzednie poprawki granic i proporcji mapy pozostały bez zmian.
-- Wszystko działa offline, bez reklam i bez dodatkowych uprawnień.
+- Flagi wypełniają rzeczywiste kształty państw zamiast wyświetlać się jako małe emoji.
+- Pakiet 238 wektorowych flag dołączony offline.
+- Nazwy krajów mają jasny tekst z ciemnym obrysem, żeby można je było przeczytać na flagach.
+- Dolny przycisk 🎵/🎶 pozwala włączyć i wyłączyć delikatną, wyraźniejszą melodię.
+- W ustawieniach dostępna jest regulacja głośności.
+- Usunięto przykład „np. tadzio340” z pola nazwy gracza.
+- Granice i mechanika quizu pozostają bez zmian.
 
-**Instalacja:** pobierz **GeoPrzygoda.apk** z najnowszego wydania, otwórz na Androidzie i wybierz **Zainstaluj**.
+**Instalacja:** pobierz GeoPrzygoda.apk z najnowszego wydania na Androidzie i zainstaluj.

@@ -14,7 +14,7 @@
   settings.innerHTML =
     '<div class="extras-panel"><button class="close-overlay extras-close" data-extra-close="settings-overlay" aria-label="Zamknij ustawienia">×</button>' +
     '<h2 id="settings-title">⚙️ Ustawienia</h2><p>Spraw, żeby odkrywanie świata było takie, jak lubisz.</p>' +
-    '<label class="extra-setting"><span><strong>🏳️ Flagi na mapie</strong><small>Pokazuj flagi na większych krajach. Przybliż mapę, żeby zobaczyć więcej.</small></span><input id="setting-flags" type="checkbox"></label>' +
+    '<label class="extra-setting"><span><strong>🏳️ Flagi na mapie</strong><small>Kolory flag wypełniają kształty państw, tak jak na prawdziwej mapie.</small></span><input id="setting-flags" type="checkbox"></label>' +
     '<label class="extra-setting"><span><strong>🎵 Spokojne dźwięki</strong><small>Delikatna, oryginalna melodia tworzona na telefonie. Działa offline.</small></span><input id="setting-music" type="checkbox"></label>' +
     '<label class="extra-setting extra-volume"><span><strong>🔉 Głośność</strong><small>Wybierz głośność muzyki.</small></span><input id="setting-volume" type="range" min="0" max="100" step="5" value="35" aria-label="Głośność muzyki"></label>' +
     '<p class="extra-note">Ustawienia zapisują się tylko na tym urządzeniu.</p></div>';
@@ -95,42 +95,45 @@
     return nativeBack();
   };
 
-  // Flags use SVG text at known map coordinates, without external images.
-  const flagLayer = document.createElementNS(ns, 'g');
-  flagLayer.id = 'flag-layer';
-  flagLayer.setAttribute('aria-hidden', 'true');
-  flagLayer.style.pointerEvents = 'none';
-  map.append(flagLayer);
-  const flagNodes = [];
+  // Each flag is a bundled SVG, stretched across the country's bounding box and
+  // clipped by the original Natural Earth polygon (not an emoji label).
+  const flagDefs = document.createElementNS(ns, 'defs');
+  flagDefs.id = 'country-flag-patterns';
+  map.insertBefore(flagDefs, map.firstChild);
+  const flagPaths = [];
   for (const c of COUNTRY_DATA) {
-    if (!c.mapped || !c.flag || c.flag === '🌍') continue;
-    const node = document.createElementNS(ns, 'text');
-    node.textContent = c.flag;
-    node.setAttribute('x', c.x);
-    node.setAttribute('y', c.y);
-    node.setAttribute('text-anchor', 'middle');
-    node.setAttribute('dominant-baseline', 'middle');
-    node.style.pointerEvents = 'none';
-    flagLayer.append(node);
-    flagNodes.push([c, node]);
+    const path = $('land-' + c.id);
+    if (!c.mapped || !path || !/^[A-Z]{2}$/.test(c.code)) continue;
+    const pattern = document.createElementNS(ns, 'pattern');
+    pattern.id = 'flag-pattern-' + c.id;
+    pattern.setAttribute('patternUnits', 'objectBoundingBox');
+    pattern.setAttribute('patternContentUnits', 'objectBoundingBox');
+    pattern.setAttribute('width', '1');
+    pattern.setAttribute('height', '1');
+    const image = document.createElementNS(ns, 'image');
+    const url = 'flags/' + c.code.toLowerCase() + '.svg';
+    image.setAttribute('href', url);
+    image.setAttributeNS('http://www.w3.org/1999/xlink', 'href', url);
+    image.setAttribute('x', '0');
+    image.setAttribute('y', '0');
+    image.setAttribute('width', '1');
+    image.setAttribute('height', '1');
+    image.setAttribute('preserveAspectRatio', 'none');
+    pattern.append(image);
+    flagDefs.append(pattern);
+    flagPaths.push([path, 'url(#' + pattern.id + ')']);
   }
+  let flagsApplied = null;
   function renderFlags() {
     const enabled = flagsEnabled && mode !== 'quiz';
-    flagLayer.style.display = enabled ? '' : 'none';
-    const labels = $('country-labels');
-    if (labels) labels.style.display = enabled ? 'none' : '';
-    if (!enabled) return;
-    const rect = map.getBoundingClientRect();
-    const scale = Math.min(rect.width / view.w, rect.height / view.h);
-    if (!Number.isFinite(scale) || scale <= 0) return;
-    const size = Math.max(1, 22 / scale);
-    for (const [c, node] of flagNodes) {
-      const visible = c.x >= view.x && c.x <= view.x + view.w &&
-        c.y >= view.y && c.y <= view.y + view.h &&
-        (((c.b[2] - c.b[0]) * scale >= 25 &&
-          (c.b[3] - c.b[1]) * scale >= 18) || selected === c.id);
-      node.style.display = visible ? '' : 'none';
-      if (visible) node.setAttribute('font-size', size);
+    if (enabled === flagsApplied) return;
+    flagsApplied = enabled;
+    map.classList.toggle('flag-fill', enabled);
+    for (const [path, fill] of flagPaths) {
+      // An inline fill keeps the selected country showing its flag; stroke
+      // highlights the selection. In quiz, restore the original palette.
+      if (enabled) path.style.fill = fill;
+      else path.style.removeProperty('fill');
     }
   }
   const originalLabelMap = labelMap;
@@ -142,11 +145,61 @@
     renderFlags();
   });
 
-  // Soft original ambient chord: generated locally with the Web Audio API.
+  // A gentle original repeating melody, audible on a phone speaker.
+  // Audio starts only after tapping music or the welcome-screen button.
   const musicToggle = $('setting-music');
   const volume = $('setting-volume');
   musicToggle.checked = readStore(musicKey) === 'on';
   volume.value = readStore(volumeKey) || '35';
+  const musicButton = document.createElement('button');
+  musicButton.type = 'button';
+  musicButton.id = 'quick-music';
+  musicButton.className = 'dock-info music-quick-toggle';
+  settingsButton.before(musicButton);
+  const melody = [392, 440, 523.25, 0, 493.88, 440, 392, 329.63,
+                  349.23, 392, 440, 0, 392, 329.63, 293.66, 0];
+  let sequencer = null, noteIndex = 0, nextNoteTime = 0;
+  function updateMusicButton() {
+    const on = musicToggle.checked;
+    musicButton.textContent = on ? '🎶' : '🎵';
+    musicButton.classList.toggle('music-active', on);
+    musicButton.setAttribute('aria-pressed', String(on));
+    musicButton.setAttribute('aria-label', on ? 'Wyłącz muzykę' : 'Włącz muzykę');
+    musicButton.title = on ? 'Muzyka włączona — dotknij, aby wyłączyć' : 'Włącz spokojną muzykę';
+  }
+  function tone(frequency, when, duration = 0.50, strength = 0.12) {
+    const oscillator = audio.createOscillator();
+    const gain = audio.createGain();
+    oscillator.type = 'sine';
+    oscillator.frequency.setValueAtTime(frequency, when);
+    gain.gain.setValueAtTime(0.0001, when);
+    gain.gain.exponentialRampToValueAtTime(strength, when + 0.045);
+    gain.gain.exponentialRampToValueAtTime(0.0001, when + duration);
+    oscillator.connect(gain);
+    gain.connect(master);
+    oscillator.start(when);
+    oscillator.stop(when + duration + 0.05);
+  }
+  function scheduleMelody() {
+    if (!audio || !musicToggle.checked || document.hidden) return;
+    while (nextNoteTime < audio.currentTime + 0.7) {
+      const frequency = melody[noteIndex % melody.length];
+      if (frequency) tone(frequency, nextNoteTime, 0.48, 0.16);
+      if (noteIndex % 4 === 0) tone(noteIndex % 8 ? 174.61 : 196, nextNoteTime, 1.8, 0.055);
+      noteIndex++;
+      nextNoteTime += 0.53;
+    }
+  }
+  function stopMusic() {
+    if (sequencer !== null) {
+      clearInterval(sequencer);
+      sequencer = null;
+    }
+    if (audio) {
+      const result = audio.suspend();
+      if (result && result.catch) result.catch(() => {});
+    }
+  }
   function playMusic() {
     if (!musicToggle.checked || document.hidden) return;
     try {
@@ -156,43 +209,48 @@
         audio = new Context();
         master = audio.createGain();
         master.connect(audio.destination);
-        [130.81, 164.81, 196, 261.63].forEach((hz, index) => {
-          const oscillator = audio.createOscillator();
-          const gain = audio.createGain();
-          oscillator.type = index === 1 ? 'triangle' : 'sine';
-          oscillator.frequency.value = hz;
-          gain.gain.value = index === 0 ? 0.09 : 0.028;
-          oscillator.connect(gain);
-          gain.connect(master);
-          oscillator.start();
-        });
       }
-      master.gain.setTargetAtTime(Number(volume.value) / 100 * 0.18, audio.currentTime, 0.1);
+      master.gain.setTargetAtTime(Number(volume.value) / 100 * 0.45, audio.currentTime, 0.12);
       const resumed = audio.resume();
-      if (resumed && resumed.catch) resumed.catch(() => {});
+      if (resumed && resumed.catch) {
+        resumed.catch(() => announce('Dotknij 🎵, aby uruchomić muzykę.'));
+      }
+      if (sequencer === null) {
+        nextNoteTime = audio.currentTime + 0.07;
+        scheduleMelody();
+        sequencer = setInterval(scheduleMelody, 180);
+      }
     } catch (error) {
       musicToggle.checked = false;
       writeStore(musicKey, 'off');
-      announce('Ten telefon nie obsługuje muzyki w grze.');
+      updateMusicButton();
+      stopMusic();
+      announce('Na tym telefonie nie udało się uruchomić dźwięku.');
     }
   }
-  musicToggle.addEventListener('change', () => {
-    writeStore(musicKey, musicToggle.checked ? 'on' : 'off');
-    if (musicToggle.checked) playMusic();
-    else if (audio) audio.suspend();
-  });
+  function setMusic(on) {
+    musicToggle.checked = on;
+    writeStore(musicKey, on ? 'on' : 'off');
+    updateMusicButton();
+    if (on) playMusic();
+    else stopMusic();
+  }
+  musicButton.addEventListener('click', () => setMusic(!musicToggle.checked));
+  musicToggle.addEventListener('change', () => setMusic(musicToggle.checked));
   volume.addEventListener('input', () => {
     writeStore(volumeKey, volume.value);
-    if (audio && master) master.gain.setTargetAtTime(Number(volume.value) / 100 * 0.18, audio.currentTime, 0.08);
+    if (audio && master) {
+      master.gain.setTargetAtTime(Number(volume.value) / 100 * 0.45, audio.currentTime, 0.1);
+    }
   });
   document.addEventListener('visibilitychange', () => {
-    if (!audio) return;
-    if (document.hidden || !musicToggle.checked) audio.suspend();
-    else playMusic();
+    if (document.hidden) stopMusic();
+    else if (musicToggle.checked) playMusic();
   });
-  for (const id of ['submit-name', 'skip-name']) $(id).addEventListener('click', () => {
-    if (musicToggle.checked) playMusic();
-  });
+  for (const id of ['submit-name', 'skip-name']) {
+    $(id).addEventListener('click', () => { if (musicToggle.checked) playMusic(); });
+  }
+  updateMusicButton();
 
   // The atlas already includes borders, area, independence and region; show them.
   const independentByArea = COUNTRY_DATA.filter(c => c.independent && c.area > 0)
