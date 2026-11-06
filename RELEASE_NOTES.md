@@ -1,9 +1,9 @@
-Pierwsza instalowana aplikacja GeoPrzygoda na Androida 🌍
+Poprawiona mapa GeoPrzygody na Androida 🌍
 
-- Animowany ekran startowy z własną nazwą użytkownika oraz przyciskami Wyślij i Pomiń.
-- Mapa świata na cały ekran z przesuwaniem i powiększaniem palcami.
-- Flagi, polskie opisy i informacje o państwach.
-- Wyszukiwarka i quiz z podpowiedziami.
+- Naturalne proporcje krajów: Polska nie jest rozciągnięta na boki.
+- Dokładniejsze granice państw i wyraźniejszy obrys.
+- Trochę mniejsza mapa świata i spokojniejsze zbliżenie po wybraniu kraju.
+- Animowany start, wyszukiwarka, opisy i quiz.
 - Mapa oraz opisy działają bez internetu.
 
 **Instalacja:** pobierz **GeoPrzygoda.apk**, otwórz plik na telefonie i wybierz **Zainstaluj**.

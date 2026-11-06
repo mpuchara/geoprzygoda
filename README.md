@@ -21,6 +21,7 @@ Wymagany Android 8.0 lub nowszy. Aplikacja jest przeznaczona między innymi do t
 - Mapa świata wsuwa się z prawej strony i zajmuje ekran aplikacji.
 - Dotknięcie państwa pokazuje flagę, opis, stolicę i inne informacje.
 - Mapę można przesuwać i powiększać dwoma palcami. Małe państwa można też znaleźć w wyszukiwarce.
+- Dokładniejsze granice Natural Earth 1:50m i odwzorowanie Merkatora zachowują naturalne proporcje Polski. Widok świata i zbliżenie kraju mają większy margines.
 - Quiz polega na wskazywaniu krajów na mapie. Dostępne są podpowiedzi i kolejne próby, bez limitu czasu.
 - Przycisk lub gest Wstecz zamyka opis, wyszukiwanie albo pomoc przed wyjściem z aplikacji.
 
@@ -42,6 +43,8 @@ GitHub Actions automatycznie buduje projekt po zmianach w `main`, uruchamia Andr
 - `app/src/main/assets/index.html` — kompletna gra, mapa i opisy.
 - `app/src/main/java/pl/mpuchara/geoprzygoda/MainActivity.java` — pełnoekranowa aplikacja na Androida.
 - `data/countries.json` — wykorzystany zestaw informacji geograficznych.
+- `data/world-50m.json` — dołączone granice Natural Earth 1:50m (domena publiczna).
+- `scripts/build_map.py` — odtwarzanie mapy i wszystkich współrzędnych poleceniem `python3 scripts/build_map.py`, bez pobierania danych.
 - `.github/workflows/android.yml` — budowanie i udostępnianie APK.
 
 Gra jest dołączona do APK i ładowana lokalnie przez AndroidX WebViewAssetLoader. Manifest nie żąda dostępu do internetu, lokalizacji, aparatu ani kontaktów. Linki do źródeł otwierają się w zewnętrznej przeglądarce.

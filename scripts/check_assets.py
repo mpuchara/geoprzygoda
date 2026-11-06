@@ -48,6 +48,14 @@ data = json.loads((ROOT / 'data/countries.json').read_text(encoding='utf-8'))
 ids = {country['id'] for country in data['countries']}
 assert parser.country_ids <= ids, 'Map and data export disagree'
 assert data['license_url'] == 'https://opendatacommons.org/licenses/odbl/1-0/'
+assert data['projection'] == 'Mercator', 'Country proportions must use the corrected projection'
+assert 'preserveAspectRatio="xMidYMid meet"' in text, 'The map must keep its proportions on all screens'
+assert sum(c['mapped'] for c in data['countries']) >= 230, 'Detailed country boundaries are missing'
+poland = next(c for c in data['countries'] if c['id'] == 'POL')
+west, north, east, south = poland['b']
+assert 1.0 < (east - west) / (south - north) < 1.2, 'Poland is stretched sideways again'
+poland_path = re.search(r'id="land-POL" d="([^"]+)"', text)[1]
+assert poland_path.count('L') >= 250, 'Poland must retain the detailed boundary'
 
 manifest = ET.parse(ROOT / 'app/src/main/AndroidManifest.xml').getroot()
 assert not manifest.findall('uses-permission'), 'Offline game should not request permissions'

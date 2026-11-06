@@ -2,10 +2,11 @@
 
 Kod aplikacji GeoPrzygoda: MIT, zobacz `LICENSE`.
 
-Mapa: Natural Earth, domena publiczna. Granice i geometria są uproszczone; drobne państwa i terytoria są oznaczone znacznikami.
+Mapa: Natural Earth 1:50m, v5.1.1, domena publiczna. Granice i geometria są uproszczone; drobne państwa i terytoria są oznaczone znacznikami. Odwzorowanie Merkatora zachowuje lokalne proporcje kształtów; obszary przy biegunach są przycięte. Plik `data/world-50m.json` zawiera współrzędne i wybrane właściwości źródła, bez upraszczania wierzchołków.
 
 - https://www.naturalearthdata.com/about/terms-of-use/
 - https://github.com/nvkelso/natural-earth-vector
+- https://github.com/nvkelso/natural-earth-vector/blob/9380cca83db5f9aef52d5e762765100745f84b27/geojson/ne_50m_admin_0_countries.geojson
 
 Informacje geograficzne i polskie nazwy: mledoze/countries, ODC Open Database License 1.0. Wykorzystany i opracowany zestaw jest dostępny w `data/countries.json`, również na ODbL 1.0. Zmiany obejmują wybór pól, polskie opisy, część polskich nazw stolic i punktów na mapie. Zestaw jest edukacyjnym zapisem danych, bez aktualizacji przez internet.
 
