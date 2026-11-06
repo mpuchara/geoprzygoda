@@ -18,6 +18,8 @@
   let fighting = false;
   let selectedTarget = null;
   let battleTimer = null;
+  let advanceFrame = null;
+  let advanceScene = null;
   let historyFocus = null;
   let lastSaved = null;
   try {
@@ -35,7 +37,9 @@
     '<label for="battle-target">Sąsiedni teren do zdobycia</label><select id="battle-target" class="battle-select"></select>' +
     '<div id="battlefield" class="battlefield hidden" role="status" aria-live="polite">' +
     '<div class="battle-soldiers"><span class="army-left">🪖 🛡️ 🪖</span><span class="army-middle">⚔️</span><span class="army-right">🪖 🛡️ 🪖</span></div>' +
-    '<div id="battle-balance" class="battle-balance"></div></div>' +
+    '<div id="battle-balance" class="battle-balance"></div>' +
+    '<div class="battle-progress-caption"><span id="battle-stage">Przygotowanie</span><strong id="battle-progress-label">0%</strong></div>' +
+    '<div id="battle-progress" class="battle-progress-track" role="progressbar" aria-label="Postęp zdobywania terenu" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="battle-conquest-fill"></span></div></div>' +
     '<div id="battle-message" class="battle-message" aria-live="polite">Wybierz sąsiada i rozpocznij bitwę!</div>' +
     '<div class="battle-actions"><button id="battle-attack" class="battle-primary">⚔️ Bitwa żołnierska</button>' +
     '<button id="battle-history" class="battle-secondary">📜 Historia</button></div>' +
@@ -115,6 +119,128 @@
   function countryPieces(id) {
     const primary = $('land-' + id);
     return primary ? primary.parentElement.querySelectorAll('path.land') : [];
+  }
+  // The front line is drawn directly on the offline SVG map, not over a screenshot.
+  // All changes remain temporary until the fictional battle is decided.
+  function clearAdvance() {
+    if (advanceFrame !== null) cancelAnimationFrame(advanceFrame);
+    advanceFrame = null;
+    if (!advanceScene) return;
+    advanceScene.host.classList.remove('battle-attacking');
+    advanceScene.ink.remove();
+    advanceScene.front.remove();
+    advanceScene.wipe.remove();
+    advanceScene.outline.remove();
+    advanceScene = null;
+  }
+  function setAdvanceProgress(fraction) {
+    const progress = Math.max(0, Math.min(1, fraction));
+    const percent = Math.round(progress * 100);
+    $('battle-conquest-fill').style.width = percent + '%';
+    $('battle-progress-label').textContent = percent + '%';
+    $('battle-progress').setAttribute('aria-valuenow', String(percent));
+    if (!advanceScene) return;
+    const { box, reverse, rect, line } = advanceScene;
+    const width = Math.max(0.01, box.width * progress);
+    const x = reverse ? box.x + box.width - width : box.x;
+    const frontX = reverse ? x : x + width;
+    rect.setAttribute('x', String(x));
+    rect.setAttribute('width', String(width));
+    line.setAttribute('x1', String(frontX));
+    line.setAttribute('x2', String(frontX));
+  }
+  function createAdvance(targetId) {
+    clearAdvance();
+    const primary = $('land-' + targetId);
+    if (!primary || !primary.ownerSVGElement) return;
+    const host = primary.parentElement;
+    const paths = [...countryPieces(targetId)];
+    if (!paths.length) return;
+    let box;
+    try { box = host.getBBox(); } catch { return; }
+    if (!box || box.width <= 0 || box.height <= 0) return;
+    const svg = primary.ownerSVGElement;
+    const ns = 'http://www.w3.org/2000/svg';
+    const make = name => document.createElementNS(ns, name);
+    let defs = svg.querySelector('defs');
+    if (!defs) {
+      defs = make('defs');
+      svg.insertBefore(defs, svg.firstChild);
+    }
+    const wipe = make('clipPath');
+    wipe.id = 'battle-advance-wipe';
+    wipe.setAttribute('clipPathUnits', 'userSpaceOnUse');
+    const rect = make('rect');
+    rect.setAttribute('y', String(box.y - 1));
+    rect.setAttribute('height', String(box.height + 2));
+    wipe.append(rect);
+    defs.append(wipe);
+    const outline = make('clipPath');
+    outline.id = 'battle-advance-outline';
+    outline.setAttribute('clipPathUnits', 'userSpaceOnUse');
+    const ink = make('g');
+    ink.classList.add('battle-advance-overlay');
+    ink.setAttribute('clip-path', 'url(#battle-advance-wipe)');
+    const attackerShape = $('land-' + game.player);
+    const fill = map.classList.contains('flag-fill')
+      ? 'url(#flag-pattern-' + game.player + ')'
+      : (attackerShape && attackerShape.getAttribute('fill')) || '#77cfa3';
+    for (const path of paths) {
+      const stencil = path.cloneNode(false);
+      stencil.removeAttribute('id');
+      stencil.removeAttribute('class');
+      stencil.removeAttribute('style');
+      outline.append(stencil);
+      const colored = path.cloneNode(false);
+      colored.removeAttribute('id');
+      colored.removeAttribute('class');
+      colored.removeAttribute('style');
+      colored.setAttribute('fill', fill);
+      colored.setAttribute('stroke', 'none');
+      ink.append(colored);
+    }
+    defs.append(outline);
+    const front = make('line');
+    front.classList.add('battle-front-line');
+    front.setAttribute('y1', String(box.y - 1));
+    front.setAttribute('y2', String(box.y + box.height + 1));
+    front.setAttribute('clip-path', 'url(#battle-advance-outline)');
+    const targetCenter = box.x + box.width / 2;
+    // Advance from the closest already-owned territory, including captured land.
+    let nearest = Infinity;
+    let reverse = false;
+    for (const owned of landsOf(game.player)) {
+      const node = $('land-' + owned.id);
+      if (!node) continue;
+      const otherBox = node.parentElement.getBBox();
+      const center = otherBox.x + otherBox.width / 2;
+      const distance = Math.abs(center - targetCenter);
+      if (distance < nearest) { nearest = distance; reverse = center > targetCenter; }
+    }
+    host.append(ink, front);
+    host.classList.add('battle-attacking');
+    advanceScene = { host, ink, front, wipe, outline, rect, line: front, box, reverse };
+    setAdvanceProgress(0);
+  }
+  function playAdvance(targetId, won, duration) {
+    createAdvance(targetId);
+    const startAt = performance.now();
+    const stage = $('battle-stage');
+    stage.textContent = '⚡ Linia frontu';
+    if (reduced) {
+      setAdvanceProgress(won ? 1 : 0);
+      return;
+    }
+    function frame(now) {
+      const t = Math.max(0, Math.min(1, (now - startAt) / duration));
+      const progress = won ? t : (t < 0.60 ? (t / 0.60) * 0.72 : 0.72 * (1 - (t - 0.60) / 0.40));
+      setAdvanceProgress(progress);
+      stage.textContent = won ? '🏳️ Zdobywanie terenu' :
+        (t < 0.60 ? '⚔️ Trwa natarcie' : '🛡️ Obrona odpycha atak');
+      if (t < 1 && fighting && game) advanceFrame = requestAnimationFrame(frame);
+      else advanceFrame = null;
+    }
+    advanceFrame = requestAnimationFrame(frame);
   }
   function restoreOriginalColors() {
     for (const c of regions) {
@@ -196,6 +322,7 @@
   function stop() {
     if (battleTimer !== null) clearTimeout(battleTimer);
     battleTimer = null;
+    clearAdvance();
     fighting = false;
     if (game) save();
     game = null;
@@ -286,11 +413,16 @@
       ' pkt ⚔️ ' + defenderRoll + ' pkt ' + defender.flag;
     $('battle-message').textContent = 'Trwa bitwa o ' + defender.n + '...';
     focusCountry(defenderId);
+    const duration = reduced ? 250 : 3200;
+    playAdvance(defenderId, won, duration);
     battleTimer = setTimeout(() => {
       if (!game) return;
       battleTimer = null;
+      setAdvanceProgress(won ? 1 : 0);
+      clearAdvance();
       fighting = false;
       field.classList.remove('running');
+      $('battle-stage').textContent = won ? '🏆 Teren zdobyty!' : '🛡️ Obrona zwyciężyła';
       game.round += 1;
       if (won) {
         game.owners[defenderId] = game.player;
@@ -303,7 +435,7 @@
              ' (' + defenderRoll + ':' + attackerRoll + ').');
       }
       updatePanel(won ? null : defenderId);
-    }, reduced ? 250 : 2100);
+    }, duration);
   }
   function renderHistory() {
     const list = $('battle-history-list');
