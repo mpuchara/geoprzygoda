@@ -39,3 +39,16 @@
 @media(max-width:650px){.territory-game{bottom:calc(78px + env(safe-area-inset-bottom));max-height:53dvh;left:9px;width:calc(100vw - 18px);padding:13px;border-radius:19px}.battle-head{font-size:15px}.battle-stats{font-size:10px;margin:7px 0}.battle-soldiers{font-size:20px}.army-left,.army-right{font-size:18px}.battle-history-list{max-height:24dvh}}
 @media(max-height:500px) and (orientation:landscape){.territory-game{bottom:10px;left:10px;width:325px;max-height:calc(100dvh - 22px)}.battle-history-list{max-height:17dvh}}
 @media(prefers-reduced-motion:reduce){.battlefield.running .army-left,.battlefield.running .army-right,.battlefield.running .army-middle{animation:none}}
+
+
+/* Expanding, map-clipped conquest front, inspired by gradual border changes. */
+#world-map .battle-advance-overlay,
+#world-map .battle-front-line{pointer-events:none}
+#world-map .battle-front-line{stroke:#fffbd1;stroke-width:3.4;stroke-dasharray:6 3;vector-effect:non-scaling-stroke;filter:drop-shadow(0 0 2px #ffda49)}
+#world-map .battle-attacking .land{stroke:#ffeb88!important;stroke-width:2.6!important;stroke-dasharray:5 4;vector-effect:non-scaling-stroke;animation:battle-front-dashes .5s linear infinite}
+@keyframes battle-front-dashes{to{stroke-dashoffset:-18}}
+.battle-progress-caption{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:10px 1px 5px;font-size:11px;font-weight:800;color:#2b5447}
+.battle-progress-caption strong{font-size:13px;font-variant-numeric:tabular-nums}
+.battle-progress-track{height:13px;border-radius:99px;background:#e7e9d0;border:1px solid #a3baa7;overflow:hidden}
+.battle-progress-track span{display:block;width:0;height:100%;border-radius:99px;background:linear-gradient(90deg,#58ad83,#b6db69);transition:none}
+@media(prefers-reduced-motion:reduce){#world-map .battle-attacking .land{animation:none}}
