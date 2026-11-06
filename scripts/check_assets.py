@@ -57,6 +57,23 @@ assert 1.0 < (east - west) / (south - north) < 1.2, 'Poland is stretched sideway
 poland_path = re.search(r'id="land-POL" d="([^"]+)"', text)[1]
 assert poland_path.count('L') >= 250, 'Poland must retain the detailed boundary'
 
+assert 'np. tadzio340' not in text, 'Example username should not be shown'
+
+
+# All mapped countries with ISO alpha-2 codes must ship their vector flag.
+flag_dir = ROOT / 'app/src/main/assets/flags'
+flag_codes = {country['code'].lower() for country in data['countries']
+              if country['mapped'] and len(country['code']) == 2}
+assert len(flag_codes) >= 230, 'Unexpected number of mapped flags'
+for code in flag_codes:
+    file = flag_dir / f'{code}.svg'
+    assert file.is_file(), f'Country flag is missing: {code}'
+    svg = ET.parse(file).getroot()
+    assert svg.tag.endswith('svg'), f'Invalid flag SVG: {code}'
+features = (ROOT / 'app/src/main/assets/features.js').read_text(encoding='utf-8')
+assert 'flag-pattern-' in features and 'quick-music' in features, 'New map/audio controls missing'
+assert 'flags/' in features, 'Map flags must be loaded from offline assets'
+
 manifest = ET.parse(ROOT / 'app/src/main/AndroidManifest.xml').getroot()
 assert not manifest.findall('uses-permission'), 'Offline game should not request permissions'
 for file in (ROOT / 'app/src/main/res').rglob('*.xml'):

@@ -20,3 +20,9 @@ Gradle Wrapper: projekt Gradle, Apache License 2.0. Skrypty startowe zachowują 
 
 - https://github.com/gradle/gradle
 - https://www.apache.org/licenses/LICENSE-2.0
+
+
+## Flagi państw
+Flagi SVG 4x3: [lipis/flag-icons](https://github.com/lipis/flag-icons), MIT License.
+Copyright (c) 2013 Panayiotis Lipiridis. Pełne warunki w \`LICENSES/FLAG_ICONS_MIT.md\`.
+Są dołączone lokalnie do aplikacji, bez połączenia internetowego.

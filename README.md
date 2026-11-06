@@ -58,3 +58,10 @@ Kod aplikacji jest na licencji MIT. Dane pochodzą z Natural Earth (domena publi
 - W opisach krajów przycisk **Więcej ciekawostek** pokazuje dodatkowe informacje z atlasu, m.in. region, status, kod kraju, liczbę sąsiadów i porównanie wielkości z Polską.
 - **Rywalizacja 🏁** to fikcyjna gra porównująca powierzchnię i liczbę sąsiadów. Zawiera wybór drugiego kraju oraz utrudnień. Nie używa danych wojskowych i nie przewiduje rzeczywistych konfliktów.
 - Nowe elementy mieszczą się w osobnych plikach \`features.js\` i \`features.css\`; mapa pozostaje generowana bez zmian przez \`scripts/build_map.py\`.
+
+## Flagi w kształtach państw i muzyka
+
+- Po włączeniu flag ich barwy wypełniają dokładne granice krajów na mapie, zamiast pojawiać się jako małe emoji. Nazwy państw są czytelne na flagach. W quizie wraca zwykłe kolorowanie odpowiedzi.
+- Wszystkie 238 flag SVG są dołączone do APK w katalogu \`app/src/main/assets/flags/\` i działają bez internetu.
+- Na dolnym pasku jest bezpośredni przycisk **🎵/🎶** do włączania i wyłączania łagodnej melodii, a w Ustawieniach pozostaje suwak głośności.
+- Ekran wyboru nazwy nie narzuca już przykładowego nicku w polu.
