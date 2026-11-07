@@ -93,6 +93,9 @@ for code in flag_codes:
     assert file.is_file(), f'Country flag is missing: {code}'
     svg = ET.parse(file).getroot()
     assert svg.tag.endswith('svg'), f'Invalid flag SVG: {code}'
+    texture = ROOT / 'app/src/main/assets/flag-textures' / f'{code}.png'
+    assert texture.is_file(), f'Android WebView PNG texture missing: {code}'
+    assert texture.read_bytes()[:8] == b'\x89PNG\r\n\x1a\n', f'Invalid WebView texture: {code}'
 features = (ROOT / 'app/src/main/assets/features.js').read_text(encoding='utf-8')
 assert 'flag-pattern-' in features and 'quick-music' in features, 'New map/audio controls missing'
 assert 'stripeOnlyCountries' in features, 'Stripe-only flags classification missing'
@@ -105,10 +108,12 @@ assert "patternContentUnits', 'objectBoundingBox'" not in features
 assert "image.setAttribute('preserveAspectRatio', 'none')" not in features
 assert "index === 0 ? 'flag-pattern-' + c.id : null" in features
 assert "stripeOnlyCountries.has(ownerId)" in features, 'Conquest flags must preserve stripe choice'
-assert 'refitProportionalCountry(country)' in features, 'Detailed North Sea map should refit flags'
+assert 'refitProportionalCountry(id)' in features, 'Detailed map should refit flags'
 assert 'window.GeoPrzygodaFitFlag' in features
 
-assert 'flags/' in features, 'Map flags must be loaded from offline assets'
+assert 'flag-textures/' in features, 'Map must use WebView-compatible local PNG textures'
+assert 'backing.setAttribute' in features and "piece.getAttribute('fill')" in features, (
+    'A failed flag texture must show the original country color')
 assert 'battle.js' in text and 'battle.css' in text, 'Battle resources missing from HTML'
 # Additional 1:10m detail is an offline asset applied to existing country paths;
 # it must not replace their ids or flag patterns.
@@ -119,7 +124,9 @@ for country, min_vertices in [('NLD', 800), ('BEL', 600), ('DEU', 2800)]:
     assert item['vertices'] >= min_vertices, f'{country} border lost 1:10m detail'
     assert item['d'].count('M') == item['rings'], f'{country} islands and coastlines mismatch'
     assert 'id="land-' + country + '"' in text, f'{country} must retain map click target'
-assert 'loadDetailedNorthSeaBorders' in features_text and "fetch('benelux-10m.json')" in features_text
+assert 'loadDetailedNorthSeaBorders' in features_text
+assert 'function restoreBaseGeometry(' in features_text, '1:50m zoom-out restoration missing'
+assert 'const flagPaths = new Map()' in features_text
 # The detailed world layer is generated during the Android build, not fetched
 # by the installed app. It should include nearly all 1:50m selectable countries.
 world_detail_path = ROOT / 'app/src/main/assets/world-detail-10m.json'
@@ -129,9 +136,15 @@ assert world_detail['projection'] == 'Mercator 1080x1080, 3 decimal SVG precisio
 assert len(world_detail['countries']) >= 220, 'Worldwide 1:10m geometry is incomplete'
 for cid in ('NLD', 'BEL', 'DEU', 'POL', 'BLR', 'IND', 'BRA'):
     details = world_detail['countries'][cid]
-    assert details['v'] > 100 and details.get('d', details.get('parts')), f'{cid} lacks detailed paths'
+    assert details['v'] > 100 and len(details['b']) == 4, f'{cid} missing detail index'
+    chunk = ROOT / 'app/src/main/assets/world-detail' / f'{cid.lower()}.json'
+    shape = json.loads(chunk.read_text(encoding='utf-8'))
+    assert shape.get('d') or shape.get('parts'), f'{cid} lacks 1:10m SVG detail'
 assert "fetch('world-detail-10m.json')" in features_text
+assert "fetch('world-detail/' + id.toLowerCase() + '.json')" in features_text
 assert 'function updateVisibleDetailedCountries()' in features_text
+assert "vb.width <= DETAIL_ZOOM_LIMIT" in features_text
+assert 'queueVisibleDetails' in features_text
 
 # Turkey's crescent/star and Saudi Arabia's calligraphy/sword retain their
 # original proportions on both map resolutions and when battles change colors.
@@ -155,17 +168,20 @@ province_path = ROOT / 'app/src/main/assets/world-provinces-10m.json'
 assert province_path.is_file(), 'Build admin-1 regions before checking Android assets'
 provinces = json.loads(province_path.read_text(encoding='utf-8'))
 assert provinces['projection'] == 'Mercator 1080x1080, 3 decimal SVG precision'
-assert len(provinces['countries']) >= 80, 'Too few admin-1 country layers'
-assert sum(map(len, provinces['countries'].values())) >= 2000, 'Too few real provinces'
+assert len(provinces['country_counts']) >= 80, 'Too few admin-1 country layers'
+assert sum(provinces['country_counts'].values()) >= 2000, 'Too few real provinces'
+assert province_path.stat().st_size < 40000, 'Province index must be compact'
 for cid, minimum in [('POL', 10), ('BLR', 5), ('USA', 30), ('DEU', 10)]:
-    regions = provinces['countries'][cid]
+    chunk = ROOT / 'app/src/main/assets/provinces' / f'{cid.lower()}.json'
+    regions = json.loads(chunk.read_text(encoding='utf-8'))
+    assert len(regions) == provinces['country_counts'][cid]
     assert len(regions) >= minimum, f'Missing real regions for {cid}'
     for region in regions:
         assert region['d'].startswith('M') and len(region['b']) == 4
         assert region['area'] > 0
         assert isinstance(region['neighbors'], list)
         assert all(0 <= n < len(regions) for n in region['neighbors'])
-for token in ('function createProvinceSectors(', "fetch('world-provinces-10m.json')",
+for token in ('function createProvinceSectors(', "fetch('provinces/' + targetId.toLowerCase() + '.json')",
               "'battle-real-provinces'", 'battle-pause', 'battle-speed',
               'battle-flag-left', 'battle-flag-right', 'battle-game-mode',
               'battle-ally', "game.scenario === 'alliance'"):
@@ -196,7 +212,7 @@ assert 'const sharedEdges = new Map()' in battle
 assert 'battle-sector-count' in battle
 assert 'window.GeoPrzygodaFitFlag' in battle and 'window.GeoPrzygodaFitFlag' in features_text
 assert "['CAN', '#ffffff']" in features_text
-assert 'vb.width > 680' in features_text
+assert 'DETAIL_ZOOM_LIMIT = 280' in features_text
 assert '.battle-fictional-sector-line' in css, 'Sector borders must be visible'
 
 
