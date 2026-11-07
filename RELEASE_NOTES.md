@@ -1,3 +1,10 @@
+GeoPrzygoda — dokładniejsze granice Holandii! 🇳🇱🌊
+
+- Holandia ma teraz bardziej szczegółowy obrys wybrzeża, wysp, zatok i ujść rzek (Natural Earth 1:10m).
+- Dopasowano również obrysy Belgii i Niemiec, aby wspólne granice lepiej się łączyły.
+- Flagi, kolory, napisy, informacje o krajach i rywalizacja pozostają bez zmian.
+- Wszystkie nowe dane działają lokalnie — aplikacja nie potrzebuje internetu.
+
 GeoPrzygoda — podbijanie terenu jak na filmie! 🗺️⚔️
 
 - Marsz od granicy do stolicy, np. Białystok → Mińsk, pozostał bez zmian.
