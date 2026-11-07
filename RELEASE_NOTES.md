@@ -1,10 +1,12 @@
-GeoPrzygoda — kolorowa rywalizacja i szybkie wyszukiwanie 🇵🇱🇫🇷🌍
+GeoPrzygoda – naturalniejszy front podczas podboju 🌍⚔️
 
-- Kolorowe tło Rywalizacji przypomina animację z początku gry (fiolet, mięta i róż).
-- Wybrane państwo i przeciwnik mają czytelne, proste prostokątne flagi.
-- W Rywalizacji można wyszukiwać kraj po nazwie, stolicy albo kodzie.
-- Podczas Bitwy o terytoria można przeszukiwać tylko dostępne kraje sąsiadujące z własnymi terenami.
-- Zachowano poprzednie poprawki flag Francji, USA i Australii w Oceanii.
-- Działa bez internetu. Zachowano muzykę, quiz, dokładne granice i historię gry.
+- Zamiast prostej pionowej kreski w Czechach i innych krajach front ma nieregularny, płynący kształt.
+- Zajmowanie terytorium zaczyna się przy granicy z państwem atakującym albo wcześniej zdobytym sąsiadem.
+- Barwy zwycięzcy pojawiają się stopniowo wewnątrz prawdziwych granic państwa, nie za nimi.
+- Przy nieudanym ataku front cofa się; po zwycięstwie kraj przechodzi do zwycięzcy.
+- W trakcie bitwy panel jest mniejszy, aby lepiej było widać animację na mapie.
+- Zachowane są flagi, muzyka, wyszukiwarka, historia i działanie bez internetu.
 
-**Instalacja:** pobierz GeoPrzygoda.apk na Androida z tego wydania.
+To wizualna gra geograficzna na współczesnych granicach, a nie mapa wojskowa ani dokładny podział na prowincje.
+
+**Instalacja:** pobierz GeoPrzygoda.apk z tego wydania na Androida.
