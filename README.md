@@ -25,6 +25,17 @@ Wymagany Android 8.0 lub nowszy. Aplikacja jest przeznaczona między innymi do t
 - Quiz polega na wskazywaniu krajów na mapie. Dostępne są podpowiedzi i kolejne próby, bez limitu czasu.
 - Przycisk lub gest Wstecz zamyka opis, wyszukiwanie albo pomoc przed wyjściem z aplikacji.
 
+## Dokładniejsza Holandia 🇳🇱
+
+Na zbliżeniu Holandii mapa korzysta z dokładniejszych granic **Natural Earth 1:10m**
+(zamiast 1:50m): lepiej odwzorowuje wybrzeże Morza Północnego, Wyspy Fryzyjskie,
+ujścia rzek oraz wyspy i zatoki Zelandii. Sąsiednie Belgia i Niemcy otrzymują
+dane z tej samej skali, aby ich granice były dopasowane.
+
+Szczegółowe ścieżki SVG są zapisane lokalnie w `app/src/main/assets/benelux-10m.json`
+i nakładane na istniejące obrysy krajów. Nie zmieniają flag, nazw, informacji,
+oznaczeń ani mechaniki rywalizacji; gra nadal działa offline.
+
 ## Budowanie
 
 Projekt korzysta z Java 17, Gradle 8.11.1, Android Gradle Plugin 8.9.2 i SDK 35.
