@@ -350,6 +350,7 @@ async function run() {
     if(!customFlag.src.startsWith('data:image/svg+xml;') || !customFlag.visible)
       throw Error('Plan 7 custom flag failure');
 
+    const mapWidthBeforeHistory = await page.evaluate(() => document.getElementById('world-map').viewBox.baseVal.width);
     await page.evaluate(() => window.GeoPrzygodaPlan7.open('time'));
     await page.waitForFunction(() => !!document.querySelector('.geo7-timeline-slider'),
       null, {timeout:12000});
@@ -357,7 +358,7 @@ async function run() {
       max:document.querySelector('.geo7-timeline-slider').max,
       originalMap:document.getElementById('world-map').viewBox.baseVal.width
     }));
-    if(Number(plan7History.max)<3 || plan7History.originalMap !== 1080)
+    if(Number(plan7History.max)<3 || plan7History.originalMap !== mapWidthBeforeHistory)
       throw Error('Plan 7 historical mode failure: '+JSON.stringify(plan7History));
 
     await page.evaluate(() => window.GeoPrzygodaPlan7.open('friends'));
