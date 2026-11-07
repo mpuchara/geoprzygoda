@@ -129,12 +129,40 @@
     'EST','LTU','LVA','HUN','BGR','ROU','ARM','LUX',
     'NGA','MLI','GIN','GAB','CIV','TCD','SLE','YEM'
   ]);
+  // A separate solid-filled path sits below every flag path. On some Android
+  // WebView GPUs SVG patterns are valid but paint TRANSPARENT pixels, so the
+  // fallback in "fill: url(#pattern) #color" never activates. A rect *inside*
+  // that pattern is equally ineffective when the whole pattern paints blank.
+  // Keep the country's original geometry and terrain color visible behind it.
+  function syncTerrainUnderlay(piece) {
+    const parent = piece.parentNode;
+    if (!parent) return;
+    let underlay = piece._geoprzygodaTerrainUnderlay;
+    if (!underlay || underlay.parentNode !== parent) {
+      underlay = document.createElementNS(ns, 'path');
+      underlay.classList.add('flag-terrain-underlay');
+      underlay.setAttribute('aria-hidden', 'true');
+      underlay.setAttribute('pointer-events', 'none');
+      piece._geoprzygodaTerrainUnderlay = underlay;
+      parent.insertBefore(underlay, piece);
+    }
+    const geometry = piece.getAttribute('d') || '';
+    const fill = piece.getAttribute('fill') || '#a8d77e';
+    if (underlay.getAttribute('d') !== geometry)
+      underlay.setAttribute('d', geometry);
+    if (underlay.getAttribute('fill') !== fill)
+      underlay.setAttribute('fill', fill);
+    const rule = piece.getAttribute('fill-rule');
+    if (rule) underlay.setAttribute('fill-rule', rule);
+  }
+
   function createProportionalFlag(c, piece, partIndex, asset, background,
                                   plainBands = false, patternId = null) {
     let box;
     try { box = piece.getBBox(); } catch { return null; }
     if (!box || !Number.isFinite(box.x + box.y + box.width + box.height) ||
         box.width <= 0 || box.height <= 0) return null;
+    syncTerrainUnderlay(piece);
     const id = patternId || 'flag-fitted-' + c.id + '-' + partIndex;
     const original = document.getElementById(id);
     const geometryKey = [asset, background || '', plainBands,
@@ -337,6 +365,7 @@
     const keep = new Set(original.map(item => item.piece));
     for (const extra of [...primary.parentElement.querySelectorAll('path.land')]) {
       if (keep.has(extra)) continue;
+      extra._geoprzygodaTerrainUnderlay?.remove();
       flagPaths.delete(extra);
       const fitted = /url\(#([^)]+)\)/.exec(extra.dataset.geoprzygodaFittedFlag || '');
       if (fitted) document.getElementById(fitted[1])?.remove();
