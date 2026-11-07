@@ -73,9 +73,35 @@ jobs:
           path: app/build/reports/lint-results-debug.html
           if-no-files-found: ignore
 
+  browser-flags:
+    name: Real map SVG rendering and zoom checks (Chromium)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Generate same detailed map as Android build
+        run: python3 scripts/build_world_detail.py
+      - name: Install Chromium for browser screenshot tests
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Check real map flags at every zoom, in quiz and battle
+        run: node scripts/check_flag_render.mjs
+      - name: Save screenshots for manual visual review
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GeoPrzygoda-Flag-Map-Screenshots
+          path: flag-render-screenshots/
+          if-no-files-found: ignore
+          retention-days: 30
+
   publish:
     name: Publish APK download
-    needs: build
+    needs: [build, browser-flags]
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 5
