@@ -22,6 +22,29 @@
   let advanceScene = null;
   let historyFocus = null;
   let lastSaved = null;
+  let battlePaused = false;
+  let battleSpeed = 1;
+  let provinceData = null;
+  let provinceLoading = null;
+  function loadProvinceData() {
+    if (provinceData) return Promise.resolve(provinceData);
+    if (!provinceLoading) {
+      provinceLoading = fetch('world-provinces-10m.json')
+        .then(response => {
+          if (!response.ok) throw new Error('No offline admin-1 geometry');
+          return response.json();
+        })
+        .then(data => {
+          if (data.projection !== 'Mercator 1080x1080, 3 decimal SVG precision' ||
+              !data.countries || !Array.isArray(data.countries.BLR))
+            throw new Error('Bad administrative region data');
+          provinceData = data.countries;
+          return provinceData;
+        })
+        .catch(() => null); // Older builds still work with fictional sectors.
+    }
+    return provinceLoading;
+  }
   try {
     lastSaved = JSON.parse(localStorage.getItem(key) || 'null');
   } catch { lastSaved = null; }
@@ -37,9 +60,10 @@
     '<label for="battle-target">Sąsiedni teren do zdobycia</label><select id="battle-target" class="battle-select"></select>' +
     '<div id="battlefield" class="battlefield hidden" role="status" aria-live="polite">' +
     '<div class="battle-soldiers"><span class="army-left">🪖 🛡️ 🪖</span><span class="army-middle">⚔️</span><span class="army-right">🪖 🛡️ 🪖</span></div>' +
-    '<div id="battle-balance" class="battle-balance"></div>' +
+    '<div class="battle-duel"><img id="battle-flag-left" alt="Flaga atakującego"><span id="battle-balance" class="battle-balance"></span><img id="battle-flag-right" alt="Flaga obrońcy"></div>' +
     '<div class="battle-progress-caption"><span id="battle-stage">Przygotowanie</span><small id="battle-sector-count">0 sektorów</small><strong id="battle-progress-label">0%</strong></div>' +
-    '<div id="battle-progress" class="battle-progress-track" role="progressbar" aria-label="Postęp zdobywania terenu" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="battle-conquest-fill"></span></div></div>' +
+    '<div id="battle-progress" class="battle-progress-track" role="progressbar" aria-label="Procent zdobytego terytorium" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="battle-conquest-fill"></span></div>' +
+    '<div class="battle-live-controls"><button id="battle-pause" type="button" aria-pressed="false">⏸ Pauza</button><label for="battle-speed">Prędkość</label><select id="battle-speed" aria-label="Prędkość bitwy"><option value="1">1×</option><option value="2">2×</option><option value="4">4×</option></select></div></div>' +
     '<div id="battle-message" class="battle-message" aria-live="polite">Wybierz sąsiada i rozpocznij bitwę!</div>' +
     '<div class="battle-actions"><button id="battle-attack" class="battle-primary">⚔️ Rozpocznij natarcie</button>' +
     '<button id="battle-history" class="battle-secondary">📜 Historia</button></div>' +
@@ -74,6 +98,38 @@
   rivalHistory.className = 'rival-history-button';
   rivalHistory.textContent = '📜 Historia i scenariusze';
   rivalStart.after(rivalHistory);
+  const battleModeRow = document.createElement('div');
+  battleModeRow.className = 'battle-mode-row';
+  battleModeRow.innerHTML =
+    '<label for="battle-game-mode">🎮 Tryb bitwy</label>' +
+    '<select id="battle-game-mode" class="rival-select">' +
+    '<option value="free">⚔️ 1 na 1</option><option value="alliance">🤝 Sojusze</option>' +
+    '<option value="random">🎲 Losowe wyzwanie</option></select>' +
+    '<label for="battle-ally" id="battle-ally-label" hidden>Wybierz sojusznika</label>' +
+    '<select id="battle-ally" class="rival-select" hidden></select>';
+  rivalStart.before(battleModeRow);
+  function updateAllyChoices() {
+    const mode = $('battle-game-mode').value;
+    $('battle-ally-label').hidden = mode !== 'alliance';
+    $('battle-ally').hidden = mode !== 'alliance';
+    if (mode !== 'alliance') return;
+    const player = $('rival-first').dataset.country;
+    const allies = [...(neighbors.get(player) || [])].map(id => playable.get(id))
+      .filter(Boolean).sort((a, b) => a.n.localeCompare(b.n, 'pl'));
+    const preferred = $('battle-ally').value;
+    $('battle-ally').replaceChildren();
+    for (const c of allies) {
+      const option = document.createElement('option');
+      option.value = c.id;
+      option.textContent = c.n;
+      $('battle-ally').append(option);
+    }
+    if (allies.some(c => c.id === preferred)) $('battle-ally').value = preferred;
+  }
+  $('battle-game-mode').addEventListener('change', updateAllyChoices);
+  new MutationObserver(updateAllyChoices).observe($('rival-first'), {
+    attributes: true, attributeFilter: ['data-country']
+  });
 
   function ownerOf(id) {
     return game && game.owners[id] && playable.has(game.owners[id]) ? game.owners[id] : id;
