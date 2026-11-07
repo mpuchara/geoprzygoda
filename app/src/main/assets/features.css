@@ -37,3 +37,9 @@
 .music-quick-toggle.music-active{background:#b6f0c1;color:#183d41;border-radius:14px;box-shadow:0 0 12px #b6f0c16b}
 .music-quick-toggle:active{transform:scale(.94)}
 @media(max-width:350px){.bottom-dock{padding:3px}.dock-button{padding:10px 12px}.dock-info{width:32px}}
+
+/* Android WebView safety: do not rely on an SVG pattern to paint its own
+   fallback. An independent original-color country path is shown underneath.
+   The overlay flag can remain transparent without revealing the ocean. */
+#world-map .flag-terrain-underlay { display:none; pointer-events:none; stroke:none; }
+#world-map.flag-fill .flag-terrain-underlay { display:block; }
