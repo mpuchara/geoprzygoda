@@ -61,6 +61,8 @@ jobs:
         run: python3 scripts/build_flag_gallery.py flag-gallery.html
       - name: Check bundled game
         run: python3 scripts/check_assets.py
+      - name: Audit Plan 10 worldwide islands, boundaries and 238 flags
+        run: python3 scripts/check_plan10_map.py
       - name: Prepare real-browser SVG flag tests
         run: |
           command -v google-chrome || command -v chromium
