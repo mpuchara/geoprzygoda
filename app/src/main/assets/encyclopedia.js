@@ -206,7 +206,10 @@
     if(current && current.parentNode)current.remove();
     const serial=requestId;
     current=el('div','geo6-encyclopedia');
-    current.dataset.country=id;
+    // The app's global [data-country] click handler navigates to a country.
+    // Never set that attribute on the entire panel: its buttons would reopen
+    // the country and erase the history immediately after being clicked.
+    current.dataset.encyclopediaCountry=id;
     const anchor=sheet.querySelector('.facts');
     if(anchor)anchor.after(current);else sheet.append(current);
     current.append(el('p','geo6-note','Wczytywanie encyklopedii offline…'));
