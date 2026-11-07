@@ -72,6 +72,18 @@ features_text = (ROOT / 'app/src/main/assets/features.js').read_text()
 battle_text = (ROOT / 'app/src/main/assets/battle.js').read_text()
 assert "path.parentElement.querySelectorAll('path.land')" in features_text
 assert "function countryPieces(id)" in battle_text
+# Conquest must show non-rectangular regions, use the map geometry and
+# avoid implying that fictional sectors are real administrative provinces.
+for fragment in ('function sectorPolygon(', 'battle-advance-wipe',
+                 'battle-sector-outline', 'threshold', 'battle-cinematic',
+                 "primary.getBBox()", 'closeAdvanceDoesNotExist'):
+    if fragment == 'closeAdvanceDoesNotExist':
+        assert 'function clearAdvance()' in battle_text
+    else:
+        assert fragment in battle_text, f'Irregular-front feature missing: {fragment}'
+assert 'Fikcyjna gra planszowa' in battle_text and 'Granice małych sektorów są umowne' in battle_text
+assert 'battle-sector-grid' in (ROOT / 'app/src/main/assets/battle.css').read_text()
+
 
 
 picker_js = (ROOT / 'app/src/main/assets/rival_ui.js').read_text(encoding='utf-8')
