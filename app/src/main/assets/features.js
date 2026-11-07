@@ -140,6 +140,32 @@
     }
     if (window.GeoPrzygodaBattle && window.GeoPrzygodaBattle.active) window.GeoPrzygodaBattle.refresh();
   }
+  // The bundled 10m outlines improve Dutch coastlines and Wadden/Zeeland
+  // islands while keeping Belgium and Germany aligned at the shared borders.
+  // Only replace SVG geometry: colors, flag patterns, labels, click targets,
+  // quiz and offline rivalry continue to use the original country elements.
+  function loadDetailedNorthSeaBorders() {
+    fetch('benelux-10m.json')
+      .then(response => {
+        if (!response.ok) throw new Error('Detailed map unavailable');
+        return response.json();
+      })
+      .then(data => {
+        if (!data || !data.countries || data.projection !== 'Mercator 1080x1080, 3 decimal SVG precision') return;
+        for (const country of ['NLD', 'BEL', 'DEU']) {
+          const shape = $('land-' + country);
+          const detail = data.countries[country];
+          if (!shape || !detail || typeof detail.d !== 'string' ||
+              detail.vertices < 500 || !detail.d.startsWith('M')) continue;
+          shape.setAttribute('d', detail.d);
+        }
+        if (window.GeoPrzygodaBattle && window.GeoPrzygodaBattle.active)
+          window.GeoPrzygodaBattle.refresh();
+      })
+      .catch(() => { /* Keep the bundled 50m boundaries if the detail asset is unavailable. */ });
+  }
+  loadDetailedNorthSeaBorders();
+
   const originalLabelMap = labelMap;
   labelMap = function () { originalLabelMap(); renderFlags(); };
   $('setting-flags').checked = flagsEnabled;
