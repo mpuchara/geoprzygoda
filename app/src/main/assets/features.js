@@ -108,6 +108,70 @@
   flagDefs.id = 'country-flag-patterns';
   map.insertBefore(flagDefs, map.firstChild);
   const flagPaths = new Map();
+
+  // Android WebView can fail to paint an SVG <pattern> even when the PNG
+  // inside it decodes correctly. Keep the tested patterns for browser/battle
+  // compatibility, but paint a separately clipped PNG above each country
+  // on Android. Every image stays inside its *actual* geographic path.
+  const androidClipFlags = /\bAndroid\b/i.test(navigator.userAgent);
+  const androidFlagLayers = new Map();
+  let androidFlagClipSerial = 0;
+  function removeAndroidFlagOverlay(piece) {
+    const layer = androidFlagLayers.get(piece);
+    if (!layer) return;
+    layer.group.remove();
+    layer.clip.remove();
+    androidFlagLayers.delete(piece);
+  }
+  function syncAndroidFlagOverlay(piece, asset, background, plainBands, box) {
+    if (!androidClipFlags || !piece.parentNode) return;
+    let layer = androidFlagLayers.get(piece);
+    if (!layer) {
+      const clip = document.createElementNS(ns, 'clipPath');
+      clip.id = 'geo8-clip-' + (++androidFlagClipSerial);
+      clip.setAttribute('clipPathUnits', 'userSpaceOnUse');
+      const boundary = document.createElementNS(ns, 'path');
+      clip.append(boundary);
+      flagDefs.append(clip);
+      const group = document.createElementNS(ns, 'g');
+      group.classList.add('geo8-flag-overlay');
+      group.setAttribute('clip-path', 'url(#' + clip.id + ')');
+      group.setAttribute('pointer-events', 'none');
+      group.setAttribute('aria-hidden', 'true');
+      const backing = document.createElementNS(ns, 'rect');
+      const image = document.createElementNS(ns, 'image');
+      image.setAttribute('pointer-events', 'none');
+      group.append(backing, image);
+      piece.parentNode.insertBefore(group, piece.nextSibling);
+      layer = {clip, boundary, group, backing, image};
+      androidFlagLayers.set(piece, layer);
+    }
+    const {boundary, group, backing, image} = layer;
+    const geometry = piece.getAttribute('d') || '';
+    if (boundary.getAttribute('d') !== geometry)
+      boundary.setAttribute('d', geometry);
+    const rule = piece.getAttribute('fill-rule') || 'nonzero';
+    if (boundary.getAttribute('clip-rule') !== rule)
+      boundary.setAttribute('clip-rule', rule);
+    for (const [attr, value] of Object.entries({
+      x: box.x, y: box.y, width: box.width, height: box.height
+    })) {
+      const expected = String(value);
+      if (backing.getAttribute(attr) !== expected) backing.setAttribute(attr, expected);
+      if (image.getAttribute(attr) !== expected) image.setAttribute(attr, expected);
+    }
+    const color = background || piece.getAttribute('fill') || '#a8d77e';
+    if (backing.getAttribute('fill') !== color) backing.setAttribute('fill', color);
+    if (image.getAttribute('href') !== asset) {
+      image.setAttribute('href', asset);
+      image.setAttributeNS('http://www.w3.org/1999/xlink', 'href', asset);
+    }
+    const fit = plainBands ? 'none' : (background ? 'xMidYMid meet' : 'xMidYMid slice');
+    if (image.getAttribute('preserveAspectRatio') !== fit)
+      image.setAttribute('preserveAspectRatio', fit);
+    // Never intercept taps, and keep flags invisible in quiz/color mode.
+    group.style.display = flagsEnabled && mode !== 'quiz' ? '' : 'none';
+  }
   // Keep complex symbols in their actual flag proportions. Pure stripe
   // patterns can still fill an irregular silhouette without visible distortion.
   // The background matches each flag, filling gaps around its centered emblem.
@@ -157,12 +221,13 @@
   }
 
   function createProportionalFlag(c, piece, partIndex, asset, background,
-                                  plainBands = false, patternId = null) {
+                                  plainBands = false, patternId = null, animationOnly = false) {
     let box;
     try { box = piece.getBBox(); } catch { return null; }
     if (!box || !Number.isFinite(box.x + box.y + box.width + box.height) ||
         box.width <= 0 || box.height <= 0) return null;
     syncTerrainUnderlay(piece);
+    if (!animationOnly) syncAndroidFlagOverlay(piece, asset, background, plainBands, box);
     const id = patternId || 'flag-fitted-' + c.id + '-' + partIndex;
     const original = document.getElementById(id);
     const geometryKey = [asset, background || '', plainBands,
@@ -217,14 +282,24 @@
   // Battles may draw the victor's flag on a completely different shape.
   // Fit its symbol to the *captured* country; never reuse the old country's
   // normalized pattern where stars, moons or emblems get stretched.
-  window.GeoPrzygodaFitFlag = function (ownerId, targetId, piece, index) {
+  window.GeoPrzygodaFitFlag = function (ownerId, targetId, piece, index, animationOnly = false) {
     const owner = byId.get(ownerId);
     const backing = emblemBackgrounds.get(ownerId);
     if (!owner || !piece || !/^[A-Z]{2}$/.test(owner.code))
       return null;
     return createProportionalFlag({ id: ownerId + '-on-' + targetId },
       piece, index, 'flag-textures/' + owner.code.toLowerCase() + '.png', backing,
-      stripeOnlyCountries.has(ownerId));
+      stripeOnlyCountries.has(ownerId), null, animationOnly);
+  };
+  window.GeoPrzygodaResetFlagOverlay = function (countryId, piece) {
+    if (!androidClipFlags) return;
+    const country = byId.get(countryId);
+    if (!country || !piece || !/^[A-Z]{2}$/.test(country.code)) return;
+    let box;
+    try { box = piece.getBBox(); } catch { return; }
+    if (box.width <= 0 || box.height <= 0) return;
+    syncAndroidFlagOverlay(piece, 'flag-textures/' + country.code.toLowerCase() + '.png',
+      emblemBackgrounds.get(countryId), stripeOnlyCountries.has(countryId), box);
   };
   // Build fitted flag patterns in frame-sized batches, not a single blocking
   // getBBox()/SVG construction pass over all 238 countries at startup.
@@ -303,6 +378,8 @@
     }
     flagsApplied = enabled;
     map.classList.toggle('flag-fill', enabled);
+    for (const layer of androidFlagLayers.values())
+      layer.group.style.display = enabled ? '' : 'none';
     for (const [path, fill] of flagPaths) {
       // An inline fill keeps the selected country showing its flag; stroke
       // highlights the selection. In quiz, restore the original palette.
@@ -366,6 +443,7 @@
     for (const extra of [...primary.parentElement.querySelectorAll('path.land')]) {
       if (keep.has(extra)) continue;
       extra._geoprzygodaTerrainUnderlay?.remove();
+      removeAndroidFlagOverlay(extra);
       flagPaths.delete(extra);
       const fitted = /url\(#([^)]+)\)/.exec(extra.dataset.geoprzygodaFittedFlag || '');
       if (fitted) document.getElementById(fitted[1])?.remove();
