@@ -838,6 +838,15 @@
         ' i ' + (playable.get(game.ally)?.n || 'sojusznik') :
       game.scenario === 'random' ? '🎲 Losowe wyzwanie: ' + leader.n :
       leader.flag + ' ' + leader.n + ' – Twoje państwo';
+    // Optional cosmetic banner chosen by the player; atlas flags stay canonical.
+    const personalFlag = window.GeoPrzygodaPlan7?.flagForCountry(game.player);
+    if (personalFlag) {
+      const icon = document.createElement('img');
+      icon.className = 'geo7-campaign-flag';
+      icon.alt = 'Własna flaga gracza';
+      icon.src = personalFlag;
+      $('battle-title').prepend(icon);
+    }
     $('battle-stats').textContent = 'Tereny: ' + lands.length + ' · Powierzchnia (na mapie): ' +
       Math.round(size).toLocaleString('pl-PL') + ' km² · Tura: ' + game.round;
     drawTargets(preferred);
@@ -958,7 +967,8 @@
     field.classList.remove('running');
     void field.offsetWidth;
     field.classList.add('running');
-    $('battle-flag-left').src = 'flags/' + attacker.code.toLowerCase() + '.svg';
+    $('battle-flag-left').src = window.GeoPrzygodaPlan7?.flagForCountry(game.player) ||
+      'flags/' + attacker.code.toLowerCase() + '.svg';
     $('battle-flag-left').alt = 'Flaga ' + attacker.n;
     $('battle-flag-right').src = 'flags/' + defender.code.toLowerCase() + '.svg';
     $('battle-flag-right').alt = 'Flaga ' + defender.n;
