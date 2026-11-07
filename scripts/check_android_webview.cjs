@@ -103,22 +103,19 @@ async function main(){
       const primary=document.getElementById('land-NLD');
       const group=primary?.parentElement;
       const pieces=group?[...group.querySelectorAll('path.land')]:[];
-      const photo=[...group.querySelectorAll('image.geo8-photo')]
-        .find(x=>x.getAttribute('href')==='flag-textures/nl.png');
-      const id=/url\(#([^)]+)\)/.exec(photo?.getAttribute('clip-path')||'')?.[1];
+      const legacy=document.getElementById('geo10-legacy-flag-NLD');
       return {
         zoom:document.getElementById('world-map').viewBox.baseVal.width,
         baseRasterHidden:document.getElementById('geo8-overview-flags').style.display==='none',
         pieces:pieces.length,
-        photoVisible:!!photo && getComputedStyle(photo).display!=='none',
-        clipExact:!!id && document.getElementById(id)?.querySelector('path')?.getAttribute('d')===
-          photo?.previousElementSibling?.getAttribute('d'),
-        legacyFlag:!!document.getElementById('geo10-legacy-flag-NLD'),
-        oldSvgSource:document.getElementById('geo10-legacy-flag-NLD')
-          ?.querySelector('image')?.getAttribute('href')
+        legacyFlag:!!legacy,
+        legacyPainted:pieces.some(p=>p.style.fill.includes('geo10-legacy-flag-NLD')),
+        oldSvgSource:legacy?.querySelector('image')?.getAttribute('href'),
+        symbolAspect:legacy?.querySelector('image')?.getAttribute('preserveAspectRatio'),
+        noDuplicateClipImages:!group?.querySelector('.geo8-photo')
       };
     })()`);
-    if(zoomCheck.photoVisible && zoomCheck.legacyFlag && zoomCheck.pieces>1)
+    if(zoomCheck.legacyPainted && zoomCheck.legacyFlag && zoomCheck.pieces>1)
       break;
   }
   const zoomCapture=await call('Page.captureScreenshot',{format:'png'});
@@ -134,8 +131,9 @@ async function main(){
      evidence.flagScale<2||evidence.actualCountryCount<190||
      evidence.assetStatus!==200)throw Error('Real WebView flag smoke test failed');
   if(!zoomCheck || zoomCheck.zoom>30 || !zoomCheck.baseRasterHidden ||
-     zoomCheck.pieces<2 || !zoomCheck.photoVisible || !zoomCheck.clipExact ||
-     !zoomCheck.legacyFlag || zoomCheck.oldSvgSource!=='flags/nl.svg')
+     zoomCheck.pieces<2 || !zoomCheck.legacyPainted ||
+     !zoomCheck.noDuplicateClipImages || !zoomCheck.legacyFlag ||
+     zoomCheck.oldSvgSource!=='flags/nl.svg' || zoomCheck.symbolAspect!=='none')
     throw Error('Plan 10: Android WebView detailed islands or legacy flag failed');
 }
 main().catch(error=>{console.error(error.stack||error);process.exitCode=1;});
