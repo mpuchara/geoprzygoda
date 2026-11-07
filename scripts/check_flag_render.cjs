@@ -269,32 +269,9 @@ async function run() {
     }));
     if(plan6.countriesInDom !== 1 || plan6.facts < 7 || !plan6.hasBorder ||
        plan6.cached > 8) throw Error('Plan 6 country details failure: '+JSON.stringify(plan6));
-    page.on('response',response=>{
-      if(response.url().includes('/history/'))console.log('HISTORY NETWORK',response.status(),response.url());
-    });
-    page.on('console',msg=>{if(msg.type()==='error'||msg.text().includes('GEO6_'))console.log('BROWSER MSG',msg.type(),msg.text());});
-    page.on('pageerror',err=>console.log('BROWSER PAGEERROR',err.stack||err.message));
     await page.click('#info-POL .geo6-history-button');
-    await page.waitForTimeout(2000);
-    console.log('HISTORY DIAG',JSON.stringify(await page.evaluate(() => ({
-      active:document.querySelector('#info-POL')?.className,
-      buttonExpanded:document.querySelector('#info-POL .geo6-history-button')?.getAttribute('aria-expanded'),
-      panelHidden:document.querySelector('#info-POL .geo6-history-panel')?.hidden,
-      content:document.querySelector('#info-POL .geo6-history-panel')?.innerHTML.slice(0,1300),
-      global:window.GeoPrzygodaEncyclopedia?.stats(),
-      dataLoaded:document.querySelector('#info-POL .geo6-history-panel')?.dataset.loaded,
-      phase:document.querySelector('#info-POL .geo6-history-panel')?.dataset.phase,
-      pageErrorsFromGlobal:window.__geo6Errors
-    }))));
-    await page.waitForFunction(() =>
-      !!document.querySelector('#info-POL .geo6-slider') ||
-      document.querySelector('#info-POL .geo6-history-panel')?.textContent.includes('Nie udało się'),
-      null, { timeout: 5000 });
-    const historyDebug=await page.evaluate(() => ({
-      rendered:!!document.querySelector('#info-POL .geo6-slider'),
-      markup:document.querySelector('#info-POL .geo6-history-panel')?.innerHTML.slice(0,1400)
-    }));
-    if (!historyDebug.rendered) throw Error('History render failure: '+JSON.stringify(historyDebug));
+    await page.waitForFunction(() => !!document.querySelector('#info-POL .geo6-slider'),
+      null, { timeout: 12000 });
     const historyCheck=await page.evaluate(() => ({
       historyEvents: document.querySelectorAll('#info-POL .geo6-year').length,
       historicalFlags: document.querySelectorAll('#info-POL .geo6-old-flag').length,
