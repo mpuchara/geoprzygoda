@@ -525,7 +525,7 @@
     const progress = clamp01(fraction);
     const percent = Math.round(progress*100);
     const currentPercent = Number($('battle-progress').getAttribute('aria-valuenow'));
-    if (percent !== currentPercent) {
+    if ((!advanceScene || !advanceScene.realProvinces) && percent !== currentPercent) {
       $('battle-conquest-fill').style.width = percent + '%';
       $('battle-progress-label').textContent = percent + '%';
       $('battle-progress').setAttribute('aria-valuenow', String(percent));
