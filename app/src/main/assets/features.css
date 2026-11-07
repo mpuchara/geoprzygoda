@@ -43,3 +43,10 @@
    The overlay flag can remain transparent without revealing the ocean. */
 #world-map .flag-terrain-underlay { display:none; pointer-events:none; stroke:none; }
 #world-map.flag-fill .flag-terrain-underlay { display:block; }
+
+/* Plan 8: draw direct WebView-compatible PNG images over country-colored paths.
+   The images are clipped to exact polygons and never intercept map touches.
+   Hide them during campaigns: conquest has its own changing ownership fills. */
+#world-map .country-flag-photo { display:none; pointer-events:none; }
+#world-map.flag-fill .country-flag-photo { display:block; }
+.battle-running #world-map.flag-fill .country-flag-photo { display:none; }
