@@ -101,7 +101,9 @@
       // after repeated open/close gestures and background document clicks.
       if (opening) {
         historyPanel.replaceChildren(el('p','geo6-note','Odczytywanie historii z pamięci telefonu…'));
+        historyPanel.dataset.phase='before-render';
         renderHistory(id,historyPanel);
+        historyPanel.dataset.phase='after-render';
       }
     });
     historyButton.setAttribute('aria-expanded','false');
