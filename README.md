@@ -36,6 +36,26 @@ Szczegółowe ścieżki SVG są zapisane lokalnie w `app/src/main/assets/benelux
 i nakładane na istniejące obrysy krajów. Nie zmieniają flag, nazw, informacji,
 oznaczeń ani mechaniki rywalizacji; gra nadal działa offline.
 
+## Szczegółowe granice wszystkich krajów 🌍
+
+Podczas budowania APK pobierany jest publiczny zestaw **Natural Earth 1:10m**
+i zamieniany na lokalną warstwę SVG `world-detail-10m.json` dla ponad 220
+mapowanych państw i terytoriów. Podczas oddalenia gry zachowujemy płynny,
+lżejszy podkład 1:50m. Po zbliżeniu mapy wczytywane są dokładniejsze
+wybrzeża, wyspy i granice krajów widocznych na ekranie.
+
+Warstwa jest generowana poleceniem:
+
+```sh
+python3 scripts/build_world_detail.py
+```
+
+Plik `app/src/main/assets/world-detail-10m.json` jest budowany automatycznie
+w GitHub Actions przed sprawdzeniem i złożeniem APK, dlatego zainstalowana
+aplikacja działa w pełni **offline**. Kilka specjalnych małych obszarów bez
+odpowiedników w Natural Earth 1:10m używa dotychczasowego obrysu 1:50m.
+Flagi, muzyka, nazwy, quiz, rywalizacja i zapisane bitwy nie są zmieniane.
+
 ## Budowanie
 
 Projekt korzysta z Java 17, Gradle 8.11.1, Android Gradle Plugin 8.9.2 i SDK 35.
