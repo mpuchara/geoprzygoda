@@ -226,8 +226,13 @@
     try { box = piece.getBBox(); } catch { return null; }
     if (!box || !Number.isFinite(box.x + box.y + box.width + box.height) ||
         box.width <= 0 || box.height <= 0) return null;
-    syncTerrainUnderlay(piece);
-    if (!animationOnly) syncAndroidFlagOverlay(piece, asset, background, plainBands, box);
+    // On Android, avoid the expensive/broken SVG paint server entirely.
+    // The original land path stays solid, with its PNG on a separate layer.
+    if (!androidClipFlags || animationOnly) syncTerrainUnderlay(piece);
+    if (androidClipFlags && !animationOnly) {
+      syncAndroidFlagOverlay(piece, asset, background, plainBands, box);
+      return piece.getAttribute('fill') || background || '#a8d77e';
+    }
     const id = patternId || 'flag-fitted-' + c.id + '-' + partIndex;
     const original = document.getElementById(id);
     const geometryKey = [asset, background || '', plainBands,
