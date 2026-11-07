@@ -35,7 +35,22 @@
     '<select id="rival-disadvantage" class="rival-select"><option value="0">Bez utrudnień</option><option value="0.15">Trudny teren (−15%)</option><option value="0.30">Bez sprzętu (−30%)</option></select>' +
     '<button id="rival-compare" class="rival-compare">🏁 Porównaj państwa</button><div id="rival-result" aria-live="polite"></div>' +
     '<p class="extra-note">Tryb „bez broni”: punkty są liczone wyłącznie z powierzchni i liczby sąsiadów z atlasu. Nie pokazujemy liczebności armii, bo obecna baza nie zawiera sprawdzonych danych wojskowych.</p></div>';
-  document.body.append(settings, rivalry);
+  // Plan 9: four tiny island territories already exist in the atlas, but are
+  // almost impossible to discover on a world-size phone map. Offer an offline
+  // island finder instead of falsely enlarging their geographic polygons.
+  const islands = document.createElement('div');
+  islands.className = 'overlay extras-overlay hidden';
+  islands.id = 'islands-overlay';
+  islands.setAttribute('role', 'dialog');
+  islands.setAttribute('aria-modal', 'true');
+  islands.setAttribute('aria-labelledby', 'islands-title');
+  islands.innerHTML =
+    '<div class="extras-panel"><button class="close-overlay extras-close" data-extra-close="islands-overlay" aria-label="Zamknij wyspy">×</button>' +
+    '<h2 id="islands-title">🏝️ Odkrywaj małe wyspy</h2>' +
+    '<p>Wybierz wyspę lub terytorium. Mapa pokaże jego prawdziwe położenie, a atlas opowie o nim więcej.</p>' +
+    '<div id="islands-list"></div>' +
+    '<p class="extra-note">To terytoria zależne, a nie cztery niezależne państwa. Bardzo małe wyspy mogą być oznaczone punktem.</p></div>';
+  document.body.append(settings, rivalry, islands);
 
   const settingsButton = document.createElement('button');
   settingsButton.id = 'open-settings';
@@ -43,6 +58,14 @@
   settingsButton.textContent = '⚙';
   settingsButton.setAttribute('aria-label', 'Otwórz ustawienia');
   $('open-about').before(settingsButton);
+  const islandButton = document.createElement('button');
+  islandButton.type = 'button';
+  islandButton.id = 'open-islands';
+  islandButton.className = 'dock-info';
+  islandButton.textContent = '🏝️';
+  islandButton.title = 'Odkrywaj małe wyspy i terytoria';
+  islandButton.setAttribute('aria-label', 'Odkrywaj małe wyspy i terytoria');
+  settingsButton.before(islandButton);
 
   function openExtra(panel, focusId) {
     priorFocus = document.activeElement;
@@ -59,17 +82,41 @@
     priorFocus = null;
   }
   function openExtraId() {
-    for (const id of ['rivalry-overlay', 'settings-overlay']) {
+    for (const id of ['rivalry-overlay', 'settings-overlay', 'islands-overlay']) {
       if (!$(id).classList.contains('hidden')) return id;
     }
     return null;
   }
   settingsButton.addEventListener('click', () => openExtra(settings, 'setting-flags'));
+  islandButton.addEventListener('click', () => openExtra(islands, 'islands-list'));
+  const islandIds = ['WLF', 'VIR', 'MYT', 'ATF'];
+  for (const id of islandIds) {
+    const c = COUNTRY_DATA.find(country => country.id === id);
+    if (!c) continue;
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'rival-compare';
+    button.style.cssText = 'display:block;width:100%;margin:10px 0;text-align:left';
+    button.textContent = c.flag + ' ' + c.n + ' — pokaż na mapie';
+    button.setAttribute('aria-label', 'Pokaż na mapie: ' + c.n);
+    button.addEventListener('click', () => {
+      closeExtra('islands-overlay');
+      // Respect the existing 1080-unit Mercator world: zoom without moving,
+      // resizing or falsifying any land boundaries, including unmapped Mayotte.
+      const width = 90, max = 1080 - width;
+      const x = Math.min(max, Math.max(0, c.x - width / 2));
+      const y = Math.min(max, Math.max(0, c.y - width / 2));
+      map.setAttribute('viewBox', [x, y, width, width].join(' '));
+      labelMap();
+      openCountry(id);
+    });
+    $('islands-list').append(button);
+  }
   $('setting-edit-name').addEventListener('click', () => {
     closeExtra('settings-overlay');
     showWelcome(true);
   });
-  for (const panel of [settings, rivalry]) {
+  for (const panel of [settings, rivalry, islands]) {
     panel.addEventListener('click', e => {
       const close = e.target.closest('[data-extra-close]');
       if (close) closeExtra(close.dataset.extraClose);
