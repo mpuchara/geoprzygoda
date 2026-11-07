@@ -98,6 +98,16 @@ async function run() {
         for (const piece of paths) {
           fragments++;
           const box = piece.getBBox();
+          // The fallback must live in a separate shape, not only *inside*
+          // the SVG pattern (which can render completely transparent in
+          // Android WebView even when the pattern URL resolves).
+          const base = piece.previousElementSibling;
+          if (!base?.classList.contains('flag-terrain-underlay') ||
+              base.getAttribute('d') !== piece.getAttribute('d') ||
+              !base.getAttribute('fill') || base.getAttribute('fill') === 'none' ||
+              base.getAttribute('pointer-events') !== 'none') {
+            errors.push(id + ': missing independent terrain underlay');
+          }
           const actual = fitFromFill(piece.style.fill);
           if (!actual) {
             errors.push(id + ': missing flag fill');
