@@ -43,7 +43,7 @@
     '<div id="battle-message" class="battle-message" aria-live="polite">Wybierz sąsiada i rozpocznij bitwę!</div>' +
     '<div class="battle-actions"><button id="battle-attack" class="battle-primary">⚔️ Bitwa żołnierska</button>' +
     '<button id="battle-history" class="battle-secondary">📜 Historia</button></div>' +
-    '<p class="battle-disclaimer">Fikcyjna gra planszowa: oddziały i wynik są losowe. Każdy teren to całe państwo ze współczesnej mapy.</p>';
+    '<p class="battle-disclaimer">Fikcyjna gra planszowa: oddziały i wynik są losowe. Granice małych sektorów są umowne. Na końcu można zdobyć całe państwo.</p>';
   app.append(panel);
 
   const history = document.createElement('div');
@@ -120,19 +120,48 @@
     const primary = $('land-' + id);
     return primary ? primary.parentElement.querySelectorAll('path.land') : [];
   }
-  // The front line is drawn directly on the offline SVG map, not over a screenshot.
-  // All changes remain temporary until the fictional battle is decided.
+  // Fictional province-like sectors are generated in the existing Natural Earth
+  // country geometry. A sector is NOT an administrative province.
+  // This yields a locally irregular, branching conquest rather than a
+  // rectangular wipe or a straight synthetic international border.
   function clearAdvance() {
     if (advanceFrame !== null) cancelAnimationFrame(advanceFrame);
     advanceFrame = null;
     if (!advanceScene) return;
     advanceScene.host.classList.remove('battle-attacking');
-    advanceScene.ink.remove();
-    advanceScene.front.remove();
-    advanceScene.wipe.remove();
-    advanceScene.outline.remove();
+    for (const key of ['ink', 'front', 'markers', 'sectors', 'wipe', 'outline']) {
+      advanceScene[key].remove();
+    }
     advanceScene = null;
   }
+
+  function sectorPolygon(sites, site, box) {
+    let polygon = [
+      [box.x, box.y], [box.x + box.width, box.y],
+      [box.x + box.width, box.y + box.height], [box.x, box.y + box.height]
+    ];
+    for (const other of sites) {
+      if (site === other || polygon.length < 3) continue;
+      const nx = 2 * (other.x - site.x), ny = 2 * (other.y - site.y);
+      const limit = other.x * other.x + other.y * other.y -
+                    site.x * site.x - site.y * site.y;
+      const inside = p => nx * p[0] + ny * p[1] - limit;
+      const next = [];
+      for (let i = 0; i < polygon.length; i++) {
+        const from = polygon[i], to = polygon[(i + 1) % polygon.length];
+        const a = inside(from), b = inside(to);
+        if (a <= 0) next.push(from);
+        if ((a < 0 && b > 0) || (a > 0 && b < 0)) {
+          const t = a / (a - b);
+          next.push([from[0] + (to[0] - from[0]) * t,
+                     from[1] + (to[1] - from[1]) * t]);
+        }
+      }
+      polygon = next;
+    }
+    return polygon;
+  }
+
   function setAdvanceProgress(fraction) {
     const progress = Math.max(0, Math.min(1, fraction));
     const percent = Math.round(progress * 100);
@@ -140,103 +169,206 @@
     $('battle-progress-label').textContent = percent + '%';
     $('battle-progress').setAttribute('aria-valuenow', String(percent));
     if (!advanceScene) return;
-    const { box, reverse, rect, line } = advanceScene;
-    const width = Math.max(0.01, box.width * progress);
-    const x = reverse ? box.x + box.width - width : box.x;
-    const frontX = reverse ? x : x + width;
-    rect.setAttribute('x', String(x));
-    rect.setAttribute('width', String(width));
-    line.setAttribute('x1', String(frontX));
-    line.setAttribute('x2', String(frontX));
+    const scene = advanceScene;
+    for (const cell of scene.cells) {
+      const revealed = progress >= 0.999 || (progress > 0 && cell.threshold <= progress);
+      if (revealed !== cell.visible) {
+        cell.visible = revealed;
+        cell.clip.style.display = revealed ? '' : 'none';
+        cell.map.classList.toggle('conquered-sector', revealed);
+      }
+    }
+    // The free-form front is also shown between the discrete sector captures.
+    const { axis, box, seed } = scene;
+    const waveSize = (axis.maxA - axis.minA) * 0.11 * Math.sin(Math.PI * progress);
+    const curve = [];
+    const count = 72;
+    const toXY = (a, b) => {
+      return [axis.cx + a * axis.nx - b * axis.ny,
+              axis.cy + a * axis.ny + b * axis.nx];
+    };
+    for (let j = 0; j <= count; j++) {
+      const u = j / count;
+      const b = axis.minB + u * (axis.maxB - axis.minB);
+      const rough = Math.sin(u * 8.4 + seed) * 0.50 +
+                    Math.sin(u * 21.7 + seed * 1.9) * 0.28 +
+                    Math.sin(u * 43.1 + seed * 2.3) * 0.14 +
+                    Math.sin(u * 75.5 + seed * 0.7) * 0.08;
+      const a = axis.minA + (axis.maxA - axis.minA) * progress +
+                rough * waveSize;
+      curve.push(toXY(a, b));
+    }
+    scene.front.setAttribute('d', curve.map((p, j) =>
+      (j ? 'L' : 'M') + p[0].toFixed(2) + ',' + p[1].toFixed(2)).join(''));
+    scene.front.style.display = progress < 0.025 || progress > 0.99 ? 'none' : '';
+    scene.markers.style.display = progress < 0.08 || progress > 0.97 ? 'none' : '';
+    const step = Math.max(1, Math.floor((count - 8) / scene.troops.length));
+    scene.troops.forEach((marker, k) => {
+      const p = curve[Math.min(count - 3, 4 + k * step)];
+      const size = Math.max(1.2, Math.min(2.8, view.w / 110));
+      marker.setAttribute('x', (p[0] - size / 2).toFixed(2));
+      marker.setAttribute('y', (p[1] - size / 3).toFixed(2));
+      marker.setAttribute('width', String(size * 1.3));
+      marker.setAttribute('height', String(size));
+    });
   }
+
   function createAdvance(targetId) {
     clearAdvance();
     const primary = $('land-' + targetId);
-    if (!primary || !primary.ownerSVGElement) return;
-    const host = primary.parentElement;
+    if (!primary || !primary.ownerSVGElement || !game) return;
+    const host = primary.parentElement, svg = primary.ownerSVGElement;
     const paths = [...countryPieces(targetId)];
     if (!paths.length) return;
+    // The principal region, not an overseas dependency or a detached island,
+    // determines the attack direction and the width of the temporary front.
     let box;
-    try { box = host.getBBox(); } catch { return; }
-    if (!box || box.width <= 0 || box.height <= 0) return;
-    const svg = primary.ownerSVGElement;
+    try { box = primary.getBBox(); } catch { return; }
+    if (!box || box.width < 0.01 || box.height < 0.01) return;
     const ns = 'http://www.w3.org/2000/svg';
-    const make = name => document.createElementNS(ns, name);
+    const make = tag => document.createElementNS(ns, tag);
     let defs = svg.querySelector('defs');
-    if (!defs) {
-      defs = make('defs');
-      svg.insertBefore(defs, svg.firstChild);
-    }
-    const wipe = make('clipPath');
-    wipe.id = 'battle-advance-wipe';
-    wipe.setAttribute('clipPathUnits', 'userSpaceOnUse');
-    const rect = make('rect');
-    rect.setAttribute('y', String(box.y - 1));
-    rect.setAttribute('height', String(box.height + 2));
-    wipe.append(rect);
-    defs.append(wipe);
+    if (!defs) { defs = make('defs'); svg.insertBefore(defs, svg.firstChild); }
     const outline = make('clipPath');
     outline.id = 'battle-advance-outline';
     outline.setAttribute('clipPathUnits', 'userSpaceOnUse');
-    const ink = make('g');
-    ink.classList.add('battle-advance-overlay');
-    ink.setAttribute('clip-path', 'url(#battle-advance-wipe)');
+    for (const path of paths) {
+      const shape = path.cloneNode(false);
+      shape.removeAttribute('id');
+      shape.removeAttribute('class');
+      shape.removeAttribute('style');
+      outline.append(shape);
+    }
+    defs.append(outline);
+    const wipe = make('clipPath');
+    wipe.id = 'battle-advance-wipe';
+    wipe.setAttribute('clipPathUnits', 'userSpaceOnUse');
+    defs.append(wipe);
+
+    const sourceBox = owned => {
+      const node = $('land-' + owned.id);
+      try { return node ? node.getBBox() : null; } catch { return null; }
+    };
+    const cx = box.x + box.width / 2, cy = box.y + box.height / 2;
+    let nearest = null, best = Infinity;
+    for (const owned of landsOf(game.player)) {
+      const other = sourceBox(owned);
+      if (!other) continue;
+      const gapX = Math.max(0, box.x - (other.x + other.width),
+                           other.x - (box.x + box.width));
+      const gapY = Math.max(0, box.y - (other.y + other.height),
+                           other.y - (box.y + box.height));
+      const distance = Math.hypot(gapX, gapY);
+      if (distance < best) {
+        best = distance;
+        nearest = { x: other.x + other.width / 2,
+                    y: other.y + other.height / 2 };
+      }
+    }
+    const dx = cx - (nearest ? nearest.x : cx - 1);
+    const dy = cy - (nearest ? nearest.y : cy);
+    const magnitude = Math.max(0.001, Math.hypot(dx, dy));
+    const nx = dx / magnitude, ny = dy / magnitude;
+    const corners = [[box.x, box.y], [box.x + box.width, box.y],
+                     [box.x, box.y + box.height],
+                     [box.x + box.width, box.y + box.height]];
+    const aCoords = corners.map(p => (p[0] - cx) * nx + (p[1] - cy) * ny);
+    const bCoords = corners.map(p => -(p[0] - cx) * ny + (p[1] - cy) * nx);
+    const axis = {
+      cx, cy, nx, ny,
+      minA: Math.min(...aCoords), maxA: Math.max(...aCoords),
+      minB: Math.min(...bCoords), maxB: Math.max(...bCoords)
+    };
+    const seed = [...targetId].reduce((v, ch) => v * 1.4 + ch.charCodeAt(0), 1) +
+                 game.round * 1.71;
+    const random = (i, j) => {
+      const raw = Math.sin(i * 127.1 + j * 311.7 + seed * 8.23) * 43758.5453;
+      return raw - Math.floor(raw);
+    };
+    const cols = Math.max(4, Math.min(9, Math.round(box.width / 4)));
+    const rows = Math.max(4, Math.min(9, Math.round(box.height / 4)));
+    const sites = [];
+    for (let y = 0; y < rows; y++) for (let x = 0; x < cols; x++) {
+      sites.push({
+        x: box.x + box.width * (x + 0.22 + random(x, y) * 0.56) / cols,
+        y: box.y + box.height * (y + 0.22 + random(y + 13, x) * 0.56) / rows
+      });
+    }
+    const sections = make('g');
+    sections.classList.add('battle-sector-grid');
+    sections.setAttribute('clip-path', 'url(#battle-advance-outline)');
+    const cells = [];
+    for (const [index, site] of sites.entries()) {
+      const polygon = sectorPolygon(sites, site, box);
+      if (polygon.length < 3) continue;
+      const d = polygon.map((p, j) =>
+        (j ? 'L' : 'M') + p[0].toFixed(3) + ',' + p[1].toFixed(3)).join('') + 'Z';
+      const clip = make('path');
+      clip.setAttribute('d', d);
+      clip.style.display = 'none';
+      wipe.append(clip);
+      const mapPath = make('path');
+      mapPath.classList.add('battle-sector-outline');
+      mapPath.setAttribute('d', d);
+      sections.append(mapPath);
+      const location = ((site.x - cx) * nx + (site.y - cy) * ny -
+                        axis.minA) / (axis.maxA - axis.minA);
+      const jitter = (random(index, 61) - 0.5) * 0.075;
+      cells.push({
+        clip, map: mapPath, visible: false,
+        threshold: Math.min(0.995, Math.max(0.025, location + jitter))
+      });
+    }
+
     const attackerShape = $('land-' + game.player);
     const fill = map.classList.contains('flag-fill')
       ? 'url(#flag-pattern-' + game.player + ')'
       : (attackerShape && attackerShape.getAttribute('fill')) || '#77cfa3';
-    for (const path of paths) {
-      const stencil = path.cloneNode(false);
-      stencil.removeAttribute('id');
-      stencil.removeAttribute('class');
-      stencil.removeAttribute('style');
-      outline.append(stencil);
-      const colored = path.cloneNode(false);
-      colored.removeAttribute('id');
-      colored.removeAttribute('class');
-      colored.removeAttribute('style');
-      colored.setAttribute('fill', fill);
-      colored.setAttribute('stroke', 'none');
-      ink.append(colored);
-    }
-    defs.append(outline);
-    const front = make('line');
+    const ink = make('g');
+    ink.classList.add('battle-advance-overlay');
+    ink.setAttribute('clip-path', 'url(#battle-advance-outline)');
+    const color = make('rect');
+    color.setAttribute('x', String(box.x - 1));
+    color.setAttribute('y', String(box.y - 1));
+    color.setAttribute('width', String(box.width + 2));
+    color.setAttribute('height', String(box.height + 2));
+    color.setAttribute('fill', fill);
+    color.setAttribute('clip-path', 'url(#battle-advance-wipe)');
+    ink.append(color);
+    const front = make('path');
     front.classList.add('battle-front-line');
-    front.setAttribute('y1', String(box.y - 1));
-    front.setAttribute('y2', String(box.y + box.height + 1));
     front.setAttribute('clip-path', 'url(#battle-advance-outline)');
-    const targetCenter = box.x + box.width / 2;
-    // Advance from the closest already-owned territory, including captured land.
-    let nearest = Infinity;
-    let reverse = false;
-    for (const owned of landsOf(game.player)) {
-      const node = $('land-' + owned.id);
-      if (!node) continue;
-      const otherBox = node.parentElement.getBBox();
-      const center = otherBox.x + otherBox.width / 2;
-      const distance = Math.abs(center - targetCenter);
-      if (distance < nearest) { nearest = distance; reverse = center > targetCenter; }
+    const markers = make('g');
+    markers.classList.add('battle-front-troops');
+    markers.setAttribute('clip-path', 'url(#battle-advance-outline)');
+    const troops = [];
+    for (let i = 0; i < 11; i++) {
+      const flag = make('rect');
+      flag.classList.add('battle-front-flag');
+      flag.setAttribute('fill', fill);
+      markers.append(flag);
+      troops.push(flag);
     }
-    host.append(ink, front);
+    host.append(ink, sections, front, markers);
     host.classList.add('battle-attacking');
-    advanceScene = { host, ink, front, wipe, outline, rect, line: front, box, reverse };
+    advanceScene = { host, ink, sectors: sections, front, markers, troops,
+                     wipe, outline, box, axis, seed, cells };
     setAdvanceProgress(0);
   }
+
   function playAdvance(targetId, won, duration) {
     createAdvance(targetId);
-    const startAt = performance.now();
+    const started = performance.now();
     const stage = $('battle-stage');
-    stage.textContent = '⚡ Linia frontu';
-    if (reduced) {
-      setAdvanceProgress(won ? 1 : 0);
-      return;
-    }
+    stage.textContent = '🗺️ Ruch oddziałów przez sektory';
+    if (reduced) { setAdvanceProgress(won ? 1 : 0); return; }
     function frame(now) {
-      const t = Math.max(0, Math.min(1, (now - startAt) / duration));
-      const progress = won ? t : (t < 0.60 ? (t / 0.60) * 0.72 : 0.72 * (1 - (t - 0.60) / 0.40));
+      const t = Math.max(0, Math.min(1, (now - started) / duration));
+      const progress = won ? t :
+        (t < 0.64 ? t / 0.64 * 0.75 : 0.75 * (1 - (t - 0.64) / 0.36));
       setAdvanceProgress(progress);
-      stage.textContent = won ? '🏳️ Zdobywanie terenu' :
-        (t < 0.60 ? '⚔️ Trwa natarcie' : '🛡️ Obrona odpycha atak');
+      stage.textContent = won ? '🏳️ Zdobywanie kolejnych sektorów' :
+        (t < 0.64 ? '⚔️ Natarcie na sąsiednie sektory' : '🛡️ Obrona odzyskuje teren');
       if (t < 1 && fighting && game) advanceFrame = requestAnimationFrame(frame);
       else advanceFrame = null;
     }
@@ -329,6 +461,7 @@
     game = null;
     selectedTarget = null;
     panel.classList.add('hidden');
+    panel.classList.remove('battle-cinematic');
     app.classList.remove('battle-running');
     $('battlefield').classList.add('hidden');
     $('battlefield').classList.remove('running');
@@ -393,6 +526,7 @@
   function attack() {
     if (!game || fighting || !selectedTarget || !frontier().includes(selectedTarget)) return;
     fighting = true;
+    panel.classList.add('battle-cinematic');
     const defenderId = selectedTarget;
     const defendingOwner = ownerOf(defenderId);
     const attacker = playable.get(game.player);
@@ -415,7 +549,7 @@
       ' pkt ⚔️ ' + defenderRoll + ' pkt ' + defender.flag;
     $('battle-message').textContent = 'Trwa bitwa o ' + defender.n + '...';
     focusCountry(defenderId);
-    const duration = reduced ? 250 : 3200;
+    const duration = reduced ? 250 : 6500;
     playAdvance(defenderId, won, duration);
     battleTimer = setTimeout(() => {
       if (!game) return;
@@ -423,6 +557,7 @@
       setAdvanceProgress(won ? 1 : 0);
       clearAdvance();
       fighting = false;
+      panel.classList.remove('battle-cinematic');
       field.classList.remove('running');
       $('battle-stage').textContent = won ? '🏆 Teren zdobyty!' : '🛡️ Obrona zwyciężyła';
       game.round += 1;
