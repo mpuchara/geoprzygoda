@@ -73,6 +73,20 @@ battle_text = (ROOT / 'app/src/main/assets/battle.js').read_text()
 assert "path.parentElement.querySelectorAll('path.land')" in features_text
 assert "function countryPieces(id)" in battle_text
 
+# The front preserves city-directed marching and shows irregular small sectors.
+for marker in ('function createBattleSectors(', 'battle-fictional-sectors',
+               'sectorPolygon', 'capitalThreshold', 'battle-cinematic',
+               "try{box=primary.getBBox();}", 'battle-unit-banner'):
+    if marker == 'sectorPolygon':
+        assert 'Clip each region by the bisectors' in battle_text
+    else:
+        assert marker in battle_text, f'Missing cinematic sector conquest: {marker}'
+assert "'battle-fictional-sector-captured'" in battle_text
+assert 'Białystok' in battle_text and 'countryGoal(' in battle_text, 'Capital route was lost'
+assert 'Granice sektorów' in battle_text or 'podbijanie sektorów ma wymyślone granice' in battle_text
+assert 'battle-fictional-sector-line' in (ROOT / 'app/src/main/assets/battle.css').read_text()
+
+
 
 picker_js = (ROOT / 'app/src/main/assets/rival_ui.js').read_text(encoding='utf-8')
 assert 'rival_ui.js' in text and 'rival_ui.css' in text, 'Searchable rivalry UI assets missing'
