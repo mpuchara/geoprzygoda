@@ -81,6 +81,17 @@ for marker in ("makePicker(rivalSelect, 'rival-country'", "makePicker(battleSele
     assert marker in picker_js, f'Missing flag search capability: {marker}'
 assert "openExtra(rivalry, 'rival-country-search')" in features_text, 'Rivalry search not focusable'
 assert 'window.GeoPrzygodaPicker.refreshBattle()' in battle_text, 'Battle search does not refresh'
+# The advancing front must grow organically from a neighboring border, not a
+# straight full-height rectangle/line across a country.
+for marker in ("function startingPoint(", "function jaggedFront(", "function ownedBorderPaths(",
+               "getPointAtLength(", "advanceScene.waves", "battle-animating"):
+    assert marker in battle_text, f'Organic territory animation missing: {marker}'
+assert "const rect = make('rect')" not in battle_text, 'Old straight-edged conquest wipe returned'
+assert "const front = make('line')" not in battle_text, 'Old straight frontline returned'
+battle_css = (ROOT / 'app/src/main/assets/battle.css').read_text(encoding='utf-8')
+assert '.battle-front-line{fill:none;' in battle_css, 'Frontier stroke should not cover flags'
+assert '.territory-game.battle-animating' in battle_css, 'Conquest must leave the map visible'
+
 
 
 # All mapped countries with ISO alpha-2 codes must ship their vector flag.
