@@ -406,6 +406,87 @@ async function run() {
     });
     if(!banner) throw Error('Plan 7 player banner missing in campaign');
 
+
+    // A Chromium context with an Android WebView UA checks the alternate
+    // clipPath branch. This is NOT a real-device WebView certification.
+    const androidContext = await browser.newContext({
+      viewport:{ width:440, height:845 }, deviceScaleFactor:1,
+      reducedMotion:'reduce', locale:'pl-PL',
+      userAgent:'Mozilla/5.0 (Linux; Android 16; Pixel 9 Build/TEST) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/120.0.0.0 Mobile Safari/537.36 wv'
+    });
+    const androidPage = await androidContext.newPage();
+    const androidErrors = [];
+    androidPage.on('pageerror', err => androidErrors.push(err.message));
+    await androidPage.goto(url, { waitUntil:'load', timeout:60000 });
+    await androidPage.evaluate(() => document.getElementById('skip-name')?.click());
+    await androidPage.waitForFunction(() => window.GeoPrzygodaFlagStatus?.().complete,
+      null, { timeout:30000 });
+    const androidClips = await androidPage.evaluate(({ iso, stripes }) => {
+      const errors = [], striped = new Set(stripes);
+      let mapped = 0, fragments = 0;
+      for (const [id, code] of Object.entries(iso)) {
+        const primary = document.getElementById('land-' + id);
+        if (!primary) continue;
+        mapped++;
+        for (const piece of primary.parentElement.querySelectorAll('path.land')) {
+          fragments++;
+          const overlay = piece.nextElementSibling;
+          if (!overlay?.classList.contains('geo8-flag-overlay')) {
+            errors.push(id + ': no clipped PNG overlay'); continue;
+          }
+          const ref = /url\(#([^)]+)\)/.exec(overlay.getAttribute('clip-path') || '')?.[1];
+          const boundary = ref && document.getElementById(ref)?.querySelector('path');
+          if (!boundary || boundary.getAttribute('d') !== piece.getAttribute('d'))
+            errors.push(id + ': clipped image extends beyond polygon or wrong geometry');
+          if (overlay.getAttribute('pointer-events') !== 'none')
+            errors.push(id + ': overlay blocks touches');
+          if (/url\(/.test(piece.style.fill))
+            errors.push(id + ': Android still depends on faulty SVG pattern painting');
+          const image = overlay.querySelector('image');
+          if (!image || image.getAttribute('href') !== 'flag-textures/' + code.toLowerCase() + '.png')
+            errors.push(id + ': wrong or missing PNG');
+          const expectedAspect = striped.has(id) ? ['none'] : ['xMidYMid meet','xMidYMid slice'];
+          if (!expectedAspect.includes(image?.getAttribute('preserveAspectRatio')))
+            errors.push(id + ': stretched flag emblem');
+          if (overlay.style.display === 'none')
+            errors.push(id + ': flag invisible when enabled');
+          if (!overlay.querySelector('rect[fill]'))
+            errors.push(id + ': missing solid backing under PNG');
+        }
+      }
+      const before = document.querySelectorAll('.geo8-flag-overlay').length;
+      const checkbox = document.getElementById('setting-flags');
+      checkbox.checked = false;
+      checkbox.dispatchEvent(new Event('change',{bubbles:true}));
+      const hidden = [...document.querySelectorAll('.geo8-flag-overlay')]
+        .every(overlay => overlay.style.display === 'none');
+      checkbox.checked = true;
+      checkbox.dispatchEvent(new Event('change',{bubbles:true}));
+      const restored = [...document.querySelectorAll('.geo8-flag-overlay')]
+        .every(overlay => overlay.style.display !== 'none');
+      const belarus = document.getElementById('land-BLR');
+      const original = belarus.nextElementSibling?.querySelector('image')?.getAttribute('href');
+      window.GeoPrzygodaFitFlag('USA','BLR',belarus,0,true);
+      const unchangedDuringAnimation =
+        belarus.nextElementSibling?.querySelector('image')?.getAttribute('href') === original;
+      window.GeoPrzygodaFitFlag('USA','BLR',belarus,0);
+      const captured = belarus.nextElementSibling?.querySelector('image')?.getAttribute('href') ===
+        'flag-textures/us.png';
+      window.GeoPrzygodaResetFlagOverlay('BLR',belarus);
+      const reset = belarus.nextElementSibling?.querySelector('image')?.getAttribute('href') === original;
+      return { mapped, fragments, before, hidden, restored, unchangedDuringAnimation,
+        captured, reset, errors };
+    }, { iso, stripes:[...stripes] });
+    if(androidClips.mapped < 190 || androidClips.fragments < 190 ||
+        androidClips.before < 190 || !androidClips.hidden || !androidClips.restored ||
+        !androidClips.unchangedDuringAnimation || !androidClips.captured ||
+        !androidClips.reset || androidClips.errors.length || androidErrors.length)
+      throw Error('Android-UA clipPath regression: ' +
+        JSON.stringify({ ...androidClips, errors:androidClips.errors.slice(0,20),
+          pageErrors:androidErrors }));
+    await androidPage.screenshot({path:path.join(reportDir,'android-ua-clip.png')});
+    await androidContext.close();
+
     const summary = {
       chromium: chrome,
       checkedSvgFiles: Object.keys(iso).length,
@@ -422,6 +503,7 @@ async function run() {
       plan6History: historyCheck,
       plan6RememberedName: remembered,
       plan7Menu, plan7Challenges, plan7Shop, plan7History, plan7Duel, persistedPlan7,
+      androidUaClipRender: androidClips,
       browserErrors: pageErrors
     };
     fs.writeFileSync(path.join(reportDir,'report.json'), JSON.stringify(summary,null,2));
