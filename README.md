@@ -84,3 +84,10 @@ Każda geograficznie oddzielona część tych państw ma teraz własne dopasowan
 ## Rywalizacja w kolorach startowych
 
 Rywalizacja ma kolorowe, animowane tło w kolorach startowego ekranu. Na ekranie wybranego państwa i przeciwnika widać proste, prostokątne flagi SVG z lokalnego katalogu `flags/`. Do wyboru przeciwnika służy **Szukaj państwa** (nazwa, stolica lub kod ISO), a podczas Bitwy o terytoria podobna wyszukiwarka pokazuje wyłącznie sąsiadujące dostępne tereny. Działa offline.
+
+
+## Podbijanie nieregularnych sektorów
+
+Kampania podbojów zachowuje pochodzący z aktualnej wersji marsz w stronę stolicy, np. Białystok → Mińsk w zabawie Polska–Białoruś. Wzdłuż tej trasy i później wokół stolicy pojawiają się fikcyjne, nieregularne sektory. Wypełniają się stopniowo, aby podbój nie wyglądał jak prosty pasek. Po wygranej zajęty zostaje cały kraj, a po przegranej front się cofa. Podczas animacji panel kurczy się, aby odsłonić większą część mapy.
+
+Granice sektorów są losowo generowane na potrzeby rozgrywki i **nie odpowiadają** granicom prawdziwych prowincji, województw ani powiatów.
