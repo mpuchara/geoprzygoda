@@ -17,7 +17,7 @@ jobs:
   build:
     name: Build and check Android app
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     env:
       GEOPRZYGODA_VERSION_NAME: 1.0.${{ github.run_number }}
     steps:
@@ -38,6 +38,8 @@ jobs:
         run: '"$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-35" "build-tools;35.0.0"'
       - name: Generate detailed world boundaries (Natural Earth 1:10m)
         run: python3 scripts/build_world_detail.py
+      - name: Generate real province borders (Natural Earth Admin-1 1:10m)
+        run: python3 scripts/build_provinces.py
       - name: Validate extra JavaScript syntax
         run: |
           node --check app/src/main/assets/features.js

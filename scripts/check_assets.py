@@ -149,6 +149,29 @@ battle = (ROOT / 'app/src/main/assets/battle.js').read_text(encoding='utf-8')
 for token in ('rival-start-map', 'battle-history-overlay', 'battle-commonwealth', 'battle-target', 'geo-territory-battle-v1'):
     assert token in battle, f'Missing battle capability: {token}'
 assert (ROOT / 'app/src/main/assets/battle.css').is_file(), 'Missing battle style'
+# Plan 4: bundled *real* administrative divisions are generated at build
+# time and remain fully offline. Microstates use a labeled fictional fallback.
+province_path = ROOT / 'app/src/main/assets/world-provinces-10m.json'
+assert province_path.is_file(), 'Build admin-1 regions before checking Android assets'
+provinces = json.loads(province_path.read_text(encoding='utf-8'))
+assert provinces['projection'] == 'Mercator 1080x1080, 3 decimal SVG precision'
+assert len(provinces['countries']) >= 80, 'Too few admin-1 country layers'
+assert sum(map(len, provinces['countries'].values())) >= 2000, 'Too few real provinces'
+for cid, minimum in [('POL', 10), ('BLR', 5), ('USA', 30), ('DEU', 10)]:
+    regions = provinces['countries'][cid]
+    assert len(regions) >= minimum, f'Missing real regions for {cid}'
+    for region in regions:
+        assert region['d'].startswith('M') and len(region['b']) == 4
+        assert region['area'] > 0
+        assert isinstance(region['neighbors'], list)
+        assert all(0 <= n < len(regions) for n in region['neighbors'])
+for token in ('function createProvinceSectors(', "fetch('world-provinces-10m.json')",
+              "'battle-real-provinces'", 'battle-pause', 'battle-speed',
+              'battle-flag-left', 'battle-flag-right', 'battle-game-mode',
+              'battle-ally', "game.scenario === 'alliance'"):
+    assert token in battle_text, f'Missing plan-4 battle feature: {token}'
+assert '#world-map .battle-real-provinces' in (
+    ROOT / 'app/src/main/assets/battle.css').read_text(encoding='utf-8')
 countries_by_id = {c['id']: c for c in data['countries']}
 assert {'POL', 'LTU', 'BLR', 'UKR'} <= countries_by_id.keys(), 'Historical game scenario needs four countries'
 assert 'LTU' in countries_by_id['POL']['borders'], 'Poland/Lithuania should be neighbors in game atlas'
