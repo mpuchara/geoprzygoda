@@ -236,11 +236,11 @@
     // When 1:10m replaces the paths, switch back to live geometry so raster
     // coastlines can never escape newly refined borders.
     const overview = map.viewBox.baseVal.width > DETAIL_ZOOM_LIMIT;
-    const visible = flagsEnabled && mode !== 'quiz' && overview;
+    const visible = false; // Samsung: raster overview obscured real country flags
     geo8Raster.style.display = visible ? '' : 'none';
     geo8Borders.style.display = visible ? '' : 'none';
     geo8SelectedBorder.style.display = visible && geo8SelectedBorder.getAttribute('d') ? '' : 'none';
-    const zoomFlags = flagsEnabled && mode !== 'quiz' && !overview;
+    const zoomFlags = false; // Samsung: rely on working SVG patterns, not clipped PNG overlays
     const wasZoom = map.classList.contains('geo8-zoom-flags');
     map.classList.toggle('geo8-zoom-flags', zoomFlags);
     if (zoomFlags !== wasZoom) {
@@ -452,7 +452,10 @@
         box.width <= 0 || box.height <= 0) return null;
     // Keep the original solid country color below the world PNG on Android.
     // GPU SVG paint servers are only needed for dynamic battle ownership.
-    if (geo8Android && !c._geo8DynamicBattle) return piece.getAttribute('fill') || '#a8d77e';
+    if (geo8Android && !c._geo8DynamicBattle) {
+      const legacy = geo10LegacyFlag(c);
+      return 'url(#' + legacy + ') ' + (piece.getAttribute('fill') || '#a8d77e');
+    }
     syncTerrainUnderlay(piece);
     const id = patternId || 'flag-fitted-' + c.id + '-' + partIndex;
     const original = document.getElementById(id);
