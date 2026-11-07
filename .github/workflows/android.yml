@@ -40,6 +40,10 @@ jobs:
         run: python3 scripts/build_world_detail.py
       - name: Generate real province borders (Natural Earth Admin-1 1:10m)
         run: python3 scripts/build_provinces.py
+      - name: Render WebView-compatible PNG textures for the 238 canonical flags
+        run: |
+          python3 -m pip install --disable-pip-version-check --no-cache-dir "CairoSVG==2.7.1"
+          python3 scripts/build_flag_textures.py
       - name: Validate extra JavaScript syntax
         run: |
           node --check app/src/main/assets/features.js
