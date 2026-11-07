@@ -502,7 +502,7 @@
     for (const c of regions) {
       for (const shape of countryPieces(c.id)) {
         const showFlag = map.classList.contains('flag-fill') && c.code;
-        if (showFlag) shape.style.fill = 'url(#flag-pattern-' + c.id + ')';
+        if (showFlag) shape.style.fill = shape.dataset.geoprzygodaFittedFlag || 'url(#flag-pattern-' + c.id + ')';
         else shape.style.removeProperty('fill');
         shape.classList.remove('battle-owned');
       }
@@ -516,7 +516,8 @@
       const owner = playable.get(holder);
       const showFlag = map.classList.contains('flag-fill') && owner && owner.code;
       for (const shape of countryPieces(c.id)) {
-        if (showFlag) shape.style.fill = 'url(#flag-pattern-' + holder + ')';
+        if (showFlag) shape.style.fill = holder === c.id && shape.dataset.geoprzygodaFittedFlag
+          ? shape.dataset.geoprzygodaFittedFlag : 'url(#flag-pattern-' + holder + ')';
         else if (holder !== c.id) {
           const parent = $('land-' + holder);
           shape.style.fill = parent ? parent.getAttribute('fill') : '#b7d8a8';
