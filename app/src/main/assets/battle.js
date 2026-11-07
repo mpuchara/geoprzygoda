@@ -160,7 +160,8 @@
       player: raw.player,
       opponent: raw.opponent,
       handicap: [0, 0.15, 0.3].includes(raw.handicap) ? raw.handicap : 0,
-      scenario: raw.scenario === 'commonwealth' ? 'commonwealth' : 'free',
+      scenario: ['commonwealth', 'alliance', 'random'].includes(raw.scenario) ? raw.scenario : 'free',
+      ally: playable.has(raw.ally) ? raw.ally : null,
       round: Math.max(1, Math.min(10000, Number(raw.round) || 1)),
       owners,
       log: Array.isArray(raw.log) ? raw.log.filter(x => typeof x === 'string').slice(-70) : []
@@ -802,6 +803,9 @@
     const size = lands.reduce((total, c) => total + c.area, 0);
     const commonwealth = game.scenario === 'commonwealth';
     $('battle-title').textContent = commonwealth ? '🏰 Rzeczpospolita Obojga Narodów (scenariusz)' :
+      game.scenario === 'alliance' ? '🤝 Sojusz: ' + leader.n +
+        ' i ' + (playable.get(game.ally)?.n || 'sojusznik') :
+      game.scenario === 'random' ? '🎲 Losowe wyzwanie: ' + leader.n :
       leader.flag + ' ' + leader.n + ' – Twoje państwo';
     $('battle-stats').textContent = 'Tereny: ' + lands.length + ' · Powierzchnia (na mapie): ' +
       Math.round(size).toLocaleString('pl-PL') + ' km² · Tura: ' + game.round;
@@ -818,6 +822,9 @@
     battleTimer = null;
     clearAdvance();
     fighting = false;
+    battlePaused = false;
+    $('battle-pause').setAttribute('aria-pressed', 'false');
+    $('battle-pause').textContent = '⏸ Pauza';
     if (game) save();
     game = null;
     selectedTarget = null;
@@ -829,7 +836,7 @@
     restoreOriginalColors();
     paint();
   }
-  function start(player, opponent, handicap = 0, scenario = 'free') {
+  function start(player, opponent, handicap = 0, scenario = 'free', ally = null) {
     if (!playable.has(player) || !playable.has(opponent) || player === opponent) {
       announce('Wybierz dwa różne państwa na mapie.');
       return;
@@ -840,9 +847,11 @@
     game = {
       v: 1, player, opponent,
       handicap: [0, 0.15, 0.3].includes(handicap) ? handicap : 0,
-      scenario, round: 1, owners: {}, log: []
+      scenario, ally: scenario === 'alliance' && neighbors.get(player)?.has(ally)
+        ? ally : null, round: 1, owners: {}, log: []
     };
     if (scenario === 'commonwealth') game.owners.LTU = 'POL';
+    if (game.ally) game.owners[game.ally] = player;
     note(scenario === 'commonwealth'
       ? '🏰 Start scenariusza: Polska i Litwa jako jedno państwo w uproszczonej grze.'
       : '🏁 Rozpoczyna się rywalizacja: ' + countryLabel(player) + ' kontra ' + countryLabel(opponent) + '.');
@@ -851,6 +860,7 @@
     $('battle-message').textContent = 'Dotknij sąsiedniego kraju lub wybierz go z listy. Zobacz, jak zmienia się linia frontu.';
     updatePanel(opponent);
     focusCountry(player);
+    loadProvinceData(); // Local bundled geometry; no Internet permission needed.
     save();
   }
   function resume() {
@@ -867,6 +877,7 @@
     app.classList.add('battle-running');
     $('battle-message').textContent = 'Wznowiono grę. Wybierz teren do ataku.';
     updatePanel(game.opponent);
+    loadProvinceData();
   }
   function chooseTarget(id) {
     if (!game || fighting) return;
@@ -973,16 +984,33 @@
   }
   rivalStart.addEventListener('click', () => {
     const first = $('rival-first').dataset.country;
-    const other = $('rival-opponent').value;
+    let other = $('rival-opponent').value;
     const penalty = Number($('rival-disadvantage').value);
+    const gameMode = $('battle-game-mode').value;
+    const ally = gameMode === 'alliance' ? $('battle-ally').value : null;
+    if (gameMode === 'random') {
+      const choices = [...(neighbors.get(first) || [])]
+        .filter(id => playable.has(id) && id !== first);
+      if (choices.length) other = choices[Math.floor(Math.random() * choices.length)];
+    }
     const close = rivalry.querySelector('[data-extra-close="rivalry-overlay"]');
     if (close) close.click();
-    start(first, other, penalty);
+    start(first, other, penalty, gameMode, ally);
   });
   rivalHistory.addEventListener('click', openHistory);
   $('battle-history').addEventListener('click', openHistory);
   $('battle-exit').addEventListener('click', stop);
   $('battle-attack').addEventListener('click', attack);
+  $('battle-pause').addEventListener('click', () => {
+    if (!fighting) return;
+    battlePaused = !battlePaused;
+    $('battle-pause').textContent = battlePaused ? '▶ Wznów' : '⏸ Pauza';
+    $('battle-pause').setAttribute('aria-pressed', String(battlePaused));
+    if (battlePaused) $('battle-stage').textContent = '⏸ Bitwa wstrzymana';
+  });
+  $('battle-speed').addEventListener('change', () => {
+    battleSpeed = Number($('battle-speed').value) || 1;
+  });
   $('battle-target').addEventListener('change', e => chooseTarget(e.target.value));
   $('battle-history-close').addEventListener('click', closeHistory);
   history.addEventListener('click', e => { if (e.target === history) closeHistory(); });
