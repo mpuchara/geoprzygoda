@@ -524,9 +524,12 @@
   function setAdvanceProgress(fraction) {
     const progress = clamp01(fraction);
     const percent = Math.round(progress*100);
-    $('battle-conquest-fill').style.width = percent + '%';
-    $('battle-progress-label').textContent = percent + '%';
-    $('battle-progress').setAttribute('aria-valuenow',String(percent));
+    const currentPercent = Number($('battle-progress').getAttribute('aria-valuenow'));
+    if (percent !== currentPercent) {
+      $('battle-conquest-fill').style.width = percent + '%';
+      $('battle-progress-label').textContent = percent + '%';
+      $('battle-progress').setAttribute('aria-valuenow', String(percent));
+    }
     if (!advanceScene) return;
     const scene=advanceScene;
     const {box,routeNodes,frontShape,unit,route,goal,entry} = scene;
@@ -576,20 +579,32 @@
         }
       }
       const count = $('battle-sector-count');
-      if (count) count.textContent = capturedCount + '/' + scene.sectors.length +
-        (scene.realProvinces ? ' prowincji' : ' sektorów (umownych)');
+      if (count && capturedCount !== scene.lastCapturedCount) {
+        count.textContent = capturedCount + '/' + scene.sectors.length +
+          (scene.realProvinces ? ' prowincji' : ' sektorów (umownych)');
+        scene.lastCapturedCount = capturedCount;
+      }
       if (scene.realProvinces && totalArea) {
         const conqueredPct = progress >= .999 ? 100 : Math.round(capturedArea / totalArea * 100);
-        $('battle-conquest-fill').style.width = conqueredPct + '%';
-        $('battle-progress-label').textContent = conqueredPct + '%';
-        $('battle-progress').setAttribute('aria-valuenow', String(conqueredPct));
+        if (conqueredPct !== Number($('battle-progress').getAttribute('aria-valuenow'))) {
+          $('battle-conquest-fill').style.width = conqueredPct + '%';
+          $('battle-progress-label').textContent = conqueredPct + '%';
+          $('battle-progress').setAttribute('aria-valuenow', String(conqueredPct));
+        }
       }
     }
     if(progress>=1){
       parts.length=0;
       parts.push('M'+(box.x-2)+','+(box.y-2)+'h'+(box.width+4)+'v'+(box.height+4)+'h-'+(box.width+4)+'Z');
     }
-    frontShape.setAttribute('d',parts.join(''));
+    // Rebuilding a province-size SVG path every 16 ms caused heavy Android
+    // WebView geometry work. Captured geometry changes only on sector changes.
+    const geometryKey = scene.sectors
+      ? parts.length + ':' + String(progress >= 1) : progress;
+    if (scene.lastGeometryKey !== geometryKey) {
+      frontShape.setAttribute('d', parts.join(''));
+      scene.lastGeometryKey = geometryKey;
+    }
     // The unit follows the invasion route; it retreats on unsuccessful attacks.
     const march=clamp01(progress/.55);
     const index=march*(routeNodes.length-1);
@@ -720,12 +735,19 @@
     const source = advanceScene?.sourceCity;
     let previous = performance.now(), elapsed = 0;
     stage.textContent = source ? '📍 Start: ' + source : '⚔️ Początek natarcia';
+    let lastPaint = 0;
     function frame(now) {
       if (!fighting || !game) { advanceFrame = null; return; }
       const delta = Math.min(120, Math.max(0, now - previous));
       previous = now;
       if (!battlePaused) elapsed += delta * battleSpeed;
       const t = clamp01(elapsed / duration);
+      // 30 FPS is enough for this map; avoids 60 heavy SVG updates per second.
+      if (t < 1 && now - lastPaint < 30) {
+        advanceFrame = requestAnimationFrame(frame);
+        return;
+      }
+      lastPaint = now;
       const progress = won ? t : (t < .60 ? t / .60 * .59 : (1-t) / .40 * .59);
       setAdvanceProgress(progress);
       if (battlePaused) stage.textContent = '⏸ Bitwa wstrzymana';
