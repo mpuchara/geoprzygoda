@@ -175,3 +175,9 @@ w nakładkach flag z symbolami (USA, Australia, Brazylia, Chiny, Nowa
 Zelandia, Wielka Brytania, Pakistan, Albania, Szwajcaria). Zostały
 zamienione na dokładne wartości barw znajdujące się w źródłowych SVG.
 Test `scripts/check_flags.py` sprawdza również te dziewięć kolorów.
+
+## Audyt renderowania flag (zadanie #17)
+
+Po audycie 238 plików SVG dodano test prawdziwego renderera **Chromium** (`scripts/check_flag_render.cjs`) wykonywany na tym samym lokalnym HTML, JavaScript i mapie SVG, które trafiają do APK. Test sprawdza mapowanie ISO do obrazu w każdym renderowanym kraju i jego wyspach, rozmiar wzorca wobec aktualnego `getBBox()`, zachowanie proporcji przy zoomie, przełączanie flag oraz flagę zwycięzcy w trybie podboju. Weryfikuje m.in. Holandię, Austrię, Francję, USA, Australię, Turcję i Wielką Brytanię.
+
+GitHub Actions publikuje osobny artefakt `GeoPrzygoda-Flag-Map-Render` ze zrzutami mapy, zbliżeniami i raportem JSON. Jest to realny test w przeglądarce oraz materiał do **ręcznej** oceny, lecz nie jest równoważny testom na fizycznym Android WebView; te należy wykonać po instalacji APK. Nie uznajemy samego testu obecności 238 flag za wizualne potwierdzenie 238 flag.

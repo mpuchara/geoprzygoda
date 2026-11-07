@@ -49,6 +49,12 @@ jobs:
         run: python3 scripts/build_flag_gallery.py flag-gallery.html
       - name: Check bundled game
         run: python3 scripts/check_assets.py
+      - name: Prepare real-browser SVG flag tests
+        run: |
+          command -v google-chrome || command -v chromium
+          npm install --no-save --no-audit --no-fund --prefix scripts/flag-browser playwright-core@1.56.1
+      - name: Render maps and test flag proportions, zoom and conquest
+        run: node scripts/check_flag_render.cjs
       - name: Compile APK and run Android lint
         run: ./gradlew --no-daemon --console=plain :app:assembleDebug :app:lintDebug
       - name: Save installable APK
@@ -64,6 +70,14 @@ jobs:
           name: GeoPrzygoda-Flag-Gallery
           path: flag-gallery.html
           if-no-files-found: error
+          retention-days: 30
+      - name: Save flag map render evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GeoPrzygoda-Flag-Map-Render
+          path: scripts/flag-render-evidence/
+          if-no-files-found: ignore
           retention-days: 30
       - name: Save Android lint report
         if: always()
