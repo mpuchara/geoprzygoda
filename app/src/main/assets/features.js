@@ -35,7 +35,22 @@
     '<select id="rival-disadvantage" class="rival-select"><option value="0">Bez utrudnień</option><option value="0.15">Trudny teren (−15%)</option><option value="0.30">Bez sprzętu (−30%)</option></select>' +
     '<button id="rival-compare" class="rival-compare">🏁 Porównaj państwa</button><div id="rival-result" aria-live="polite"></div>' +
     '<p class="extra-note">Tryb „bez broni”: punkty są liczone wyłącznie z powierzchni i liczby sąsiadów z atlasu. Nie pokazujemy liczebności armii, bo obecna baza nie zawiera sprawdzonych danych wojskowych.</p></div>';
-  document.body.append(settings, rivalry);
+  // Plan 9 + Plan 10: preserve the other branch's offline island finder,
+  // extended with real archipelago locations. A shortcut zooms to existing
+  // Natural Earth geometry; it never invents an island or enlarges its shape.
+  const islands = document.createElement('div');
+  islands.className = 'overlay extras-overlay hidden';
+  islands.id = 'islands-overlay';
+  islands.setAttribute('role','dialog');
+  islands.setAttribute('aria-modal','true');
+  islands.setAttribute('aria-labelledby','islands-title');
+  islands.innerHTML =
+    '<div class="extras-panel"><button class="close-overlay extras-close" data-extra-close="islands-overlay" aria-label="Zamknij wyspy">×</button>' +
+    '<h2 id="islands-title">🏝️ Odkrywaj prawdziwe wyspy</h2>' +
+    '<p>Wybierz archipelag, a mapa pokaże jego prawdziwe położenie i dokładne wybrzeże po przybliżeniu.</p>' +
+    '<div id="islands-list"></div>' +
+    '<p class="extra-note">Małe wyspy i terytoria zależne pozostają częścią właściwych państw. Jeśli danych geometrycznych brakuje, nie rysujemy sztucznych kółek.</p></div>';
+  document.body.append(settings, rivalry, islands);
 
   const settingsButton = document.createElement('button');
   settingsButton.id = 'open-settings';
@@ -43,6 +58,14 @@
   settingsButton.textContent = '⚙';
   settingsButton.setAttribute('aria-label', 'Otwórz ustawienia');
   $('open-about').before(settingsButton);
+  const islandButton = document.createElement('button');
+  islandButton.type='button';
+  islandButton.id='open-islands';
+  islandButton.className='dock-info';
+  islandButton.textContent='🏝️';
+  islandButton.setAttribute('aria-label','Odkrywaj wyspy i archipelagi');
+  islandButton.title='Odkrywaj wyspy';
+  settingsButton.before(islandButton);
 
   function openExtra(panel, focusId) {
     priorFocus = document.activeElement;
@@ -59,17 +82,62 @@
     priorFocus = null;
   }
   function openExtraId() {
-    for (const id of ['rivalry-overlay', 'settings-overlay']) {
+    for (const id of ['rivalry-overlay', 'settings-overlay', 'islands-overlay']) {
       if (!$(id).classList.contains('hidden')) return id;
     }
     return null;
   }
   settingsButton.addEventListener('click', () => openExtra(settings, 'setting-flags'));
+  islandButton.addEventListener('click', () => openExtra(islands,'geo9-island-first'));
+  // [atlas entity, visible archipelago, longitude, latitude]. Locations are
+  // navigational centers, not synthetic points rendered as physical islands.
+  const islandShortcuts = [
+    ['WLF','Wallis i Futuna',-176.2,-13.3],
+    ['VIR','Wyspy Dziewicze Stanów Zjednoczonych',-64.9,18.35],
+    ['MYT','Majotta',45.16,-12.83],
+    ['ATF','Wyspy Kerguelena',69.2,-49.35],
+    ['FRO','Wyspy Owcze',-6.8,62.05],
+    ['PRT','Azory',-27.2,38.7],
+    ['PRT','Madera',-16.95,32.75],
+    ['ESP','Baleary',2.72,39.68],
+    ['ESP','Wyspy Kanaryjskie',-16.55,28.3],
+    ['MDV','Malediwy',73.48,4.2],
+    ['BHS','Bahamy',-77.4,25],
+    ['SYC','Seszele',55.45,-4.61],
+    ['KIR','Kiribati',172.98,1.45],
+    ['TUV','Tuvalu',179.2,-8.52],
+    ['FJI','Fidżi',178.43,-17.7],
+    ['COK','Wyspy Cooka',-159.78,-21.22],
+    ['PYF','Polinezja Francuska',-149.57,-17.54]
+  ];
+  for (const [id,name,lon,lat] of islandShortcuts) {
+    const c = byId.get(id);
+    if (!c) continue;
+    const item = document.createElement('button');
+    item.type='button'; item.className='rival-compare';
+    item.style.cssText='display:block;width:100%;margin:9px 0;text-align:left';
+    item.textContent=(c.flag||'🏝️')+' '+name+' — pokaż na mapie';
+    item.setAttribute('aria-label','Pokaż na mapie: '+name);
+    if (name === 'Wallis i Futuna') item.id='geo9-island-first';
+    item.addEventListener('click',()=>{
+      closeExtra('islands-overlay');
+      const x=(lon+180)*3;
+      const y=540-540/Math.PI*Math.asinh(Math.tan(lat*Math.PI/180));
+      const width=36;
+      setView({
+        x:Math.max(0,Math.min(1080-width,x-width/2)),
+        y:Math.max(0,Math.min(1080-width,y-width/2)),
+        w:width,h:width
+      },true);
+      openCountry(id,false);
+    });
+    $('islands-list').append(item);
+  }
   $('setting-edit-name').addEventListener('click', () => {
     closeExtra('settings-overlay');
     showWelcome(true);
   });
-  for (const panel of [settings, rivalry]) {
+  for (const panel of [settings, rivalry, islands]) {
     panel.addEventListener('click', e => {
       const close = e.target.closest('[data-extra-close]');
       if (close) closeExtra(close.dataset.extraClose);
