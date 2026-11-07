@@ -88,7 +88,7 @@
     return null;
   }
   settingsButton.addEventListener('click', () => openExtra(settings, 'setting-flags'));
-  islandButton.addEventListener('click', () => openExtra(islands, 'islands-list'));
+  islandButton.addEventListener('click', () => openExtra(islands, 'geo9-island-first'));
   const islandIds = ['WLF', 'VIR', 'MYT', 'ATF'];
   for (const id of islandIds) {
     const c = COUNTRY_DATA.find(country => country.id === id);
@@ -96,6 +96,7 @@
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'rival-compare';
+    if (id === 'WLF') button.id = 'geo9-island-first';
     button.style.cssText = 'display:block;width:100%;margin:10px 0;text-align:left';
     button.textContent = c.flag + ' ' + c.n + ' — pokaż na mapie';
     button.setAttribute('aria-label', 'Pokaż na mapie: ' + c.n);
