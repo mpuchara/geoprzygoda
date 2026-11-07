@@ -480,6 +480,7 @@
     game = null;
     selectedTarget = null;
     panel.classList.add('hidden');
+    panel.classList.remove('battle-animating');
     app.classList.remove('battle-running');
     $('battlefield').classList.add('hidden');
     $('battlefield').classList.remove('running');
@@ -557,6 +558,7 @@
     const won = attackerRoll >= defenderRoll;
     const turn = game.round;
     $('battle-attack').disabled = true;
+    panel.classList.add('battle-animating');
     const field = $('battlefield');
     field.classList.remove('hidden');
     field.classList.remove('running');
@@ -574,6 +576,7 @@
       setAdvanceProgress(won ? 1 : 0);
       clearAdvance();
       fighting = false;
+      panel.classList.remove('battle-animating');
       field.classList.remove('running');
       $('battle-stage').textContent = won ? '🏆 Teren zdobyty!' : '🛡️ Obrona zwyciężyła';
       game.round += 1;

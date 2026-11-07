@@ -107,6 +107,14 @@ assert 'LTU' in countries_by_id['POL']['borders'], 'Poland/Lithuania should be n
 assert 'BLR' in countries_by_id['LTU']['borders'] or 'BLR' in countries_by_id['POL']['borders'], 'Commonwealth has no Belarus frontier'
 assert 'UKR' in countries_by_id['POL']['borders'], 'Commonwealth has no Ukraine frontier'
 
+# Organic fronts remain capital-directed while the map stays visible in battles.
+assert 'battle-animating' in battle, 'During a battle the panel must collapse'
+assert 'function smoothBlob(' in battle, 'Organic conquest should be retained'
+assert 'function closestBorderStart(' in battle, 'Capital-directed attack route should remain'
+css = (ROOT / 'app/src/main/assets/battle.css').read_text(encoding='utf-8')
+assert '.battle-organic-fill{' in css and 'stroke-dasharray:4 3' in css, 'Organic frontier outline is missing'
+assert '.territory-game.battle-animating' in css, 'Battle view obscures too much of map'
+
 manifest = ET.parse(ROOT / 'app/src/main/AndroidManifest.xml').getroot()
 assert not manifest.findall('uses-permission'), 'Offline game should not request permissions'
 for file in (ROOT / 'app/src/main/res').rglob('*.xml'):
