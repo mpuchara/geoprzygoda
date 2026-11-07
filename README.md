@@ -214,3 +214,15 @@ na Samsungu/Android WebView.
 - W każdej turze zwycięstwo wciąż przypisuje cały pokonany kraj po zakończeniu stopniowej animacji. **Nie ma jeszcze trwałego zapisu pojedynczych zdobytych prowincji między turami**.
 - Dane Natural Earth Admin-1 nie obejmują każdej jednostki administracyjnej na świecie, a niektóre granice mogą być generalizowane; wynik podboju to gra, nie odwzorowanie prawdziwych konfliktów.
 - Flagi pozostają tymi samymi 238 plikami SVG, z testami zgodności ISO oraz poprawionymi proporcjami z Planu nr 3. Testy automatyczne nie zastępują oględzin w Android WebView.
+
+
+## Plan nr 5 — stabilne kolory i płynna mapa na Androidzie 🌍⚡
+
+- **Kolor kraju nigdy nie znika**: każda flaga na mapie ma pod spodem zwykły kolor kraju. Jeśli obraz flagi nie zostanie narysowany w Android WebView, widać bezpieczne tło.
+- Flagi nadal odpowiadają 238 oryginalnym plikom ISO SVG, ale na mapie wyświetlane są **lekkie tekstury PNG 256×192**, generowane z tych samych SVG w czasie budowania APK. Źródłowe flagi SVG pozostają bez zmian.
+- Widok świata korzysta z lekkiej geometrii **Natural Earth 1:50m**. Po przybliżeniu do kraju wczytywana jest wyłącznie potrzebna geometria **1:10m**, a po oddaleniu oryginalne ścieżki 1:50m są przywracane.
+- Mapa pobiera mały indeks krajów i osobne pliki granic dla widocznych państw. Aktualizacja odbywa się po krótkim zatrzymaniu gestu i najwyżej dla kilku państw na raz; przeliczenia SVG są buforowane.
+- Bitwa wczytuje wyłącznie prowincje atakowanego kraju. Przed poprawką pobierała wielomegabajtową geometrię wszystkich państw naraz; teraz pamięć przechowuje najwyżej dwa ostatnie kraje.
+- Animacja bitwy ogranicza odświeżanie do ok. 30 klatek/s i nie przebudowuje ogromnego kształtu zajętych prowincji, dopóki nie zmieni się faktyczna granica.
+- Nadal działają muzyka, quiz, wybór flag, tryby rywalizacji i pozostałe poprawki Planów 3 i 4. Nie wprowadzono nowego trybu gry.
+- Automatyczne testy sprawdzają zgodność 238 flag, obecność bezpiecznego koloru, zmianę zoomu i przywrócenie 1:50m. Rzeczywistą płynność i wygląd w Android WebView trzeba dodatkowo ocenić na telefonie.
