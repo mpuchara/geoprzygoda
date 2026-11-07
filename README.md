@@ -226,3 +226,24 @@ na Samsungu/Android WebView.
 - Animacja bitwy ogranicza odświeżanie do ok. 30 klatek/s i nie przebudowuje ogromnego kształtu zajętych prowincji, dopóki nie zmieni się faktyczna granica.
 - Nadal działają muzyka, quiz, wybór flag, tryby rywalizacji i pozostałe poprawki Planów 3 i 4. Nie wprowadzono nowego trybu gry.
 - Automatyczne testy sprawdzają zgodność 238 flag, obecność bezpiecznego koloru, zmianę zoomu i przywrócenie 1:50m. Rzeczywistą płynność i wygląd w Android WebView trzeba dodatkowo ocenić na telefonie.
+
+
+## Plan nr 6 — encyklopedia i historia państw (offline)
+
+- Dla wszystkich **251 państw i terytoriów** są osobne, małe pliki JSON w katalogu `app/src/main/assets/encyclopedia/`. Wczytujemy wyłącznie otwarty kraj, nie wszystkie opisy naraz. W pamięci przeglądarki trzymamy maksymalnie 8 ostatnich rekordów.
+- Dane obejmują dostępne nazwy stolic, powierzchnię, kontynent, waluty (246 pozycji), języki (249), dostęp do morza (249) i ludność z **2024 r.** (215 pozycji). Długości granic, wybrzeża i wybrane ukształtowanie terenu prezentujemy wyłącznie tam, gdzie mamy wiarygodne źródło (np. Polska, GUS); nie obliczamy długości z mapy 1:50m.
+- W opisie jest przycisk **🏰 Jak było dawniej?**. Dla Polski, Niderlandów, Niemiec, Francji, USA i Austrii dostępna jest przesuwana palcem oś czasu z dawnymi nazwami, ustrojami i postaciami historycznymi. Pokazujemy historyczne flagi wyłącznie tam, gdzie da się potwierdzić wygląd i okres ich użycia. Brak zweryfikowanych historycznych wielokątów = brak fikcyjnych granic na mapie.
+- Zakładka faktów oraz historia są tworzone dopiero po otwarciu kraju; animowana wstążka respektuje `prefers-reduced-motion`. Mapa, quiz, prowincje, flagi, muzyka i rywalizacja pozostają bez zmian.
+- Zapisana prawdziwa nazwa gracza pomija ekran powitalny przy kolejnym uruchomieniu. **Pomiń** nie tworzy fikcyjnego konta. W ustawieniach jest opcja **Zmień nazwę gracza**.
+
+### Źródła, datowanie i prawa do danych
+
+- Dane administracyjno-geograficzne, języki, waluty: `mledoze/countries` (<https://github.com/mledoze/countries>) ODbL 1.0; stan repozytorium jest przypięty w `encyclopedia-sources.json`.
+- Ludność: World Bank World Development Indicators `SP.POP.TOTL`, rok 2024, CC BY 4.0 (<https://data.worldbank.org/indicator/SP.POP.TOTL>), arkusz wg aktualizacji z 19 grudnia 2025; pochodzenie i rewizja kopii zapisane w metadanych.
+- Granice i geografia Polski: GUS, `Mały Rocznik Statystyczny Polski 2025` i `Polska w liczbach` oraz ZPE (odnośniki w rekordzie `pol.json`).
+- Historie: IPN, gov.pl, Rijksmuseum, holenderski Dom Królewski, Deutsches Historisches Museum, US National Archives, Smithsonian, Library of Congress i austriackie MSZ; źródła zapisane przy poszczególnych krajach.
+- Brak danych = brak wartości w interfejsie; wskaźniki demograficzne mają zawsze rok. Wzorce flag historycznych mają opis wariantów i zastrzeżenia; nie są współczesnymi flagami mapy.
+
+### Testy
+
+CI sprawdza wszystkie 251 JSON, waliduje oznaczenia lat, wykonuje testy rysowania flag, nawigacji w historycznej osi czasu i odtwarzania pseudonimu po ponownym uruchomieniu. Testy Chromium i Android Lint nie zastępują pomiaru płynności na fizycznym telefonie.
