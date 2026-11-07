@@ -13,7 +13,7 @@ import xml.etree.ElementTree as ET
 from xml.sax.saxutils import escape
 
 import cairosvg
-from PIL import Image, ImageColor, ImageOps
+from PIL import Image, ImageChops, ImageColor, ImageOps
 
 ROOT = Path(__file__).resolve().parents[1]
 ASSETS = ROOT / "app/src/main/assets"
@@ -60,6 +60,62 @@ def flag_tile(source, dimensions, stretch, background):
                         centering=(.5, .5))
 
 
+def individual_islands(d):
+    """Split multi-island SVG paths into separate flag-sized geographic pieces.
+
+    A single 1:50m path for NLD, ESP, PRT, KIR or MDV may span an ocean.
+    Fitting one flag to that enormous bounding box gives islands one pixel
+    of the flag. Group contained inner rings (lake holes) with their outer
+    coast so their masks remain topologically valid.
+    """
+    rings = []
+    for path in re.findall(r"M[^Z]+Z", d):
+        points = [(float(x), float(y)) for x, y in COORDS.findall(path)]
+        if len(points) < 3:
+            continue
+        bounds = [min(x for x,y in points), min(y for x,y in points),
+                  max(x for x,y in points), max(y for x,y in points)]
+        rings.append((path, points, bounds))
+    if len(rings) < 2:
+        return [d]
+
+    def contains(polygon, point):
+        x,y = point
+        inside=False
+        for a,b in zip(polygon, polygon[1:]+polygon[:1]):
+            if (a[1]>y)!=(b[1]>y) and x < ((b[0]-a[0])*(y-a[1]) /
+                                                  (b[1]-a[1]) + a[0]):
+                inside=not inside
+        return inside
+
+    parents={}
+    for i,(_,points,b) in enumerate(rings):
+        area=(b[2]-b[0])*(b[3]-b[1])
+        best=None
+        best_area=float("inf")
+        for j,(_,other,container) in enumerate(rings):
+            if i==j: continue
+            other_area=(container[2]-container[0])*(container[3]-container[1])
+            if other_area <= area + 1e-8 or other_area >= best_area:
+                continue
+            if (container[0] <= b[0] and container[1] <= b[1] and
+                container[2] >= b[2] and container[3] >= b[3] and
+                contains(other,points[0])):
+                best, best_area = j, other_area
+        if best is not None:
+            parents[i]=best
+
+    components={}
+    for i,(path,_,_) in enumerate(rings):
+        root=i
+        seen=set()
+        while root in parents and root not in seen:
+            seen.add(root)
+            root=parents[root]
+        components.setdefault(root,[]).append(path)
+    return ["".join(paths) for paths in components.values()]
+
+
 def paint_piece(world, source, d, stretch, background):
     points = [(float(x), float(y)) for x, y in COORDS.findall(d)]
     if not points:
@@ -81,7 +137,7 @@ def paint_piece(world, source, d, stretch, background):
                           output_width=w, output_height=h)
     mask = Image.open(BytesIO(png)).convert("RGBA").getchannel("A")
     tile = flag_tile(source, (w, h), stretch, background)
-    tile.putalpha(mask)
+    tile.putalpha(ImageChops.multiply(tile.getchannel('A'), mask))
     world.alpha_composite(tile, (left, top))
     return True
 
@@ -105,10 +161,11 @@ def main():
             raise RuntimeError(f"Missing PNG texture {texture}")
         flag = Image.open(texture).convert("RGBA")
         for element in anchor.findall("svg:path", NS):
-            if paint_piece(world, flag, element.get("d", ""),
-                           country_id in stripes, backgrounds.get(country_id)):
-                rendered_shapes += 1
-                rendered_ids.add(country_id)
+            for island in individual_islands(element.get("d", "")):
+                if paint_piece(world, flag, island, country_id in stripes,
+                               backgrounds.get(country_id)):
+                    rendered_shapes += 1
+                    rendered_ids.add(country_id)
     if len(rendered_ids) < 230:
         raise RuntimeError(f"Incomplete flag raster: {len(rendered_ids)} countries")
     output = ASSETS / "flag-overview.png"
