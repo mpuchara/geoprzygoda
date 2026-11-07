@@ -48,16 +48,17 @@ def flag_tile(source, dimensions, stretch, background):
     w, h = dimensions
     if stretch:
         return source.resize((w, h), Image.Resampling.LANCZOS)
-    if background:
-        output = Image.new("RGBA", dimensions, ImageColor.getrgb(background) + (255,))
-        ratio = min(w / source.width, h / source.height)
-        new_size = (max(1, round(source.width * ratio)),
-                    max(1, round(source.height * ratio)))
-        icon = source.resize(new_size, Image.Resampling.LANCZOS)
-        output.alpha_composite(icon, ((w - icon.width) // 2, (h - icon.height) // 2))
-        return output
-    return ImageOps.fit(source, dimensions, method=Image.Resampling.LANCZOS,
-                        centering=(.5, .5))
+    # Never crop a national emblem or coat of arms: ImageOps.fit used to
+    # discard the sides of flags when a country's bounding box was tall.
+    # The complete official flag must remain visible inside each polygon.
+    backdrop = ImageColor.getrgb(background) if background else (255, 255, 255)
+    output = Image.new("RGBA", dimensions, backdrop + (255,))
+    ratio = min(w / source.width, h / source.height)
+    new_size = (max(1, round(source.width * ratio)),
+                max(1, round(source.height * ratio)))
+    icon = source.resize(new_size, Image.Resampling.LANCZOS)
+    output.alpha_composite(icon, ((w - icon.width) // 2, (h - icon.height) // 2))
+    return output
 
 
 def individual_islands(d):
