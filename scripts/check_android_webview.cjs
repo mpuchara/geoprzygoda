@@ -93,11 +93,49 @@ async function main(){
   const capture=await call('Page.captureScreenshot',{format:'png'});
   if(capture?.data)fs.writeFileSync('webview-evidence/webview.png',
     Buffer.from(capture.data,'base64'));
+  // Verify the historical 1.0.26 SVG fallback and direct PNG clipping at a
+  // real close-up, not only the pre-rasterized global overview.
+  await evaluate('setView({x:548,y:343,w:25,h:25},false)');
+  let zoomCheck=null;
+  for (let attempt=0;attempt<45;attempt++) {
+    await sleep(350);
+    zoomCheck=await evaluate(String.raw`(()=>{
+      const primary=document.getElementById('land-NLD');
+      const group=primary?.parentElement;
+      const pieces=group?[...group.querySelectorAll('path.land')]:[];
+      const photo=[...group.querySelectorAll('image.geo8-photo')]
+        .find(x=>x.getAttribute('href')==='flag-textures/nl.png');
+      const id=/url\(#([^)]+)\)/.exec(photo?.getAttribute('clip-path')||'')?.[1];
+      return {
+        zoom:document.getElementById('world-map').viewBox.baseVal.width,
+        baseRasterHidden:document.getElementById('geo8-overview-flags').style.display==='none',
+        pieces:pieces.length,
+        photoVisible:!!photo && getComputedStyle(photo).display!=='none',
+        clipExact:!!id && document.getElementById(id)?.querySelector('path')?.getAttribute('d')===
+          photo?.previousElementSibling?.getAttribute('d'),
+        legacyFlag:!!document.getElementById('geo10-legacy-flag-NLD'),
+        oldSvgSource:document.getElementById('geo10-legacy-flag-NLD')
+          ?.querySelector('image')?.getAttribute('href')
+      };
+    })()`);
+    if(zoomCheck.photoVisible && zoomCheck.legacyFlag && zoomCheck.pieces>1)
+      break;
+  }
+  const zoomCapture=await call('Page.captureScreenshot',{format:'png'});
+  if(zoomCapture?.data)fs.writeFileSync('webview-evidence/nld-zoom.png',
+    Buffer.from(zoomCapture.data,'base64'));
+  fs.writeFileSync('webview-evidence/zoom-report.json',
+    JSON.stringify(zoomCheck,null,2));
+  console.log('Plan 10 Netherlands close-up',JSON.stringify(zoomCheck));
   console.log(JSON.stringify(evidence,null,2));
   ws.close();
   if(!evidence.mapHasFlags||!evidence.rasterVisible||!evidence.borderVisible||
      evidence.rasterSrc!=='flag-overview.png'||evidence.flagCount<230||
      evidence.flagScale<2||evidence.actualCountryCount<190||
      evidence.assetStatus!==200)throw Error('Real WebView flag smoke test failed');
+  if(!zoomCheck || zoomCheck.zoom>30 || !zoomCheck.baseRasterHidden ||
+     zoomCheck.pieces<2 || !zoomCheck.photoVisible || !zoomCheck.clipExact ||
+     !zoomCheck.legacyFlag || zoomCheck.oldSvgSource!=='flags/nl.svg')
+    throw Error('Plan 10: Android WebView detailed islands or legacy flag failed');
 }
 main().catch(error=>{console.error(error.stack||error);process.exitCode=1;});
