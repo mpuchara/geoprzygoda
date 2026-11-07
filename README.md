@@ -82,3 +82,10 @@ Każda geograficznie oddzielona część tych państw ma teraz własne dopasowan
 ## Rywalizacja w kolorach startowych
 
 Rywalizacja ma kolorowe, animowane tło w kolorach startowego ekranu. Na ekranie wybranego państwa i przeciwnika widać proste, prostokątne flagi SVG z lokalnego katalogu `flags/`. Do wyboru przeciwnika służy **Szukaj państwa** (nazwa, stolica lub kod ISO), a podczas Bitwy o terytoria podobna wyszukiwarka pokazuje wyłącznie sąsiadujące dostępne tereny. Działa offline.
+
+
+## Naturalniejszy front zdobywania kraju
+
+Animacja **Bitwy o terytoria** nie używa już pionowego przesuwania prostokąta. Zamiast tego nieregularna linia frontu wyrusza z najbliższego fragmentu granicy już posiadanego terytorium; postęp jest przycinany dokładnymi kształtami państw. Przy odpartej próbie natarcia front cofa się. Mniejszy panel bitewny odsłania mapę podczas animacji. Bardzo małe, odległe wyspy są aktualizowane wraz z końcowym wynikiem, bez obciążania telefonu animacjami setek fragmentów.
+
+Gra nadal zajmuje **całe państwo po wygranej bitwie**, ponieważ atlas nie zawiera wiarygodnego podziału na prowincje. Front jest efektem wizualnym, nie symulacją prawdziwych walk.
