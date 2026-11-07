@@ -131,3 +131,11 @@ Turcja ma teraz czerwone tło na całym swoim obszarze, ale półksiężyc i gwi
 ## Dwie rozmowy, wspólny kod
 
 Przy rozwijaniu GeoPrzygody w dwóch rozmowach wspólnym źródłem jest repozytorium GitHub **mpuchara/geoprzygoda**. Każdą nową poprawkę zaczynamy od aktualnego `main`, wykonujemy na odrębnej gałęzi i łączymy dopiero po testach i sprawdzeniu, czy nie pojawiły się nowe commity z drugiej rozmowy. Nowy APK publikowany z `main` zawiera połączone poprawki (np. Turcji i Holandii) i nie nadpisuje innych zmian. Rozmowy nie mają automatycznej komunikacji między sobą — współdzielą repozytorium.
+
+## Wygląd podboju wzorowany na nagraniu z gry strategicznej
+
+Obszary w bitwie są podzielone na **fikcyjne nieregularne sektory** zamiast prostokątów i prostych linii Voronoi. Sektory mają wspólne, dopasowane do siebie łamane brzegi i są przejmowane kolejno od granicy w kierunku stolicy, dzięki czemu podbój przypomina stopniowe przejmowanie prowincji. Podczas bitwy na dole jest wąski pasek postępu pokazujący liczbę zajętych sektorów, tak aby mapa pozostała widoczna.
+
+Geograficzne **granice państw nadal pochodzą z Natural Earth 1:10m**, a nie z nagrania. Szczegółową warstwę włączamy wcześniej podczas przybliżania (dla szerokości widoku do 680 jednostek mapy). Podziały wewnątrz celu to tylko **fikcyjne sektory rozgrywki**, nie rzeczywiste województwa czy prowincje.
+
+Symbole na wybranych flagach (m.in. Turcja, Arabia Saudyjska, USA, Australia, Francja, Kanada, Brazylia, Indie, Japonia, Chiny) mają zachowane proporcje. Poprawne dopasowanie obejmuje również barwy zwycięzcy podczas podboju innych krajów. Mechanika została zaprojektowana na podstawie opisu zachowania gry referencyjnej, bez kopiowania jej zasobów graficznych.
