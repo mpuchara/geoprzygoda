@@ -101,9 +101,7 @@
       // after repeated open/close gestures and background document clicks.
       if (opening) {
         historyPanel.replaceChildren(el('p','geo6-note','Odczytywanie historii z pamięci telefonu…'));
-        historyPanel.dataset.phase='before-render';
-        renderHistory(id,historyPanel);
-        historyPanel.dataset.phase='after-render';
+        renderHistory(c.id,historyPanel);
       }
     });
     historyButton.setAttribute('aria-expanded','false');
@@ -170,7 +168,6 @@
     host.append(area);
   }
   async function renderHistory(id,host){
-    console.info('GEO6_HISTORY_BEGIN', id, knownHistory.has(id));
     host.replaceChildren(el('p','geo6-note','Odczytywanie historii z pamięci telefonu…'));
     if (!knownHistory.has(id)) {
       host.replaceChildren(el('p','geo6-note','Dla tego kraju nie mamy jeszcze sprawdzonej osi czasu ani historycznych flag. Nie pokazujemy wymyślonych danych.'));
@@ -178,7 +175,6 @@
     }
     try {
       const data=await readOffline('history/'+id.toLowerCase()+'.json');
-      console.info('GEO6_HISTORY_LOADED', id, data?.events?.length);
       if(activeId!==id)return;
       host.replaceChildren(el('h3','geo6-history-title','Historia: '+atlas.get(id).n));
       if(data.events?.length)renderTimeline(host,data.events);
