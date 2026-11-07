@@ -936,6 +936,35 @@
     refreshOwnership();
     if (window.GeoPrzygodaPicker) window.GeoPrzygodaPicker.refreshBattle();
   }
+  // Plan 11: lightweight original marching units in the existing battlefield.
+  // Each unit carries the actual local SVG flag; CSS handles animation without
+  // per-frame JavaScript or external assets.
+  function renderMarchingArmies(attacker, defender) {
+    const field = $('battlefield');
+    field.querySelector('.geo11-armies')?.remove();
+    const layer = document.createElement('div');
+    layer.className = 'geo11-armies';
+    layer.setAttribute('aria-hidden', 'true');
+    for (const [side, country] of [['left', attacker], ['right', defender]]) {
+      for (let index = 0; index < 6; index++) {
+        const soldier = document.createElement('span');
+        soldier.className = 'geo11-soldier geo11-' + side;
+        soldier.style.setProperty('--unit', String(index));
+        soldier.style.setProperty('--delay', (index * 0.14) + 's');
+        const helmet = document.createElement('span');
+        helmet.className = 'geo11-helmet';
+        const body = document.createElement('span');
+        body.className = 'geo11-body';
+        const flag = document.createElement('img');
+        flag.className = 'geo11-unit-flag';
+        flag.src = 'flags/' + country.code.toLowerCase() + '.svg';
+        flag.alt = '';
+        soldier.append(helmet, body, flag);
+        layer.append(soldier);
+      }
+    }
+    field.append(layer);
+  }
   async function attack() {
     if (!game || fighting || !selectedTarget || !frontier().includes(selectedTarget)) return;
     fighting = true;
@@ -972,6 +1001,7 @@
     $('battle-flag-left').alt = 'Flaga ' + attacker.n;
     $('battle-flag-right').src = 'flags/' + defender.code.toLowerCase() + '.svg';
     $('battle-flag-right').alt = 'Flaga ' + defender.n;
+    renderMarchingArmies(attacker, defender);
     $('battle-balance').textContent = attackerRoll + ' pkt ⚔️ ' + defenderRoll + ' pkt';
     $('battle-message').textContent = 'Trwa bitwa o ' + defender.n + '...';
     focusCountry(defenderId);
@@ -984,6 +1014,7 @@
       battlePaused = false;
       panel.classList.remove('battle-animating', 'battle-paused');
       field.classList.remove('running');
+      field.querySelector('.geo11-armies')?.remove();
       $('battle-stage').textContent = won ? '🏆 Teren zdobyty!' : '🛡️ Obrona zwyciężyła';
       game.round += 1;
       if (won) {
