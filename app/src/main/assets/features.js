@@ -95,9 +95,10 @@
     return nativeBack();
   };
 
-  // Every ISO flag is a pinned, local SVG. The country path supplies the
-  // clipping outline, so flags never paint outside actual country borders.
-  // Complex symbols use userSpaceOnUse patterns to preserve their aspect ratio.
+  // Every flag, not only emblem-heavy examples, is fitted independently into
+  // the real geographic path using a userSpaceOnUse pattern. Never stretch the
+  // artwork of an emblem/cross/star to the bounding box. Only simple bands
+  // may use preserveAspectRatio='none'; the country path clips all fills.
   const flagDefs = document.createElementNS(ns, 'defs');
   flagDefs.id = 'country-flag-patterns';
   map.insertBefore(flagDefs, map.firstChild);
@@ -123,12 +124,13 @@
     'EST','LTU','LVA','HUN','BGR','ROU','ARM','LUX',
     'NGA','MLI','GIN','GAB','CIV','TCD','SLE','YEM'
   ]);
-  function createProportionalFlag(c, piece, partIndex, asset, background) {
+  function createProportionalFlag(c, piece, partIndex, asset, background,
+                                  plainBands = false, patternId = null) {
     let box;
     try { box = piece.getBBox(); } catch { return null; }
     if (!box || !Number.isFinite(box.x + box.y + box.width + box.height) ||
         box.width <= 0 || box.height <= 0) return null;
-    const id = 'flag-fitted-' + c.id + '-' + partIndex;
+    const id = patternId || 'flag-fitted-' + c.id + '-' + partIndex;
     const original = document.getElementById(id);
     const pattern = original || document.createElementNS(ns, 'pattern');
     pattern.id = id;
@@ -158,10 +160,13 @@
     for (const [attr, value] of Object.entries({
       x: box.x, y: box.y, width: box.width, height: box.height
     })) image.setAttribute(attr, String(value));
-    // "none" would stretch stars, crescents and coats of arms. Both
-    // "meet" and "slice" retain the flag artwork's correct proportions.
-    image.setAttribute('preserveAspectRatio',
-      background ? 'xMidYMid meet' : 'xMidYMid slice');
+    // PreserveAspectRatio="none" is allowed exclusively for verified simple
+    // bands. Every emblem, crescent, star and cross retains 4:3 geometry.
+    // "meet" keeps complete artwork on a matching solid background, whereas
+    // "slice" fills narrow islands by cropping edges, never distorting symbols.
+    const fit = plainBands ? 'none'
+      : (background ? 'xMidYMid meet' : 'xMidYMid slice');
+    image.setAttribute('preserveAspectRatio', fit);
     pattern.append(image);
     if (!original) flagDefs.append(pattern);
     return 'url(#' + pattern.id + ')';
@@ -172,43 +177,29 @@
   window.GeoPrzygodaFitFlag = function (ownerId, targetId, piece, index) {
     const owner = byId.get(ownerId);
     const backing = emblemBackgrounds.get(ownerId);
-    if (!owner || stripeOnlyCountries.has(ownerId) || !piece ||
-        !/^[A-Z]{2}$/.test(owner.code))
-      return 'url(#flag-pattern-' + ownerId + ')';
+    if (!owner || !piece || !/^[A-Z]{2}$/.test(owner.code))
+      return null;
     return createProportionalFlag({ id: ownerId + '-on-' + targetId },
-      piece, index, 'flags/' + owner.code.toLowerCase() + '.svg', backing)
-      || 'url(#flag-pattern-' + ownerId + ')';
+      piece, index, 'flags/' + owner.code.toLowerCase() + '.svg', backing,
+      stripeOnlyCountries.has(ownerId));
   };
   for (const c of COUNTRY_DATA) {
     const path = $('land-' + c.id);
     if (!c.mapped || !path || !/^[A-Z]{2}$/.test(c.code)) continue;
-    const pattern = document.createElementNS(ns, 'pattern');
-    pattern.id = 'flag-pattern-' + c.id;
-    pattern.setAttribute('patternUnits', 'objectBoundingBox');
-    pattern.setAttribute('patternContentUnits', 'objectBoundingBox');
-    pattern.setAttribute('width', '1');
-    pattern.setAttribute('height', '1');
-    const image = document.createElementNS(ns, 'image');
     const url = 'flags/' + c.code.toLowerCase() + '.svg';
-    image.setAttribute('href', url);
-    image.setAttributeNS('http://www.w3.org/1999/xlink', 'href', url);
-    image.setAttribute('x', '0');
-    image.setAttribute('y', '0');
-    image.setAttribute('width', '1');
-    image.setAttribute('height', '1');
-    image.setAttribute('preserveAspectRatio', 'none');
-    pattern.append(image);
-    flagDefs.append(pattern);
-    // Flag patterns are per island for emblem-heavy countries so complex
-    // symbols are never stretched to the shape's map bounding box.
+    // The first fragment keeps the legacy "flag-pattern-ID" alias, but it is
+    // now a fitted userSpaceOnUse SVG pattern, never an objectBBox fallback.
+    // Other fragments (mainland, distant islands) each get independent fits.
     const pieces = [...path.parentElement.querySelectorAll('path.land')];
     pieces.forEach((piece, index) => {
-      const background = emblemBackgrounds.get(c.id);
-      const fitted = !stripeOnlyCountries.has(c.id)
-        ? createProportionalFlag(c, piece, index, url, background)
-        : null;
-      if (fitted) piece.dataset.geoprzygodaFittedFlag = fitted;
-      flagPaths.push([piece, fitted || 'url(#' + pattern.id + ')']);
+      const fitted = createProportionalFlag(
+        c, piece, index, url, emblemBackgrounds.get(c.id),
+        stripeOnlyCountries.has(c.id),
+        index === 0 ? 'flag-pattern-' + c.id : null
+      );
+      if (!fitted) return; // Preserve original terrain color if geometry is invalid.
+      piece.dataset.geoprzygodaFittedFlag = fitted;
+      flagPaths.push([piece, fitted]);
     });
   }
 
@@ -216,11 +207,13 @@
     const c = byId.get(id);
     const background = emblemBackgrounds.get(id);
     const primary = $('land-' + id);
-    if (!c || stripeOnlyCountries.has(id) || !primary) return;
+    if (!c || !primary) return;
     const pieces = [...primary.parentElement.querySelectorAll('path.land')];
     pieces.forEach((piece, index) => {
       const fitted = createProportionalFlag(
-        c, piece, index, 'flags/' + c.code.toLowerCase() + '.svg', background
+        c, piece, index, 'flags/' + c.code.toLowerCase() + '.svg', background,
+        stripeOnlyCountries.has(id),
+        index === 0 ? 'flag-pattern-' + id : null
       );
       if (!fitted) return;
       piece.dataset.geoprzygodaFittedFlag = fitted;
