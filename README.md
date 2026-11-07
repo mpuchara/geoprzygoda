@@ -82,3 +82,9 @@ Każda geograficznie oddzielona część tych państw ma teraz własne dopasowan
 ## Rywalizacja w kolorach startowych
 
 Rywalizacja ma kolorowe, animowane tło w kolorach startowego ekranu. Na ekranie wybranego państwa i przeciwnika widać proste, prostokątne flagi SVG z lokalnego katalogu `flags/`. Do wyboru przeciwnika służy **Szukaj państwa** (nazwa, stolica lub kod ISO), a podczas Bitwy o terytoria podobna wyszukiwarka pokazuje wyłącznie sąsiadujące dostępne tereny. Działa offline.
+
+## Nieregularne zdobywanie obszarów
+
+Bitwa o terytoria pokazuje teraz podbój przez umowne małe sektory na tle dokładnej mapy Natural Earth. Linia frontu nie jest prostą prostokątną zasłoną: zależy od najbliższego zdobytego terenu i ma nieregularne wybrzuszenia. Zdobyte sektory otrzymują barwy atakującego, a na mapie przesuwają się małe znaczniki flag. Przy bitwie panel staje się mniejszy, aby było widać więcej mapy.
+
+**Ważne:** granice sektorów są generowane na potrzeby gry, nie przedstawiają prawdziwych powiatów/prowincji. Po wygranej dotychczasowa mechanika oznacza całe państwo jako zdobyte, a po przegranej front wraca do pozycji wyjściowej. Nie są to realne operacje wojskowe.
