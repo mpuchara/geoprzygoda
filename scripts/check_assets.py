@@ -97,6 +97,16 @@ features = (ROOT / 'app/src/main/assets/features.js').read_text(encoding='utf-8'
 assert 'flag-pattern-' in features and 'quick-music' in features, 'New map/audio controls missing'
 assert 'flags/' in features, 'Map flags must be loaded from offline assets'
 assert 'battle.js' in text and 'battle.css' in text, 'Battle resources missing from HTML'
+# Additional 1:10m detail is an offline asset applied to existing country paths;
+# it must not replace their ids or flag patterns.
+detail_data = json.loads((ROOT / 'app/src/main/assets/benelux-10m.json').read_text(encoding='utf-8'))
+assert detail_data['projection'] == 'Mercator 1080x1080, 3 decimal SVG precision'
+for country, min_vertices in [('NLD', 800), ('BEL', 600), ('DEU', 2800)]:
+    item = detail_data['countries'][country]
+    assert item['vertices'] >= min_vertices, f'{country} border lost 1:10m detail'
+    assert item['d'].count('M') == item['rings'], f'{country} islands and coastlines mismatch'
+    assert 'id="land-' + country + '"' in text, f'{country} must retain map click target'
+assert 'loadDetailedNorthSeaBorders' in features_text and "fetch('benelux-10m.json')" in features_text
 battle = (ROOT / 'app/src/main/assets/battle.js').read_text(encoding='utf-8')
 for token in ('rival-start-map', 'battle-history-overlay', 'battle-commonwealth', 'battle-target', 'geo-territory-battle-v1'):
     assert token in battle, f'Missing battle capability: {token}'
