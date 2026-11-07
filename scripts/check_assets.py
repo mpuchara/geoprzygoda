@@ -107,6 +107,18 @@ for country, min_vertices in [('NLD', 800), ('BEL', 600), ('DEU', 2800)]:
     assert item['d'].count('M') == item['rings'], f'{country} islands and coastlines mismatch'
     assert 'id="land-' + country + '"' in text, f'{country} must retain map click target'
 assert 'loadDetailedNorthSeaBorders' in features_text and "fetch('benelux-10m.json')" in features_text
+# The detailed world layer is generated during the Android build, not fetched
+# by the installed app. It should include nearly all 1:50m selectable countries.
+world_detail_path = ROOT / 'app/src/main/assets/world-detail-10m.json'
+assert world_detail_path.is_file(), 'Generate detailed world data before validating Android assets'
+world_detail = json.loads(world_detail_path.read_text(encoding='utf-8'))
+assert world_detail['projection'] == 'Mercator 1080x1080, 3 decimal SVG precision'
+assert len(world_detail['countries']) >= 220, 'Worldwide 1:10m geometry is incomplete'
+for cid in ('NLD', 'BEL', 'DEU', 'POL', 'BLR', 'IND', 'BRA'):
+    details = world_detail['countries'][cid]
+    assert details['v'] > 100 and details.get('d', details.get('parts')), f'{cid} lacks detailed paths'
+assert "fetch('world-detail-10m.json')" in features_text
+assert 'function updateVisibleDetailedCountries()' in features_text
 battle = (ROOT / 'app/src/main/assets/battle.js').read_text(encoding='utf-8')
 for token in ('rival-start-map', 'battle-history-overlay', 'battle-commonwealth', 'battle-target', 'geo-territory-battle-v1'):
     assert token in battle, f'Missing battle capability: {token}'
