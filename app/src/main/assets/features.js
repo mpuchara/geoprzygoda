@@ -108,6 +108,71 @@
   flagDefs.id = 'country-flag-patterns';
   map.insertBefore(flagDefs, map.firstChild);
   const flagPaths = new Map();
+
+  // Plan 8: a pre-masked, single PNG paints all 238 flag-shaped countries on
+  // Android. No SVG pattern, image/clipPath or hundreds of GPU masks are needed
+  // for the overview. Original interactive country polygons remain underneath.
+  const geo8Android = /\bAndroid\b/i.test(navigator.userAgent);
+  const geo8CountryGroup = document.getElementById('countries');
+  let geo8Raster = null, geo8Borders = null, geo8SelectedBorder = null;
+  if (geo8Android && geo8CountryGroup) {
+    geo8Raster = document.createElementNS(ns, 'image');
+    geo8Raster.id = 'geo8-overview-flags';
+    geo8Raster.setAttribute('href', 'flag-overview.png');
+    geo8Raster.setAttributeNS('http://www.w3.org/1999/xlink', 'href', 'flag-overview.png');
+    geo8Raster.setAttribute('x', '0');
+    geo8Raster.setAttribute('y', '0');
+    geo8Raster.setAttribute('width', '1080');
+    geo8Raster.setAttribute('height', '1080');
+    geo8Raster.setAttribute('preserveAspectRatio', 'none');
+    geo8Raster.setAttribute('pointer-events', 'none');
+    geo8Raster.setAttribute('aria-hidden', 'true');
+    geo8Raster.style.display = 'none';
+    geo8Borders = document.createElementNS(ns, 'path');
+    geo8Borders.id = 'geo8-overview-borders';
+    geo8Borders.setAttribute('fill', 'none');
+    geo8Borders.setAttribute('stroke', '#293f50');
+    geo8Borders.setAttribute('stroke-width', '1.05');
+    geo8Borders.setAttribute('stroke-linejoin', 'round');
+    geo8Borders.setAttribute('vector-effect', 'non-scaling-stroke');
+    geo8Borders.setAttribute('pointer-events', 'none');
+    geo8Borders.style.display = 'none';
+    geo8Borders.setAttribute('d', [...geo8CountryGroup.querySelectorAll('path.land')]
+      .map(piece => piece.getAttribute('d') || '').join(''));
+    geo8SelectedBorder = document.createElementNS(ns, 'path');
+    geo8SelectedBorder.id = 'geo8-selected-border';
+    geo8SelectedBorder.setAttribute('fill', 'none');
+    geo8SelectedBorder.setAttribute('stroke', '#fff5c6');
+    geo8SelectedBorder.setAttribute('stroke-width', '2.8');
+    geo8SelectedBorder.setAttribute('stroke-linejoin', 'round');
+    geo8SelectedBorder.setAttribute('vector-effect', 'non-scaling-stroke');
+    geo8SelectedBorder.setAttribute('pointer-events', 'none');
+    geo8SelectedBorder.style.display = 'none';
+    // Labels and tiny-country clickable dots stay above this transparent image.
+    geo8CountryGroup.after(geo8Raster, geo8Borders, geo8SelectedBorder);
+    const syncSelected = () => {
+      if (!geo8SelectedBorder) return;
+      const selected = geo8CountryGroup.querySelector('.country-link.selected');
+      geo8SelectedBorder.setAttribute('d', selected
+        ? [...selected.querySelectorAll('path.land')].map(piece => piece.getAttribute('d') || '').join('')
+        : '');
+    };
+    new MutationObserver(syncSelected).observe(geo8CountryGroup,
+      {subtree:true, attributes:true, attributeFilter:['class']});
+    syncSelected();
+  }
+  function geo8UpdateRaster() {
+    if (!geo8Raster) return;
+    // When 1:10m replaces the paths, switch back to live geometry so raster
+    // coastlines can never escape newly refined borders.
+    const overview = map.viewBox.baseVal.width > DETAIL_ZOOM_LIMIT;
+    const visible = flagsEnabled && mode !== 'quiz' && overview;
+    geo8Raster.style.display = visible ? '' : 'none';
+    geo8Borders.style.display = visible ? '' : 'none';
+    geo8SelectedBorder.style.display = visible && geo8SelectedBorder.getAttribute('d') ? '' : 'none';
+    map.classList.toggle('geo8-zoom-flags', flagsEnabled && mode !== 'quiz' && !overview);
+  }
+
   // Keep complex symbols in their actual flag proportions. Pure stripe
   // patterns can still fill an irregular silhouette without visible distortion.
   // The background matches each flag, filling gaps around its centered emblem.
@@ -162,6 +227,9 @@
     try { box = piece.getBBox(); } catch { return null; }
     if (!box || !Number.isFinite(box.x + box.y + box.width + box.height) ||
         box.width <= 0 || box.height <= 0) return null;
+    // Keep the original solid country color below the world PNG on Android.
+    // GPU SVG paint servers are only needed for dynamic battle ownership.
+    if (geo8Android && !c._geo8DynamicBattle) return piece.getAttribute('fill') || '#a8d77e';
     syncTerrainUnderlay(piece);
     const id = patternId || 'flag-fitted-' + c.id + '-' + partIndex;
     const original = document.getElementById(id);
@@ -222,7 +290,7 @@
     const backing = emblemBackgrounds.get(ownerId);
     if (!owner || !piece || !/^[A-Z]{2}$/.test(owner.code))
       return null;
-    return createProportionalFlag({ id: ownerId + '-on-' + targetId },
+    return createProportionalFlag({ id: ownerId + '-on-' + targetId, _geo8DynamicBattle: true },
       piece, index, 'flag-textures/' + owner.code.toLowerCase() + '.png', backing,
       stripeOnlyCountries.has(ownerId));
   };
@@ -299,10 +367,12 @@
     const enabled = flagsEnabled && mode !== 'quiz';
     if (enabled === flagsApplied) {
       if (enabled) queueFlagPreparation();
+      geo8UpdateRaster();
       return;
     }
     flagsApplied = enabled;
     map.classList.toggle('flag-fill', enabled);
+    geo8UpdateRaster();
     for (const [path, fill] of flagPaths) {
       // An inline fill keeps the selected country showing its flag; stroke
       // highlights the selection. In quiz, restore the original palette.
@@ -545,6 +615,7 @@
       detailFrame = requestAnimationFrame(() => {
         detailFrame = null;
         updateVisibleDetailedCountries();
+        geo8UpdateRaster();
       });
     }, 100);
   }
