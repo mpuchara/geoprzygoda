@@ -119,6 +119,20 @@ for cid in ('NLD', 'BEL', 'DEU', 'POL', 'BLR', 'IND', 'BRA'):
     assert details['v'] > 100 and details.get('d', details.get('parts')), f'{cid} lacks detailed paths'
 assert "fetch('world-detail-10m.json')" in features_text
 assert 'function updateVisibleDetailedCountries()' in features_text
+
+# Turkey's crescent/star and Saudi Arabia's calligraphy/sword retain their
+# original proportions on both map resolutions and when battles change colors.
+for token in ("['TUR', '#e30a17']", "['SAU', '#165d31']",
+              'function createProportionalFlag(', 'function refitProportionalCountry(',
+              "pattern.setAttribute('patternUnits', 'userSpaceOnUse')",
+              "'xMidYMid meet'", 'refitProportionalCountry(id)',
+              'geoprzygodaFittedFlag'):
+    assert token in features_text, f'Missing undistorted flag handling: {token}'
+assert 'geoprzygodaFittedFlag' in battle_text, (
+    'Entering battle mode must preserve corrected flag proportions')
+assert 'loadDetailedNorthSeaBorders' in features_text
+assert 'world_detail_path.is_file()' in Path(__file__).read_text(encoding='utf-8')
+
 battle = (ROOT / 'app/src/main/assets/battle.js').read_text(encoding='utf-8')
 for token in ('rival-start-map', 'battle-history-overlay', 'battle-commonwealth', 'battle-target', 'geo-territory-battle-v1'):
     assert token in battle, f'Missing battle capability: {token}'
