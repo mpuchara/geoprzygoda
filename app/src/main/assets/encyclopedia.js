@@ -195,6 +195,7 @@
       host.append(el('p','geo6-map-note','🗺️ Dawnych granic nie rysujemy bez zweryfikowanych danych geograficznych. Mapa współczesna pozostaje bez zmian.'));
       sourceLinks(host,data.sources);
     } catch(e){
+      console.error('GeoPrzygoda: history could not render', id, e);
       host.replaceChildren(el('p','geo6-note','Nie udało się otworzyć sprawdzonych danych historycznych.'));
     }
   }
