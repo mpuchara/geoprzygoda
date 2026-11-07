@@ -104,7 +104,11 @@ async function run() {
             errors.push(id + ': missing SVG pattern/image ' + actual);
             continue;
           }
-          if (image.getAttribute('href') !== 'flags/' + code.toLowerCase() + '.svg')
+          const backing = pattern.querySelector('rect');
+          if (!backing || !backing.getAttribute('fill') ||
+              backing.getAttribute('fill') === 'none')
+            errors.push(id + ': missing fallback terrain background');
+          if (image.getAttribute('href') !== 'flag-textures/' + code.toLowerCase() + '.png')
             errors.push(id + ': wrong country flag URL: ' + image.getAttribute('href'));
           const aspect = image.getAttribute('preserveAspectRatio');
           // All 238 mapped flags now use per-fragment userSpaceOnUse patterns.
@@ -140,6 +144,12 @@ async function run() {
     if (before.errors.length) throw Error('Flag pattern problems:\n' + before.errors.slice(0, 30).join('\n'));
     await page.screenshot({ path: path.join(reportDir, 'world.png') });
 
+    // Verify map starts with lightweight 1:50m outlines, not eager 1:10m.
+    const initialBorders = await page.evaluate(() => ({
+      NLD: document.getElementById('land-NLD').getAttribute('d'),
+      POL: document.getElementById('land-POL').getAttribute('d'),
+      detailCount: document.querySelectorAll('.land.flag-fragment').length
+    }));
     let zoomed = 0;
     for (const id of zoomTargets) {
       const result = await page.evaluate(id => {
@@ -164,7 +174,7 @@ async function run() {
           const value = /url\(["']?#([^)"']+)/.exec(piece.style.fill || '')?.[1];
           const pattern = value && document.getElementById(value);
           const image = pattern?.querySelector('image');
-          if (!image || image.getAttribute('href') !== 'flags/' + code.toLowerCase() + '.svg')
+          if (!image || image.getAttribute('href') !== 'flag-textures/' + code.toLowerCase() + '.png')
             problems.push('missing/mismatched image after zoom');
           if (image && (stripe
               ? image.getAttribute('preserveAspectRatio') !== 'none'
@@ -190,7 +200,15 @@ async function run() {
     await page.evaluate(() => {
       document.getElementById('world-map').setAttribute('viewBox', '0 0 1080 1080');
     });
-    await page.waitForTimeout(150);
+    await page.waitForTimeout(500);
+    const reset = await page.evaluate(() => ({
+      nl: document.getElementById('land-NLD').getAttribute('d'),
+      pol: document.getElementById('land-POL').getAttribute('d'),
+      zoomed: document.getElementById('world-map').viewBox.baseVal.width
+    }));
+    if (reset.nl !== initialBorders.NLD || reset.pol !== initialBorders.POL ||
+        reset.zoomed !== 1080)
+      throw Error('Zoom-out failed to restore light 1:50m map geometry');
     const toggled = await page.evaluate(() => {
       const checkbox = document.getElementById('setting-flags');
       const map = document.getElementById('world-map');
@@ -218,7 +236,7 @@ async function run() {
         flag: pattern?.querySelector('image')?.getAttribute('href')
       };
     });
-    if (conquest.flag !== 'flags/us.svg' ||
+    if (conquest.flag !== 'flag-textures/us.png' ||
         !['xMidYMid meet','xMidYMid slice'].includes(conquest.aspect))
       throw Error('Battle conquest stretched USA flag: ' + JSON.stringify(conquest));
 
@@ -231,6 +249,7 @@ async function run() {
       stripePieces: before.stripePieces,
       zoomedCountries: zoomed,
       flagsToggle: toggled,
+      restoredOverviewGeometry: true,
       battleForeignFlag: conquest,
       screenshotFiles: ['world.png', ...zoomTargets.map(x => x.toLowerCase() + '-zoom.png')],
       browserErrors: pageErrors
