@@ -253,7 +253,7 @@
   // At close zoom the detailed 1:10m geometry takes precedence. Load ordinary
   // clipped PNGs only for countries currently in the viewport, in small frames.
   // This is independent of the robust single-image world overview.
-  let geo8ZoomFrame = null, geo8ZoomIndex = 0;
+  let geo8ZoomFrame = null, geo8ZoomIndex = 0, geo8PhotoSerial = 0;
   // Plan 10: restore the known working GeoPrzygoda 1.0.26 paint-server
   // technique as a lazy close-up fallback. The source is the original local
   // SVG, not the nested PNG that disappears on some Samsung WebViews.
@@ -302,11 +302,47 @@
   // aspect ratio) already clips itself perfectly to the real 1:10m path.
   function geo8SyncPhoto(piece, country) {
     if (!piece?.isConnected || !country || app.classList.contains('battle-running')) return;
-    const fallback = geo10LegacyFlag(country);
-    const originalColor = piece.getAttribute('fill') || '#a8d77e';
-    const paint = 'url(#' + fallback + ') ' + originalColor;
-    if (piece.style.fill !== paint) piece.style.fill = paint;
-    geo10LegacyPaths.add(piece);
+    let box;
+    try { box = piece.getBBox(); } catch { return; }
+    if (!box || box.width <= 0 || box.height <= 0) return;
+    let clip = piece._geo8PhotoClip, image = piece._geo8PhotoImage;
+    if (!clip || !image || !image.isConnected) {
+      clip = document.createElementNS(ns, 'clipPath');
+      clip.id = 'geo8-photo-clip-' + country.id + '-' + (++geo8PhotoSerial);
+      clip.setAttribute('clipPathUnits','userSpaceOnUse');
+      clip.append(document.createElementNS(ns,'path'));
+      flagDefs.append(clip);
+      image = document.createElementNS(ns,'image');
+      image.classList.add('geo8-photo');
+      image.setAttribute('clip-path','url(#'+clip.id+')');
+      image.setAttribute('pointer-events','none');
+      image.setAttribute('aria-hidden','true');
+      piece.after(image);
+      piece._geo8PhotoClip = clip;
+      piece._geo8PhotoImage = image;
+      // The old 1.0.26 SVG pattern remains a fallback, but is never
+      // painted simultaneously with the PNG (important for mobile GPUs).
+      image.addEventListener('error', () => {
+        if (!piece.isConnected || app.classList.contains('battle-running')) return;
+        const legacy = geo10LegacyFlag(country);
+        piece.style.fill = 'url(#'+legacy+') '+(piece.getAttribute('fill')||'#a8d77e');
+        geo10LegacyPaths.add(piece);
+      });
+    }
+    if (image.previousElementSibling !== piece) piece.after(image);
+    const path = clip.firstElementChild;
+    const geometry = piece.getAttribute('d') || '';
+    if (path.getAttribute('d') !== geometry) path.setAttribute('d',geometry);
+    path.setAttribute('clip-rule',piece.getAttribute('fill-rule')||'evenodd');
+    for (const [attr,value] of Object.entries({x:box.x,y:box.y,width:box.width,height:box.height}))
+      image.setAttribute(attr,String(value));
+    const asset = 'flag-textures/' + country.code.toLowerCase() + '.png';
+    if (image.getAttribute('href') !== asset) {
+      image.setAttribute('href',asset);
+      image.setAttributeNS('http://www.w3.org/1999/xlink','href',asset);
+    }
+    image.setAttribute('preserveAspectRatio',stripeOnlyCountries.has(country.id)
+      ? 'none' : (emblemBackgrounds.has(country.id) ? 'xMidYMid meet' : 'xMidYMid slice'));
   }
   let geo8ZoomPieceIndex = 0, geo8ZoomPieces = null;
   function geo8PhotoBatch() {
