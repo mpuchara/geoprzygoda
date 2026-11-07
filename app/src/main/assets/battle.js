@@ -315,7 +315,7 @@
     const len=Math.max(1,Math.hypot(dx,dy));
     const seed=Array.from(targetId).reduce((sum,ch)=>sum*7+ch.charCodeAt(0),1)%31;
     const bend=(seed%2?1:-1)*Math.min(len*.24,Math.min(box.width,box.height)*.19);
-    const routeNodes=[];
+    const routeNodes=[start];
     for(let i=0;i<10;i++){
       const t=i/9;
       const offset=Math.sin(Math.PI*t)*bend;
@@ -385,9 +385,9 @@
       const progress=won?t:(t<.60?t/.60*.59:(1-t)/.40*.59);
       setAdvanceProgress(progress);
       if(t<.15)stage.textContent=source?'📍 Start: '+source:'⚔️ Przekroczenie granicy';
+      else if(!won && t>=.60)stage.textContent='🛡️ Obrońcy odzyskują teren';
       else if(progress<.55)stage.textContent=location?'➡️ Kierunek: '+location:'➡️ Natarcie w głąb kraju';
-      else if(won)stage.textContent='🗺️ Zajmowanie kolejnych regionów';
-      else stage.textContent='🛡️ Obrońcy odzyskują teren';
+      else stage.textContent='🗺️ Zajmowanie kolejnych regionów';
       if(t<1 && fighting && game)advanceFrame=requestAnimationFrame(frame);
       else advanceFrame=null;
     }
