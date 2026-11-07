@@ -178,7 +178,7 @@
   // At close zoom the detailed 1:10m geometry takes precedence. Load ordinary
   // clipped PNGs only for countries currently in the viewport, in small frames.
   // This is independent of the robust single-image world overview.
-  let geo8ZoomFrame = null, geo8ZoomIndex = 0;
+  let geo8ZoomFrame = null, geo8ZoomIndex = 0, geo8PhotoSerial = 0;
   function geo8SyncPhoto(piece, country) {
     if (!piece || !piece.parentNode || !country) return;
     let box;
@@ -187,7 +187,7 @@
     let clip = piece._geo8PhotoClip, image = piece._geo8PhotoImage;
     if (!clip || !image || !image.isConnected) {
       clip = document.createElementNS(ns, 'clipPath');
-      clip.id = 'geo8-photo-clip-' + country.id + '-' + (geo8ZoomIndex++) + '-' + Math.floor(Math.random() * 100000);
+      clip.id = 'geo8-photo-clip-' + country.id + '-' + (++geo8PhotoSerial);
       clip.setAttribute('clipPathUnits','userSpaceOnUse');
       clip.append(document.createElementNS(ns,'path'));
       flagDefs.append(clip);
