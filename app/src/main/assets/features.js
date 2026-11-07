@@ -95,8 +95,9 @@
     return nativeBack();
   };
 
-  // Each flag is a bundled SVG, stretched across the country's bounding box and
-  // clipped by the original Natural Earth polygon (not an emoji label).
+  // Every ISO flag is a pinned, local SVG. The country path supplies the
+  // clipping outline, so flags never paint outside actual country borders.
+  // Complex symbols use userSpaceOnUse patterns to preserve their aspect ratio.
   const flagDefs = document.createElementNS(ns, 'defs');
   flagDefs.id = 'country-flag-patterns';
   map.insertBefore(flagDefs, map.firstChild);
@@ -113,6 +114,14 @@
     ['NZL', '#012169'], ['GBR', '#ffffff'], ['PAK', '#01411c'],
     ['ARG', '#ffffff'], ['ISR', '#ffffff'], ['EGY', '#ffffff'],
     ['MAR', '#c1272d'], ['ALB', '#e41e20'], ['CHE', '#da291c']
+  ]);
+  // These flags consist only of plain horizontal or vertical bands, without
+  // a canton, emblem or coat of arms. Stretching bands is safe; all other SVGs
+  // keep their original proportions (including small islands).
+  const stripeOnlyCountries = new Set([
+    'AUT','NLD','FRA','BEL','DEU','ITA','IRL','POL','UKR','RUS',
+    'EST','LTU','LVA','HUN','BGR','ROU','ARM','LUX',
+    'NGA','MLI','GIN','GAB','CIV','TCD','SLE','YEM'
   ]);
   function createProportionalFlag(c, piece, partIndex, asset, background) {
     let box;
@@ -131,21 +140,28 @@
     for (const [attr, value] of Object.entries({
       x: box.x, y: box.y, width: box.width, height: box.height
     })) pattern.setAttribute(attr, String(value));
-    const backing = document.createElementNS(ns, 'rect');
-    for (const [attr, value] of Object.entries({
-      x: box.x, y: box.y, width: box.width, height: box.height
-    })) backing.setAttribute(attr, String(value));
-    backing.setAttribute('fill', background);
-    pattern.append(backing);
+    // For individually verified emblems, a matching base + "meet" keeps the
+    // *entire* icon visible (e.g. the small Union Jack on Australia's flag).
+    // For all other detailed flags "slice" covers the full silhouette without
+    // distorting any part of the SVG; only extreme aspect ratios crop edges.
+    if (background) {
+      const backing = document.createElementNS(ns, 'rect');
+      for (const [attr, value] of Object.entries({
+        x: box.x, y: box.y, width: box.width, height: box.height
+      })) backing.setAttribute(attr, String(value));
+      backing.setAttribute('fill', background);
+      pattern.append(backing);
+    }
     const image = document.createElementNS(ns, 'image');
     image.setAttribute('href', asset);
     image.setAttributeNS('http://www.w3.org/1999/xlink', 'href', asset);
     for (const [attr, value] of Object.entries({
       x: box.x, y: box.y, width: box.width, height: box.height
     })) image.setAttribute(attr, String(value));
-    // "meet" preserves the moon, star, lettering and sword without cropping.
-    // The identical background color fills any extra area inside the country.
-    image.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+    // "none" would stretch stars, crescents and coats of arms. Both
+    // "meet" and "slice" retain the flag artwork's correct proportions.
+    image.setAttribute('preserveAspectRatio',
+      background ? 'xMidYMid meet' : 'xMidYMid slice');
     pattern.append(image);
     if (!original) flagDefs.append(pattern);
     return 'url(#' + pattern.id + ')';
@@ -156,7 +172,8 @@
   window.GeoPrzygodaFitFlag = function (ownerId, targetId, piece, index) {
     const owner = byId.get(ownerId);
     const backing = emblemBackgrounds.get(ownerId);
-    if (!owner || !backing || !piece || !/^[A-Z]{2}$/.test(owner.code))
+    if (!owner || stripeOnlyCountries.has(ownerId) || !piece ||
+        !/^[A-Z]{2}$/.test(owner.code))
       return 'url(#flag-pattern-' + ownerId + ')';
     return createProportionalFlag({ id: ownerId + '-on-' + targetId },
       piece, index, 'flags/' + owner.code.toLowerCase() + '.svg', backing)
@@ -187,7 +204,7 @@
     const pieces = [...path.parentElement.querySelectorAll('path.land')];
     pieces.forEach((piece, index) => {
       const background = emblemBackgrounds.get(c.id);
-      const fitted = background
+      const fitted = !stripeOnlyCountries.has(c.id)
         ? createProportionalFlag(c, piece, index, url, background)
         : null;
       if (fitted) piece.dataset.geoprzygodaFittedFlag = fitted;
@@ -199,7 +216,7 @@
     const c = byId.get(id);
     const background = emblemBackgrounds.get(id);
     const primary = $('land-' + id);
-    if (!c || !background || !primary) return;
+    if (!c || stripeOnlyCountries.has(id) || !primary) return;
     const pieces = [...primary.parentElement.querySelectorAll('path.land')];
     pieces.forEach((piece, index) => {
       const fitted = createProportionalFlag(
@@ -248,6 +265,9 @@
           if (!shape || !detail || typeof detail.d !== 'string' ||
               detail.vertices < 500 || !detail.d.startsWith('M')) continue;
           shape.setAttribute('d', detail.d);
+          // New, more precise outlines change bounding boxes. Recalculate the
+          // fitted flag before rendering the next frame (also for Dutch islands).
+          refitProportionalCountry(country);
         }
         if (window.GeoPrzygodaBattle && window.GeoPrzygodaBattle.active)
           window.GeoPrzygodaBattle.refresh();
