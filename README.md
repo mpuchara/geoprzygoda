@@ -175,3 +175,27 @@ w nakładkach flag z symbolami (USA, Australia, Brazylia, Chiny, Nowa
 Zelandia, Wielka Brytania, Pakistan, Albania, Szwajcaria). Zostały
 zamienione na dokładne wartości barw znajdujące się w źródłowych SVG.
 Test `scripts/check_flags.py` sprawdza również te dziewięć kolorów.
+
+## Poprawki wg audytu doradcy — Issue #17
+
+Dla wszystkich dostępnych na mapie państw wzorce flag SVG są teraz dopasowywane
+**osobno do każdego konturu SVG** w współrzędnych `userSpaceOnUse`.
+Usunięto z domyślnych wzorców `objectBoundingBox`. Złożone symbole mają
+zachowane proporcje dzięki `meet` albo `slice`; `none` jest stosowane
+wyłącznie w sprawdzonych flagach ze zwykłymi pasami (np. Austria, Holandia,
+Francja). Wzorce są przeliczane także po zamianie konturów na Natural Earth
+1:10m, przy dodaniu wysp oraz podczas przejmowania państw w bitwie.
+
+Obok istniejącego audytu **238 SVG/ISO** dodano test uruchamiający **rzeczywistą
+mapę w Chromium**: sprawdza przypisanie SVG, jednostki wzorców, dopasowanie
+bounding box do kraju i niedozwolone deformacje emblematów; robi zrzuty
+ekranu Holandii, Austrii, Francji, USA, Australii, Turcji, Arabii
+Saudyjskiej, Wielkiej Brytanii, Chile, Nepalu, Watykanu, Monako,
+Nowej Zelandii i Japonii. Test obejmuje też zoom-out, wyłączenie/włączenie
+flag, quiz oraz zmianę flag podczas bitwy Turcja–Grecja.
+Wyniki i PNG znajdują się w artefakcie GitHub Actions
+`GeoPrzygoda-Flag-Map-Screenshots`.
+
+Ważne: automatyczny test Chromium **nie zastępuje ręcznej kontroli na Android
+WebView**. Screenshots są materiałem do osobnej oceny, nie są zaliczane jako
+ręcznie sprawdzone flagi.
