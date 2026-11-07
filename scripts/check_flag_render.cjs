@@ -406,6 +406,34 @@ async function run() {
     });
     if(!banner) throw Error('Plan 7 player banner missing in campaign');
 
+
+    // Plan 10: the parallel island-finder survives, synthetic circles are
+    // invisible, and a real archipelago zoom keeps the country sheet usable.
+    await page.reload({waitUntil:'load'});
+    await page.waitForFunction(() => !!document.getElementById('open-islands'),
+      null, {timeout:12000});
+    await page.evaluate(() => document.getElementById('skip-name')?.click());
+    const plan10Islands = await page.evaluate(() => {
+      const map = document.getElementById('world-map');
+      const dot = document.querySelector('#small-countries .small-marker .dot');
+      const circlesHidden = !!dot && getComputedStyle(dot).display === 'none';
+      document.getElementById('open-islands').click();
+      const entries = [...document.querySelectorAll('#islands-list button')];
+      const menuOpen = !document.getElementById('islands-overlay').classList.contains('hidden');
+      const azores = entries.find(x=>x.textContent.includes('Azory'));
+      azores?.click();
+      return {
+        circlesHidden, menuOpen, entries:entries.length,
+        zoom:map.viewBox.baseVal.width,
+        portugalSelected:!!document.querySelector('#info-PRT.country-sheet.active'),
+        islandMenuClosed:document.getElementById('islands-overlay').classList.contains('hidden')
+      };
+    });
+    if(!plan10Islands.circlesHidden || !plan10Islands.menuOpen ||
+       plan10Islands.entries < 15 || plan10Islands.zoom > 90 ||
+       !plan10Islands.portugalSelected || !plan10Islands.islandMenuClosed)
+      throw Error('Plan 10 island finder regression: '+JSON.stringify(plan10Islands));
+
     const summary = {
       chromium: chrome,
       checkedSvgFiles: Object.keys(iso).length,
@@ -422,6 +450,7 @@ async function run() {
       plan6History: historyCheck,
       plan6RememberedName: remembered,
       plan7Menu, plan7Challenges, plan7Shop, plan7History, plan7Duel, persistedPlan7,
+      plan10Islands,
       browserErrors: pageErrors
     };
     fs.writeFileSync(path.join(reportDir,'report.json'), JSON.stringify(summary,null,2));
