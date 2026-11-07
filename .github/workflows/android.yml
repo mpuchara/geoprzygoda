@@ -44,6 +44,10 @@ jobs:
         run: |
           python3 -m pip install --disable-pip-version-check --no-cache-dir "CairoSVG==2.7.1"
           python3 scripts/build_flag_textures.py
+      - name: Pre-render precise 1:50m flag-filled world for Android WebView
+        run: |
+          python3 -m pip install --disable-pip-version-check --no-cache-dir "Pillow==11.3.0"
+          python3 scripts/build_flag_overview.py
       - name: Validate extra JavaScript syntax
         run: |
           node --check app/src/main/assets/features.js
@@ -72,6 +76,15 @@ jobs:
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 30
+      - name: Save rasterized world flag map for visual inspection
+        uses: actions/upload-artifact@v4
+        with:
+          name: GeoPrzygoda-World-Flag-Raster
+          path: |
+            app/src/main/assets/flag-overview.png
+            app/src/main/assets/flag-overview.json
+          if-no-files-found: error
+          retention-days: 30
       - name: Save flag audit gallery
         uses: actions/upload-artifact@v4
         with:
@@ -94,6 +107,61 @@ jobs:
           name: Android-lint
           path: app/build/reports/lint-results-debug.html
           if-no-files-found: ignore
+
+  webview:
+    name: Test Android WebView on emulator
+    if: github.event_name == 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: actions/download-artifact@v4
+        with:
+          name: GeoPrzygoda-Android
+          path: emulator-apk
+      - name: Install CDP test dependencies
+        run: npm install --no-save --no-audit --no-fund --prefix scripts/flag-browser playwright-core@1.56.1 ws@8.18.3
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules && sudo udevadm trigger --name-match=kvm
+      - name: Open real Android emulator WebView and capture flags
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+          script: |
+            mkdir -p webview-evidence
+            adb install -r emulator-apk/app-debug.apk
+            adb shell settings put secure immersive_mode_confirmations confirmed
+            adb shell am start -n pl.mpuchara.geoprzygoda/.MainActivity
+            sleep 15
+            adb shell input tap 820 632
+            sleep 2
+            adb shell screencap -p /sdcard/geoprzygoda.png
+            adb pull /sdcard/geoprzygoda.png webview-evidence/initial-screen.png
+            adb forward tcp:9222 "localabstract:webview_devtools_remote_$(adb shell pidof pl.mpuchara.geoprzygoda | tr -d '\r')"
+            node scripts/check_android_webview.cjs
+            adb shell screencap -p /sdcard/geoprzygoda.png
+            adb pull /sdcard/geoprzygoda.png webview-evidence/phone-screen.png
+      - name: Upload Android WebView screenshot and checks
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GeoPrzygoda-Android-WebView
+          path: webview-evidence/
+          if-no-files-found: warn
+          retention-days: 30
 
   publish:
     name: Publish APK download
