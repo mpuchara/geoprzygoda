@@ -211,6 +211,91 @@
     }
     return out+'Z';
   }
+  // Generate fictional small regions inside a country's real coastline.
+  // Voronoi borders are irregular; they are NOT real administrative borders.
+  function createBattleSectors(box, goal, routeNodes, seed, radius, make, clipId) {
+    const columns = Math.max(4, Math.min(9, Math.round(box.width / 4)));
+    const rows = Math.max(4, Math.min(9, Math.round(box.height / 4)));
+    const random = (x, y) => {
+      const n = Math.sin(x * 127.1 + y * 311.7 + seed * 17.81) * 43758.5453;
+      return n - Math.floor(n);
+    };
+    const sites = [];
+    for (let y = 0; y < rows; y++) for (let x = 0; x < columns; x++) {
+      sites.push({
+        x: box.x + box.width * (x + .2 + random(x, y) * .6) / columns,
+        y: box.y + box.height * (y + .2 + random(y + 17, x) * .6) / rows
+      });
+    }
+    const grid = make('g');
+    grid.classList.add('battle-fictional-sectors');
+    grid.setAttribute('clip-path', 'url(#' + clipId + ')');
+    const sectors = [];
+    for (let i = 0; i < sites.length; i++) {
+      const site = sites[i];
+      let polygon = [
+        [box.x, box.y], [box.x + box.width, box.y],
+        [box.x + box.width, box.y + box.height], [box.x, box.y + box.height]
+      ];
+      // Clip each region by the bisectors of its neighboring seed points.
+      for (let j = 0; j < sites.length && polygon.length >= 3; j++) {
+        if (i === j) continue;
+        const other = sites[j];
+        const vx = 2 * (other.x - site.x), vy = 2 * (other.y - site.y);
+        const edge = other.x * other.x + other.y * other.y -
+                     site.x * site.x - site.y * site.y;
+        const side = p => vx * p[0] + vy * p[1] - edge;
+        const clipped = [];
+        for (let k = 0; k < polygon.length; k++) {
+          const a = polygon[k], b = polygon[(k + 1) % polygon.length];
+          const da = side(a), db = side(b);
+          if (da <= 0) clipped.push(a);
+          if ((da < 0 && db > 0) || (da > 0 && db < 0)) {
+            const amount = da / (da - db);
+            clipped.push([
+              a[0] + (b[0] - a[0]) * amount,
+              a[1] + (b[1] - a[1]) * amount
+            ]);
+          }
+        }
+        polygon = clipped;
+      }
+      if (polygon.length < 3) continue;
+      const d = polygon.map((p, k) =>
+        (k ? 'L' : 'M') + p[0].toFixed(3) + ',' + p[1].toFixed(3)
+      ).join('') + 'Z';
+      const outline = make('path');
+      outline.setAttribute('d', d);
+      outline.classList.add('battle-fictional-sector-line');
+      grid.append(outline);
+
+      // First capture sectors close to the marching route (toward the capital).
+      // After reaching the capital, nearby sectors expand outwards unevenly.
+      let roadThreshold = 1;
+      const stepSize = Math.max(1, Math.min(box.width, box.height) * .15);
+      for (let k = 0; k < routeNodes.length - 1; k++) {
+        const a = routeNodes[k], b = routeNodes[k + 1];
+        const dx = b.x - a.x, dy = b.y - a.y;
+        const lengthSq = Math.max(.001, dx * dx + dy * dy);
+        const t = Math.max(0, Math.min(1,
+          ((site.x - a.x) * dx + (site.y - a.y) * dy) / lengthSq
+        ));
+        const nearestX = a.x + dx * t, nearestY = a.y + dy * t;
+        const distance = Math.hypot(site.x - nearestX, site.y - nearestY);
+        const along = (k + t) / (routeNodes.length - 1);
+        roadThreshold = Math.min(roadThreshold,
+          .045 + along * .47 + Math.min(.22, distance / stepSize * .08));
+      }
+      const capitalThreshold = .43 +
+        .48 * Math.min(1, Math.hypot(site.x - goal.x, site.y - goal.y) /
+                           Math.max(1, radius));
+      const jitter = (random(i, seed + 22) - .5) * .055;
+      const threshold = Math.max(.02, Math.min(.98,
+        Math.min(roadThreshold, capitalThreshold) + jitter));
+      sectors.push({ d, outline, threshold, revealed: false });
+    }
+    return { grid, sectors };
+  }
   function clearAdvance() {
     if (advanceFrame !== null) cancelAnimationFrame(advanceFrame);
     advanceFrame = null;
@@ -253,6 +338,16 @@
           scene.radius*1.45*side,scene.radius*1.45*side,scene.seed+11.5));
       }
     }
+    if (scene.sectors) {
+      for (const cell of scene.sectors) {
+        const captured = progress >= .999 || (progress > 0 && progress >= cell.threshold);
+        if (captured !== cell.revealed) {
+          cell.revealed = captured;
+          cell.outline.classList.toggle('battle-fictional-sector-captured', captured);
+        }
+        if (captured) parts.push(cell.d);
+      }
+    }
     if(progress>=1){
       parts.length=0;
       parts.push('M'+(box.x-2)+','+(box.y-2)+'h'+(box.width+4)+'v'+(box.height+4)+'h-'+(box.width+4)+'Z');
@@ -280,7 +375,7 @@
     const paths=[...countryPieces(targetId)];
     if(!paths.length)return;
     let box;
-    try{box=host.getBBox();}catch{return;}
+    try{box=primary.getBBox();}catch{return;}
     if(!box || box.width<=0 || box.height<=0)return;
     const c=playable.get(targetId);
     const goal=countryGoal(c);
@@ -338,7 +433,14 @@
     const unitCore=make('circle');
     unitCore.setAttribute('r','2');
     unitCore.classList.add('battle-unit-core');
-    unit.append(unitRing,unitCore);
+    const banner = make('rect');
+    banner.classList.add('battle-unit-banner');
+    banner.setAttribute('x','3');
+    banner.setAttribute('y','-9');
+    banner.setAttribute('width','8');
+    banner.setAttribute('height','5');
+    banner.setAttribute('fill',fill);
+    unit.append(unitRing,unitCore,banner);
     graphics.append(unit);
     const marker=make('g');
     marker.classList.add('battle-capital-marker');
@@ -356,15 +458,18 @@
       marker.append(label);
     }
     graphics.append(marker);
-    host.append(ink,graphics);
     host.classList.add('battle-attacking');
     const radius=Math.max(...[
       [box.x,box.y],[box.x+box.width,box.y],
       [box.x,box.y+box.height],[box.x+box.width,box.y+box.height]
     ].map(corner=>Math.hypot(corner[0]-goal.x,corner[1]-goal.y)));
+    const { grid, sectors } = createBattleSectors(
+      box, goal, routeNodes, seed, radius, make, clip.id
+    );
+    host.append(ink, grid, graphics);
     advanceScene={
-      nodes:[ink,graphics,clip],host,frontShape:ink,route,unit,glow,
-      goal,entry,sourceCity,seed,routeNodes,box,radius
+      nodes:[ink,grid,graphics,clip],host,frontShape:ink,route,unit,glow,
+      goal,entry,sourceCity,seed,routeNodes,box,radius,sectors
     };
     setAdvanceProgress(0);
   }
@@ -568,7 +673,7 @@
       ' pkt ⚔️ ' + defenderRoll + ' pkt ' + defender.flag;
     $('battle-message').textContent = 'Trwa bitwa o ' + defender.n + '...';
     focusCountry(defenderId);
-    const duration = reduced ? 250 : 3200;
+    const duration = reduced ? 250 : 6500;
     playAdvance(defenderId, won, duration);
     battleTimer = setTimeout(() => {
       if (!game) return;
