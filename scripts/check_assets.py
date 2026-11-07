@@ -95,6 +95,13 @@ for code in flag_codes:
     assert svg.tag.endswith('svg'), f'Invalid flag SVG: {code}'
 features = (ROOT / 'app/src/main/assets/features.js').read_text(encoding='utf-8')
 assert 'flag-pattern-' in features and 'quick-music' in features, 'New map/audio controls missing'
+assert 'stripeOnlyCountries' in features, 'Stripe-only flags classification missing'
+assert "'AUT','NLD','FRA'" in features, 'NL, AT and FR must remain plain bands'
+assert "'xMidYMid slice'" in features, 'Symbols in detailed flags must not stretch'
+assert "background ? 'xMidYMid meet' : 'xMidYMid slice'" in features
+assert 'refitProportionalCountry(country)' in features, 'Detailed North Sea map should refit flags'
+assert 'window.GeoPrzygodaFitFlag' in features
+
 assert 'flags/' in features, 'Map flags must be loaded from offline assets'
 assert 'battle.js' in text and 'battle.css' in text, 'Battle resources missing from HTML'
 # Additional 1:10m detail is an offline asset applied to existing country paths;
