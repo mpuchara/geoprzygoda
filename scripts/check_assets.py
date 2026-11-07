@@ -119,6 +119,34 @@ assert 'deferredDetailParts' in features, 'Panned-to islands must not disappear'
 assert 'backing.setAttribute' in features and "piece.getAttribute('fill')" in features, (
     'A failed flag texture must show the original country color')
 assert 'battle.js' in text and 'battle.css' in text, 'Battle resources missing from HTML'
+# Plan 6 data remain lazy-loaded per country and tied to verifiable sources.
+import datetime
+encyclopedia = ROOT / 'app/src/main/assets/encyclopedia'
+records = sorted(encyclopedia.glob('*.json'))
+assert len(records) == 251, f'Expected 251 offline encyclopedia records; got {len(records)}'
+for file in records:
+    record = json.loads(file.read_text(encoding='utf-8'))
+    assert record['id'].lower() == file.stem, f'Wrong country record {file.name}'
+    assert (record.get('population') is None) == (record.get('populationYear') is None), (
+        f'Population must have a year: {file.name}')
+    if record.get('populationYear'):
+        assert 1960 <= record['populationYear'] <= datetime.date.today().year
+    for currency in record.get('currency', []):
+        assert len(currency['code']) == 3, f'Invalid currency code: {file.name}'
+history_root = ROOT / 'app/src/main/assets/history'
+history_index = json.loads((history_root / 'INDEX.json').read_text(encoding='utf-8'))
+assert len(history_index['available']) >= 6, 'Sourced timelines missing'
+for cid in history_index['available']:
+    row = json.loads((history_root / f'{cid.lower()}.json').read_text(encoding='utf-8'))
+    assert row['events'] and row['sources'], f'History lacks evidence: {cid}'
+    assert all(isinstance(e['year'], int) for e in row['events'])
+assert (ROOT / 'app/src/main/assets/encyclopedia.js').is_file()
+assert (ROOT / 'app/src/main/assets/encyclopedia.css').is_file()
+assert "window.GeoPrzygodaEncyclopedia?.enhance(id)" in features
+assert "readStore('geo-player-name').trim()" in features
+assert "id=\"setting-edit-name\"" in features
+assert 'encyclopediaScript.src=\'encyclopedia.js\'' in features
+
 # Additional 1:10m detail is an offline asset applied to existing country paths;
 # it must not replace their ids or flag patterns.
 detail_data = json.loads((ROOT / 'app/src/main/assets/benelux-10m.json').read_text(encoding='utf-8'))

@@ -252,6 +252,45 @@ async function run() {
         !['xMidYMid meet','xMidYMid slice'].includes(conquest.aspect))
       throw Error('Battle conquest stretched USA flag: ' + JSON.stringify(conquest));
 
+    // Plan 6: only selected country facts are brought into the DOM.
+    await page.waitForFunction(() => !!window.GeoPrzygodaEncyclopedia,
+      null, { timeout: 12000 });
+    await page.evaluate(() => openCountry('POL', false));
+    await page.waitForFunction(() =>
+      !!document.querySelector('#info-POL .geo6-fact') &&
+      !!document.querySelector('#info-POL .geo6-history-button'),
+      null, { timeout: 12000 });
+    const plan6 = await page.evaluate(() => ({
+      countriesInDom: document.querySelectorAll('.geo6-encyclopedia').length,
+      facts: document.querySelectorAll('#info-POL .geo6-fact').length,
+      hasBorder: [...document.querySelectorAll('#info-POL .geo6-fact')]
+        .some(x => x.textContent.includes('3071')),
+      cached: window.GeoPrzygodaEncyclopedia.stats().recordsCached
+    }));
+    if(plan6.countriesInDom !== 1 || plan6.facts < 7 || !plan6.hasBorder ||
+       plan6.cached > 8) throw Error('Plan 6 country details failure: '+JSON.stringify(plan6));
+    await page.click('#info-POL .geo6-history-button');
+    await page.waitForFunction(() => !!document.querySelector('#info-POL .geo6-slider'),
+      null, { timeout: 12000 });
+    const historyCheck=await page.evaluate(() => ({
+      historyEvents: document.querySelectorAll('#info-POL .geo6-year').length,
+      historicalFlags: document.querySelectorAll('#info-POL .geo6-old-flag').length,
+      sliderMax: document.querySelector('#info-POL .geo6-slider')?.max
+    }));
+    if(historyCheck.historyEvents < 5 || historyCheck.historicalFlags < 1)
+      throw Error('Plan 6 historical timeline failure: '+JSON.stringify(historyCheck));
+    await page.evaluate(() => localStorage.setItem('geo-player-name','tadzio340'));
+    await page.reload({waitUntil:'load'});
+    await page.waitForFunction(() => document.querySelector('#username-display')?.textContent.includes('tadzio340'),
+      null, { timeout: 12000 });
+    const remembered=await page.evaluate(() => ({
+      greeting: document.querySelector('#username-display').textContent,
+      entering: document.querySelector('#welcome').classList.contains('leaving')
+    }));
+    if (!remembered.greeting.includes('tadzio340'))
+      throw Error('Saved username was not restored');
+    await page.evaluate(() => localStorage.removeItem('geo-player-name'));
+
     const summary = {
       chromium: chrome,
       checkedSvgFiles: Object.keys(iso).length,
@@ -264,6 +303,9 @@ async function run() {
       restoredOverviewGeometry: true,
       battleForeignFlag: conquest,
       screenshotFiles: ['world.png', ...zoomTargets.map(x => x.toLowerCase() + '-zoom.png')],
+      plan6Encyclopedia: plan6,
+      plan6History: historyCheck,
+      plan6RememberedName: remembered,
       browserErrors: pageErrors
     };
     fs.writeFileSync(path.join(reportDir,'report.json'), JSON.stringify(summary,null,2));

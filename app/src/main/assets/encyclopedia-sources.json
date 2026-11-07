@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "license": "ODbL-1.0 for mledoze/countries, CC BY 4.0 for World Bank WDI",
+  "sources": [
+    {
+      "field": "currencies/languages/landlocked",
+      "title": "mledoze/countries",
+      "revision": "fa4f62182d19ff4f8b325cde6387c9cd9d80955a",
+      "url": "https://github.com/mledoze/countries/tree/fa4f62182d19ff4f8b325cde6387c9cd9d80955a",
+      "license": "ODbL-1.0"
+    },
+    {
+      "field": "population",
+      "title": "World Development Indicators SP.POP.TOTL 2024",
+      "year": 2024,
+      "snapshot": "2025-12-19",
+      "mirrorRevision": "8947797810675783dc6a7c0fa89a67f1b06d8e23",
+      "url": "https://data.worldbank.org/indicator/SP.POP.TOTL",
+      "license": "CC BY 4.0"
+    },
+    {
+      "field": "POL geography",
+      "title": "GUS 2025 & Geoportal Edu",
+      "url": "https://stat.gov.pl/"
+    }
+  ],
+  "notice": "For unavailable fields show nothing, never infer border length or historical country geometry."
+}

@@ -17,6 +17,7 @@
     '<label class="extra-setting"><span><strong>🏳️ Flagi na mapie</strong><small>Kolory flag wypełniają kształty państw, tak jak na prawdziwej mapie.</small></span><input id="setting-flags" type="checkbox"></label>' +
     '<label class="extra-setting"><span><strong>🎵 Spokojne dźwięki</strong><small>Delikatna, oryginalna melodia tworzona na telefonie. Działa offline.</small></span><input id="setting-music" type="checkbox"></label>' +
     '<label class="extra-setting extra-volume"><span><strong>🔉 Głośność</strong><small>Wybierz głośność muzyki.</small></span><input id="setting-volume" type="range" min="0" max="100" step="5" value="35" aria-label="Głośność muzyki"></label>' +
+    '<button id="setting-edit-name" type="button" class="rival-compare" style="margin-top:14px">👤 Zmień nazwę gracza</button>' +
     '<p class="extra-note">Ustawienia zapisują się tylko na tym urządzeniu.</p></div>';
   const rivalry = document.createElement('div');
   rivalry.className = 'overlay extras-overlay hidden';
@@ -64,6 +65,10 @@
     return null;
   }
   settingsButton.addEventListener('click', () => openExtra(settings, 'setting-flags'));
+  $('setting-edit-name').addEventListener('click', () => {
+    closeExtra('settings-overlay');
+    showWelcome(true);
+  });
   for (const panel of [settings, rivalry]) {
     panel.addEventListener('click', e => {
       const close = e.target.closest('[data-extra-close]');
@@ -641,6 +646,14 @@
   }
   updateMusicButton();
 
+  // The first welcome screen is only shown until a real, nonempty nickname is
+  // saved. Guests do not create a fake account and can set a nickname later.
+  const savedPlayerName = readStore('geo-player-name').trim();
+  if (savedPlayerName) {
+    $('username').value = savedPlayerName.slice(0, 24);
+    enterWorld(false);
+  }
+
   // The atlas already includes borders, area, independence and region; show them.
   const independentByArea = COUNTRY_DATA.filter(c => c.independent && c.area > 0)
     .sort((a, b) => b.area - a.area);
@@ -695,7 +708,10 @@
   const originalOpenCountry = openCountry;
   openCountry = function (id, focus = true) {
     originalOpenCountry(id, focus);
-    if (mode !== 'quiz') enhanceSheet(id);
+    if (mode !== 'quiz') {
+      enhanceSheet(id);
+      window.GeoPrzygodaEncyclopedia?.enhance(id);
+    }
   };
 
   const opponentList = $('rival-opponent');
@@ -752,4 +768,18 @@
   opponentList.addEventListener('change', compare);
   $('rival-disadvantage').addEventListener('change', compare);
   renderFlags();
+
+  // Keep the heavy encyclopedia out of the map startup path. Its JS and CSS
+  // are separate offline assets; only the chosen country's JSON is requested.
+  const encyclopediaStyle=document.createElement('link');
+  encyclopediaStyle.rel='stylesheet';
+  encyclopediaStyle.href='encyclopedia.css';
+  document.head.append(encyclopediaStyle);
+  const encyclopediaScript=document.createElement('script');
+  encyclopediaScript.src='encyclopedia.js';
+  encyclopediaScript.onload=()=>{
+    const active=document.querySelector('.country-sheet.active');
+    if(active)window.GeoPrzygodaEncyclopedia?.enhance(active.id.slice(5));
+  };
+  document.body.append(encyclopediaScript);
 })();

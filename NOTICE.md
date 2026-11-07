@@ -44,3 +44,8 @@ Gradle Wrapper: projekt Gradle, Apache License 2.0. Skrypty startowe zachowują 
 Flagi SVG 4x3: [lipis/flag-icons](https://github.com/lipis/flag-icons), MIT License.
 Copyright (c) 2013 Panayiotis Lipiridis. Pełne warunki w \`LICENSES/FLAG_ICONS_MIT.md\`.
 Są dołączone lokalnie do aplikacji, bez połączenia internetowego.
+
+
+## Plan 6: World Development Indicators and mledoze/countries
+
+The optional offline encyclopedia JSON is derived from [mledoze/countries](https://github.com/mledoze/countries), licensed under ODbL 1.0. Population values for 2024 come from World Bank World Development Indicators `SP.POP.TOTL`, licensed under CC BY 4.0; these values remain attributed as World Bank and are not represented as live readings. The mirror snapshot is listed in `app/src/main/assets/encyclopedia-sources.json`. Other historical entries cite official cultural or state institutions individually. The added country JSON can be reused subject to the applicable source licenses.
