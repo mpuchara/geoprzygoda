@@ -52,3 +52,19 @@
 .battle-progress-track{height:13px;border-radius:99px;background:#e7e9d0;border:1px solid #a3baa7;overflow:hidden}
 .battle-progress-track span{display:block;width:0;height:100%;border-radius:99px;background:linear-gradient(90deg,#58ad83,#b6db69);transition:none}
 @media(prefers-reduced-motion:reduce){#world-map .battle-attacking .land{animation:none}}
+
+
+/* Organic conquest: real country contours, curved moving front and capitals. */
+#world-map .battle-organic-fill,
+#world-map .battle-route-graphics{pointer-events:none}
+#world-map .battle-organic-fill{opacity:.96}
+#world-map .battle-route-line{fill:none;stroke:#fff1ad;stroke-width:1.8;stroke-dasharray:4 3;stroke-linecap:round;vector-effect:non-scaling-stroke;filter:drop-shadow(0 0 2px #251b3b)}
+#world-map .battle-front-halo{fill:#ffe98444;stroke:#ffde83;stroke-width:1.1;vector-effect:non-scaling-stroke}
+#world-map .battle-moving-unit circle:first-child{fill:#fff8d3;stroke:#2c5c63;stroke-width:1.8;vector-effect:non-scaling-stroke}
+#world-map .battle-unit-core{fill:#2c7973}
+#world-map .battle-capital-marker circle:first-child{fill:#ffe4a8;stroke:#2d3b54;stroke-width:1.5;vector-effect:non-scaling-stroke}
+#world-map .battle-capital-marker circle:nth-child(2){fill:#e77947}
+#world-map .battle-capital-marker text{fill:#fffdf0;stroke:#142c45;stroke-width:2.2;paint-order:stroke;stroke-linejoin:round;font-size:9px;font-weight:900}
+#world-map .battle-attacking .land{animation:battle-soft-border 1.5s ease-in-out infinite alternate;stroke-dasharray:none!important;stroke:#fce3ac!important;stroke-width:2!important;vector-effect:non-scaling-stroke}
+@keyframes battle-soft-border{from{stroke-opacity:.6}to{stroke-opacity:1}}
+@media(prefers-reduced-motion:reduce){#world-map .battle-attacking .land{animation:none}}
