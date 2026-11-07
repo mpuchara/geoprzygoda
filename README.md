@@ -139,3 +139,33 @@ Obszary w bitwie są podzielone na **fikcyjne nieregularne sektory** zamiast pro
 Geograficzne **granice państw nadal pochodzą z Natural Earth 1:10m**, a nie z nagrania. Szczegółową warstwę włączamy wcześniej podczas przybliżania (dla szerokości widoku do 680 jednostek mapy). Podziały wewnątrz celu to tylko **fikcyjne sektory rozgrywki**, nie rzeczywiste województwa czy prowincje.
 
 Symbole na wybranych flagach (m.in. Turcja, Arabia Saudyjska, USA, Australia, Francja, Kanada, Brazylia, Indie, Japonia, Chiny) mają zachowane proporcje. Poprawne dopasowanie obejmuje również barwy zwycięzcy podczas podboju innych krajów. Mechanika została zaprojektowana na podstawie opisu zachowania gry referencyjnej, bez kopiowania jej zasobów graficznych.
+
+## Plan nr 3 — kontrola wszystkich flag 🇳🇱 🇦🇹 🇦🇺
+
+Porównano **238 z 238** lokalnych flag SVG po identyfikatorach blob Git SHA-1
+ze źródłem [lipis/flag-icons](https://github.com/lipis/flag-icons) (`flags/4x3`,
+commit `ac7e0eb3259eb62aa6100c435607e2fe03896a97`).
+Wszystkie 238 plików są identyczne z odpowiednimi oryginałami. W bazie
+występuje 238 unikalnych, mapowanych kodów ISO alpha-2, bez braków.
+Weryfikacja ta jest powtarzana offline na GitHub Actions przez
+`python3 scripts/check_flags.py`, z przypiętym wzorcem
+`scripts/flag_reference.json`, który zabezpiecza zarówno zawartość flag,
+jak i przypisania ISO alpha-3 → alpha-2.
+
+**Wykryta przyczyna złego wyglądu:** nie podmiana flag, lecz rozciąganie
+obrazów na nieregularnych kształtach państw. Teraz symbole w flagach mają
+zachowane proporcje przez wzory SVG `userSpaceOnUse` i skalowanie
+`xMidYMid meet` lub `xMidYMid slice`. Wyjątek stanowią
+proste pasy bez herbów i gwiazd (np. Holandia, Austria, Francja), które
+można wypełnić bez zniekształcenia wzoru. Symbole mieszczą się w granicach
+państwa, a po wczytaniu granic 1:10m dopasowanie jest przeliczane.
+
+Przy `slice` bardzo nietypowy kształt kraju może przyciąć brzegi flagi,
+ale nie zniekształca samych znaków. Niektóre wysepki są tak małe, że
+nie da się na nich dostrzec całego rysunku flagi bez większego przybliżenia.
+
+Do sprawdzania wyglądu źródłowych flag na komputerze lub telefonie
+generowana jest samodzielna galeria
+`python3 scripts/build_flag_gallery.py flag-gallery.html`.
+Plik `flag-gallery.html` jest publikowany razem z APK w wydaniach gry.
+Galeria nie zastępuje sprawdzania flag na kształtach państw w telefonie.
