@@ -107,6 +107,20 @@ for country, min_vertices in [('NLD', 800), ('BEL', 600), ('DEU', 2800)]:
     assert item['d'].count('M') == item['rings'], f'{country} islands and coastlines mismatch'
     assert 'id="land-' + country + '"' in text, f'{country} must retain map click target'
 assert 'loadDetailedNorthSeaBorders' in features_text and "fetch('benelux-10m.json')" in features_text
+
+# Preserve flags with complex symbols. Their graphics must not be distorted
+# to the country's rectangular bounding box as in the original Turkish flag.
+for marker in ("['TUR', '#e30a17']", "['SAU', '#165d31']",
+               'function createProportionalFlag(', "'userSpaceOnUse'",
+               "'xMidYMid meet'", 'geoprzygodaFittedFlag'):
+    assert marker in features_text, f'Proportional flag rendering missing: {marker}'
+assert 'geoprzygodaFittedFlag' in battle_text, 'Battle mode loses corrected flags'
+for code in ('tr', 'sa'):
+    assert (ROOT / 'app/src/main/assets/flags' / (code + '.svg')).is_file(), (
+        f'Missing flag icon {code}')
+assert (ROOT / 'app/src/main/assets/benelux-10m.json').is_file(), (
+    'Concurrent Dutch coastline improvement must remain included')
+
 battle = (ROOT / 'app/src/main/assets/battle.js').read_text(encoding='utf-8')
 for token in ('rival-start-map', 'battle-history-overlay', 'battle-commonwealth', 'battle-target', 'geo-territory-battle-v1'):
     assert token in battle, f'Missing battle capability: {token}'
