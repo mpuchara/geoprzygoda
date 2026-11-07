@@ -70,6 +70,25 @@ au = svg_text('AU')
 assert '#00008B' in au and 'flag-icons-au' in au
 assert 'flag-icons-gb' in svg_text('GB'), 'UK flag is missing'
 
+# A source SVG may be correct while the *map backing* is a wrong color.
+# Match proportional flag backgrounds to colors in the original artwork.
+fixed_backgrounds = {
+    'USA': ('US', '#bd3d44'), 'AUS': ('AU', '#00008B'),
+    'BRA': ('BR', '#229e45'), 'CHN': ('CN', '#ee1c25'),
+    'NZL': ('NZ', '#00247d'), 'GBR': ('GB', '#012169'),
+    'PAK': ('PK', '#0c590b'), 'ALB': ('AL', 'red'),
+    'CHE': ('CH', 'red'),
+}
+feature_source = (ROOT / 'app/src/main/assets/features.js').read_text(encoding='utf-8')
+for cid, (iso, color) in fixed_backgrounds.items():
+    assert actual_iso[cid] == iso, 'Wrong ISO country for backing: ' + cid
+    assert "['%s', '%s']" % (cid, color) in feature_source, (
+        'Incorrect map flag background: ' + cid
+    )
+    assert 'fill="%s"' % color in svg_text(iso), (
+        'Flag backing color not found in original SVG: ' + cid
+    )
+
 print('Verified %d ISO mappings and %d upstream-identical SVG flags.' %
       (len(actual_iso), len(codes)))
 print('SVG content mismatches: 0. Missing files: 0. Duplicate ISO codes: 0.')
