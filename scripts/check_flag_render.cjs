@@ -111,7 +111,7 @@ async function run() {
           // Unlike SVG patterns, a normal <image> clipped by a country outline
           // has a reliable WebView paint path. Verify it is cached per fragment.
           const photo = piece.nextElementSibling;
-          const photoClipId = /url\\(#([^)]*)\\)/.exec(photo?.getAttribute('clip-path') || '')?.[1];
+          const photoClipId = /url\(#([^)]*)\)/.exec(photo?.getAttribute('clip-path') || '')?.[1];
           const photoClip = photoClipId && document.getElementById(photoClipId);
           if (!photo?.classList.contains('country-flag-photo') ||
               photo.getAttribute('href') !== 'flag-textures/' + code.toLowerCase() + '.png' ||
