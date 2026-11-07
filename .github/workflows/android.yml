@@ -75,7 +75,8 @@ jobs:
 
   browser-flags:
     name: Real map SVG rendering and zoom checks (Chromium)
-    runs-on: ubuntu-latest
+    # Playwright 1.55 targets ubuntu 24.04; ubuntu-latest is 26.04 here.
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
