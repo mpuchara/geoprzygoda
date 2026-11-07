@@ -105,7 +105,10 @@ async function run() {
           }
           // SVG 1.1 permits a terrain-color fallback after a paint server.
           // This remains visible if Android WebView fails the entire pattern.
-          if (!/\)\s*#[0-9a-f]{3,8}\b/i.test(piece.style.fill))
+          // Chromium serializes #rrggbb as rgb(...); validate the paint
+          // fallback after url(...) independently of its CSSOM formatting.
+          const trailingPaint = piece.style.fill.replace(/^\s*url\([^)]*\)\s*/, '').trim();
+          if (!trailingPaint || trailingPaint === 'none')
             errors.push(id + ': missing fallback color outside pattern');
           const pattern = document.getElementById(actual);
           const image = pattern?.querySelector('image');
