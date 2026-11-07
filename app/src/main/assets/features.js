@@ -214,6 +214,63 @@
     if (!original) flagDefs.append(pattern);
     return paint;
   }
+  // Plan 8: Android WebView does not consistently paint raster <image> nodes
+  // nested in SVG <pattern>. For the atlas render the same local PNG as a
+  // *normal SVG image*, clipped to the real country path. The old pattern
+  // stays available for battle ownership and as a compatibility fallback.
+  // All nodes are cached per piece; no extra redraw happens on map panning.
+  let photoClipNextId = 0;
+  function syncDirectFlagPhoto(piece, asset, plainBands, background) {
+    const parent = piece.parentNode;
+    if (!parent) return;
+    let box;
+    try { box = piece.getBBox(); } catch { return; }
+    if (!box || !Number.isFinite(box.x + box.y + box.width + box.height) ||
+        box.width <= 0 || box.height <= 0) return;
+    let clip = piece._geoprzygodaPhotoClip;
+    let image = piece._geoprzygodaPhotoImage;
+    if (!clip || !image || !image.isConnected) {
+      const clipId = 'country-photo-clip-' + photoClipNextId++;
+      clip = document.createElementNS(ns, 'clipPath');
+      clip.setAttribute('id', clipId);
+      clip.setAttribute('clipPathUnits', 'userSpaceOnUse');
+      const outline = document.createElementNS(ns, 'path');
+      clip.append(outline);
+      flagDefs.append(clip);
+      image = document.createElementNS(ns, 'image');
+      image.classList.add('country-flag-photo');
+      image.setAttribute('clip-path', 'url(#' + clipId + ')');
+      image.setAttribute('pointer-events', 'none');
+      image.setAttribute('aria-hidden', 'true');
+      piece._geoprzygodaPhotoClip = clip;
+      piece._geoprzygodaPhotoImage = image;
+      piece.after(image);
+    }
+    if (image.previousElementSibling !== piece) piece.after(image);
+    const outline = clip.firstElementChild;
+    const geometry = piece.getAttribute('d') || '';
+    if (outline.getAttribute('d') !== geometry)
+      outline.setAttribute('d', geometry);
+    const rule = piece.getAttribute('fill-rule') || 'nonzero';
+    if (outline.getAttribute('clip-rule') !== rule)
+      outline.setAttribute('clip-rule', rule);
+    for (const [attr, value] of Object.entries({
+      x: box.x, y: box.y, width: box.width, height: box.height
+    })) {
+      const stringValue = String(value);
+      if (image.getAttribute(attr) !== stringValue)
+        image.setAttribute(attr, stringValue);
+    }
+    if (image.getAttribute('href') !== asset) {
+      image.setAttribute('href', asset);
+      image.setAttributeNS('http://www.w3.org/1999/xlink', 'href', asset);
+    }
+    const fit = plainBands ? 'none'
+      : (background ? 'xMidYMid meet' : 'xMidYMid slice');
+    if (image.getAttribute('preserveAspectRatio') !== fit)
+      image.setAttribute('preserveAspectRatio', fit);
+  }
+
   // Battles may draw the victor's flag on a completely different shape.
   // Fit its symbol to the *captured* country; never reuse the old country's
   // normalized pattern where stars, moons or emblems get stretched.
@@ -245,6 +302,8 @@
         index === 0 ? 'flag-pattern-' + c.id : null
       );
       if (!fitted) return; // Keep original country color if geometry is invalid.
+      syncDirectFlagPhoto(piece, url, stripeOnlyCountries.has(c.id),
+        emblemBackgrounds.has(c.id));
       piece.dataset.geoprzygodaFittedFlag = fitted;
       flagPaths.set(piece, fitted);
       if (flagsEnabled && mode !== 'quiz') piece.style.fill = fitted;
@@ -286,6 +345,8 @@
         index === 0 ? 'flag-pattern-' + id : null
       );
       if (!fitted) return;
+      syncDirectFlagPhoto(piece, 'flag-textures/' + c.code.toLowerCase() + '.png',
+        stripeOnlyCountries.has(id), emblemBackgrounds.has(id));
       piece.dataset.geoprzygodaFittedFlag = fitted;
       flagPaths.set(piece, fitted);
       if (map.classList.contains('flag-fill') &&
@@ -366,6 +427,8 @@
     for (const extra of [...primary.parentElement.querySelectorAll('path.land')]) {
       if (keep.has(extra)) continue;
       extra._geoprzygodaTerrainUnderlay?.remove();
+      extra._geoprzygodaPhotoImage?.remove();
+      extra._geoprzygodaPhotoClip?.remove();
       flagPaths.delete(extra);
       const fitted = /url\(#([^)]+)\)/.exec(extra.dataset.geoprzygodaFittedFlag || '');
       if (fitted) document.getElementById(fitted[1])?.remove();
