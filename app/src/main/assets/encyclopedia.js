@@ -93,14 +93,14 @@
     historyButton.type='button';
     const historyPanel=el('section','geo6-history-panel');
     historyPanel.hidden=true;
-    // Keep this as a closure value: data-* attributes are used throughout
-    // the map to drive navigation and should not control loading state.
-    let historyInitialized=false;
     historyButton.addEventListener('click',()=>{
-      historyPanel.hidden = !historyPanel.hidden;
-      historyButton.setAttribute('aria-expanded',String(!historyPanel.hidden));
-      if (!historyPanel.hidden && !historyInitialized) {
-        historyInitialized=true;
+      const opening=historyPanel.hidden;
+      historyPanel.hidden=!opening;
+      historyButton.setAttribute('aria-expanded',String(opening));
+      // Render directly on every opening, avoiding stale per-panel state
+      // after repeated open/close gestures and background document clicks.
+      if (opening) {
+        historyPanel.replaceChildren(el('p','geo6-note','Odczytywanie historii z pamięci telefonu…'));
         renderHistory(id,historyPanel);
       }
     });
