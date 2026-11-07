@@ -653,7 +653,7 @@
     const attacker=$('land-'+game.player);
     const fill=map.classList.contains('flag-fill')
       ? (window.GeoPrzygodaFitFlag
-          ? window.GeoPrzygodaFitFlag(game.player,targetId,primary,0)
+          ? window.GeoPrzygodaFitFlag(game.player,targetId,primary,0,true)
           : 'url(#flag-pattern-'+game.player+')')
       : (attacker?.getAttribute('fill') || '#77cfa3');
     ink.setAttribute('fill',fill);
@@ -769,6 +769,7 @@
         const showFlag = map.classList.contains('flag-fill') && c.code;
         if (showFlag) shape.style.fill = shape.dataset.geoprzygodaFittedFlag || 'url(#flag-pattern-' + c.id + ')';
         else shape.style.removeProperty('fill');
+        window.GeoPrzygodaResetFlagOverlay?.(c.id, shape);
         shape.classList.remove('battle-owned');
       }
     }
