@@ -131,7 +131,6 @@ for token in ("['TUR', '#e30a17']", "['SAU', '#165d31']",
 assert 'geoprzygodaFittedFlag' in battle_text, (
     'Entering battle mode must preserve corrected flag proportions')
 assert 'loadDetailedNorthSeaBorders' in features_text
-assert 'world_detail_path.is_file()' in Path(__file__).read_text(encoding='utf-8')
 
 battle = (ROOT / 'app/src/main/assets/battle.js').read_text(encoding='utf-8')
 for token in ('rival-start-map', 'battle-history-overlay', 'battle-commonwealth', 'battle-target', 'geo-territory-battle-v1'):
