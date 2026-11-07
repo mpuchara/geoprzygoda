@@ -253,7 +253,7 @@
   // At close zoom the detailed 1:10m geometry takes precedence. Load ordinary
   // clipped PNGs only for countries currently in the viewport, in small frames.
   // This is independent of the robust single-image world overview.
-  let geo8ZoomFrame = null, geo8ZoomIndex = 0, geo8PhotoSerial = 0;
+  let geo8ZoomFrame = null, geo8ZoomIndex = 0;
   // Plan 10: restore the known working GeoPrzygoda 1.0.26 paint-server
   // technique as a lazy close-up fallback. The source is the original local
   // SVG, not the nested PNG that disappears on some Samsung WebViews.
@@ -296,69 +296,50 @@
         piece.getAttribute('fill') || '#a8d77e';
     }
   }
+  // Do NOT paint an SVG clipPath PNG and an SVG pattern simultaneously.
+  // The stacked GPU paint servers caused Android emulator stalls at zoom.
+  // The proven 1.0.26 objectBoundingBox SVG pattern (with preserved emblem
+  // aspect ratio) already clips itself perfectly to the real 1:10m path.
   function geo8SyncPhoto(piece, country) {
-    if (!piece || !piece.parentNode || !country) return;
-    let box;
-    try { box = piece.getBBox(); } catch { return; }
-    if (!box || box.width <= 0 || box.height <= 0) return;
-    let clip = piece._geo8PhotoClip, image = piece._geo8PhotoImage;
-    if (!clip || !image || !image.isConnected) {
-      clip = document.createElementNS(ns, 'clipPath');
-      clip.id = 'geo8-photo-clip-' + country.id + '-' + (++geo8PhotoSerial);
-      clip.setAttribute('clipPathUnits','userSpaceOnUse');
-      clip.append(document.createElementNS(ns,'path'));
-      flagDefs.append(clip);
-      image = document.createElementNS(ns,'image');
-      image.classList.add('geo8-photo');
-      image.setAttribute('clip-path','url(#' + clip.id + ')');
-      image.setAttribute('pointer-events','none');
-      image.setAttribute('aria-hidden','true');
-      piece.after(image);
-      piece._geo8PhotoClip = clip;
-      piece._geo8PhotoImage = image;
-    }
-    if (image.previousElementSibling !== piece) piece.after(image);
-    clip.firstElementChild.setAttribute('d', piece.getAttribute('d') || '');
-    clip.firstElementChild.setAttribute('clip-rule', piece.getAttribute('fill-rule') || 'evenodd');
-    for (const [attr, value] of Object.entries({
-      x:box.x, y:box.y, width:box.width, height:box.height
-    })) image.setAttribute(attr,String(value));
-    const asset = 'flag-textures/' + country.code.toLowerCase() + '.png';
-    if (image.getAttribute('href') !== asset) {
-      image.setAttribute('href', asset);
-      image.setAttributeNS('http://www.w3.org/1999/xlink','href',asset);
-    }
-    image.setAttribute('preserveAspectRatio', stripeOnlyCountries.has(country.id)
-      ? 'none' : (emblemBackgrounds.has(country.id) ? 'xMidYMid meet' : 'xMidYMid slice'));
-    if (map.classList.contains('geo8-zoom-flags') &&
-        !app.classList.contains('battle-running')) {
-      const fallback = geo10LegacyFlag(country);
-      piece.style.fill = 'url(#' + fallback + ') ' +
-        (piece.getAttribute('fill') || '#a8d77e');
-      geo10LegacyPaths.add(piece);
-    }
+    if (!piece?.isConnected || !country || app.classList.contains('battle-running')) return;
+    const fallback = geo10LegacyFlag(country);
+    const originalColor = piece.getAttribute('fill') || '#a8d77e';
+    const paint = 'url(#' + fallback + ') ' + originalColor;
+    if (piece.style.fill !== paint) piece.style.fill = paint;
+    geo10LegacyPaths.add(piece);
   }
+  let geo8ZoomPieceIndex = 0, geo8ZoomPieces = null;
   function geo8PhotoBatch() {
     geo8ZoomFrame = null;
-    if (!geo8Android || !map.classList.contains('geo8-zoom-flags')) return;
-    const view = map.viewBox.baseVal, start = performance.now();
-    let countriesDone = 0;
-    while (geo8ZoomIndex < flagCountries.length && countriesDone < 7) {
-      const country = flagCountries[geo8ZoomIndex++];
-      const primary = $('land-' + country.id);
-      if (!primary) continue;
-      let painted = false;
-      for (const piece of primary.parentElement.querySelectorAll('path.land')) {
-        let box;
-        try { box = piece.getBBox(); } catch { continue; }
-        if (box.x > view.x + view.width || box.x + box.width < view.x ||
-            box.y > view.y + view.height || box.y + box.height < view.y) continue;
-        geo8SyncPhoto(piece,country);
-        painted = true;
-        if (performance.now() - start > 7) break;
+    if (!geo8Android || !map.classList.contains('geo8-zoom-flags') ||
+        app.classList.contains('battle-running')) return;
+    const view = map.viewBox.baseVal;
+    const start = performance.now();
+    let checked = 0;
+    // Even if all countries are outside the camera, inspect at most 12
+    // individual paths per frame. A single USA/Canada country can contain
+    // hundreds of islands, and getBBox() is synchronous on Android WebView.
+    while (geo8ZoomIndex < flagCountries.length && checked < 12) {
+      if (checked && performance.now() - start >= 5) break;
+      const country = flagCountries[geo8ZoomIndex];
+      if (!geo8ZoomPieces) {
+        const primary = $('land-' + country.id);
+        geo8ZoomPieces = primary
+          ? [...primary.parentElement.querySelectorAll('path.land')] : [];
+        geo8ZoomPieceIndex = 0;
       }
-      if (painted) countriesDone++;
-      if (performance.now() - start > 7) break;
+      if (geo8ZoomPieceIndex >= geo8ZoomPieces.length) {
+        geo8ZoomIndex++;
+        geo8ZoomPieces = null;
+        continue;
+      }
+      const piece = geo8ZoomPieces[geo8ZoomPieceIndex++];
+      checked++;
+      let box;
+      try { box = piece.getBBox(); } catch { continue; }
+      if (box.x > view.x + view.width || box.x + box.width < view.x ||
+          box.y > view.y + view.height || box.y + box.height < view.y) continue;
+      geo8SyncPhoto(piece,country);
     }
     if (geo8ZoomIndex < flagCountries.length)
       geo8ZoomFrame = requestAnimationFrame(geo8PhotoBatch);
@@ -368,6 +349,8 @@
     if (geo8ZoomFrame !== null) cancelAnimationFrame(geo8ZoomFrame);
     geo8ZoomFrame = null;
     geo8ZoomIndex = 0;
+    geo8ZoomPieceIndex = 0;
+    geo8ZoomPieces = null;
     if (map.classList.contains('geo8-zoom-flags'))
       geo8ZoomFrame = requestAnimationFrame(geo8PhotoBatch);
   }
