@@ -181,3 +181,25 @@ Test `scripts/check_flags.py` sprawdza również te dziewięć kolorów.
 Po audycie 238 plików SVG dodano test prawdziwego renderera **Chromium** (`scripts/check_flag_render.cjs`) wykonywany na tym samym lokalnym HTML, JavaScript i mapie SVG, które trafiają do APK. Test sprawdza mapowanie ISO do obrazu w każdym renderowanym kraju i jego wyspach, rozmiar wzorca wobec aktualnego `getBBox()`, zachowanie proporcji przy zoomie, przełączanie flag oraz flagę zwycięzcy w trybie podboju. Weryfikuje m.in. Holandię, Austrię, Francję, USA, Australię, Turcję i Wielką Brytanię.
 
 GitHub Actions publikuje osobny artefakt `GeoPrzygoda-Flag-Map-Render` ze zrzutami mapy, zbliżeniami i raportem JSON. Jest to realny test w przeglądarce oraz materiał do **ręcznej** oceny, lecz nie jest równoważny testom na fizycznym Android WebView; te należy wykonać po instalacji APK. Nie uznajemy samego testu obecności 238 flag za wizualne potwierdzenie 238 flag.
+
+## Rozwiązanie #17 — flagi na prawdziwych konturach bez rozciągania
+
+Po audycie 238 oryginalnych SVG poprawiono mapowanie **każdego**
+widocznego konturu: `objectBoundingBox` usunięto z flag na mapie,
+a każda flaga jest teraz dopasowywana w `userSpaceOnUse`.
+Pierwszy fragment kraju zachowuje historyczny identyfikator
+`flag-pattern-<ISO3>`, ale nie jest już wzorem obiektowym.
+Pozostałe fragmenty (wyspy i oddzielne regiony) mają własne dopasowanie.
+
+* Flagi z godłami, półksiężycami, gwiazdami i krzyżami używają
+  `meet` albo `slice`, bez deformacji symboli.
+* Wyłącznie sprawdzone proste flagi pasiaste (np. Austria, Holandia,
+  Francja) mogą używać `preserveAspectRatio=none`, aby zachować pasy.
+* Wzory przeliczają się po wczytaniu 1:10m, podczas przełączania
+  flag, quizu oraz w trybie podbojów.
+
+Do testów istniejących od zgłoszenia #17 dołączono walidację,
+że **żadna flaga** nie używa `objectBoundingBox` na mapie,
+oraz kolejne zrzuty z zoomu małych krajów i wysp.
+Testy przeglądarkowe na Chromium nie są testami ręcznymi
+na Samsungu/Android WebView.

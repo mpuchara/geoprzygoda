@@ -14,7 +14,7 @@ const reportDir = path.resolve(__dirname, 'flag-render-evidence');
 const manifest = JSON.parse(fs.readFileSync(path.resolve(__dirname, 'flag_reference.json'), 'utf8'));
 const iso = manifest.iso_alpha3_to_alpha2;
 const fixed = ['NLD','AUT','FRA','USA','AUS','TUR','GBR','JPN','CAN','SAU','NPL','MCO','VAT','KIR'];
-const zoomTargets = ['NLD','AUT','FRA','USA','AUS','TUR'];
+const zoomTargets = ['NLD','AUT','FRA','USA','AUS','TUR','GBR','SAU','CHL','NPL','VAT','MCO','JPN','KIR'];
 const stripes = new Set([
   'AUT','NLD','FRA','BEL','DEU','ITA','IRL','POL','UKR','RUS',
   'EST','LTU','LVA','HUN','BGR','ROU','ARM','LUX',
@@ -107,18 +107,24 @@ async function run() {
           if (image.getAttribute('href') !== 'flags/' + code.toLowerCase() + '.svg')
             errors.push(id + ': wrong country flag URL: ' + image.getAttribute('href'));
           const aspect = image.getAttribute('preserveAspectRatio');
+          // All 238 mapped flags now use per-fragment userSpaceOnUse patterns.
+          // The primary piece keeps the historical flag-pattern-ID alias.
+          if (actual !== 'flag-pattern-' + id &&
+              !actual.startsWith('flag-fitted-' + id + '-'))
+            errors.push(id + ': foreign or unfitted flag reference ' + actual);
+          if (pattern.getAttribute('patternUnits') !== 'userSpaceOnUse' ||
+              pattern.getAttribute('patternContentUnits') !== 'userSpaceOnUse')
+            errors.push(id + ': normalized/stretched flag pattern');
           if (expectedStripes.has(id)) {
             stripePieces++;
-            if (actual !== 'flag-pattern-' + id)
-              errors.push(id + ': simple stripes unexpectedly use a fitted pattern');
-          } else if (box.width > 0 && box.height > 0) {
+            if (aspect !== 'none')
+              errors.push(id + ': simple stripes unexpectedly changed ratio');
+          } else {
             fittedPieces++;
-            if (!actual.startsWith('flag-fitted-' + id + '-'))
-              errors.push(id + ': emblem or complex flag is stretched instead of fitted');
             if (!['xMidYMid meet', 'xMidYMid slice'].includes(aspect))
-              errors.push(id + ': stretched or missing aspect ratio: ' + aspect);
-            if (pattern.getAttribute('patternUnits') !== 'userSpaceOnUse')
-              errors.push(id + ': wrong units on fitted pattern');
+              errors.push(id + ': stretched emblem/cross or incorrect ratio: ' + aspect);
+          }
+          if (box.width > 0 && box.height > 0) {
             const value = attr => Number(pattern.getAttribute(attr));
             if (Math.abs(value('x') - box.x) > .04 ||
                 Math.abs(value('y') - box.y) > .04 ||
@@ -160,13 +166,17 @@ async function run() {
           const image = pattern?.querySelector('image');
           if (!image || image.getAttribute('href') !== 'flags/' + code.toLowerCase() + '.svg')
             problems.push('missing/mismatched image after zoom');
-          if (!stripe && piece.getBBox().width > 0 && image &&
-              image.getAttribute('preserveAspectRatio') === 'none')
-            problems.push('stretched image after zoom');
-          if (!stripe && piece.getBBox().width > 0 && pattern) {
+          if (image && (stripe
+              ? image.getAttribute('preserveAspectRatio') !== 'none'
+              : image.getAttribute('preserveAspectRatio') === 'none'))
+            problems.push('wrong SVG image aspect ratio after zoom');
+          if (piece.getBBox().width > 0 && pattern) {
             const box = piece.getBBox();
-            if (Math.abs(Number(pattern.getAttribute('width')) - box.width) > .04)
-              problems.push('stale fitted width after zoom');
+            if (pattern.getAttribute('patternUnits') !== 'userSpaceOnUse')
+              problems.push('normalized/old SVG flag pattern after zoom');
+            if (Math.abs(Number(pattern.getAttribute('width')) - box.width) > .04 ||
+                Math.abs(Number(pattern.getAttribute('height')) - box.height) > .04)
+              problems.push('stale fitted size after zoom');
           }
         }
         return { pieces: pieces.length, problems };

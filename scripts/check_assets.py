@@ -98,7 +98,13 @@ assert 'flag-pattern-' in features and 'quick-music' in features, 'New map/audio
 assert 'stripeOnlyCountries' in features, 'Stripe-only flags classification missing'
 assert "'AUT','NLD','FRA'" in features, 'NL, AT and FR must remain plain bands'
 assert "'xMidYMid slice'" in features, 'Symbols in detailed flags must not stretch'
+assert "plainBands ? 'none'" in features, 'Only stripe flags may have a stretched artwork'
 assert "background ? 'xMidYMid meet' : 'xMidYMid slice'" in features
+assert "patternUnits', 'objectBoundingBox'" not in features, 'No flag may use a normalized bounding box pattern'
+assert "patternContentUnits', 'objectBoundingBox'" not in features
+assert "image.setAttribute('preserveAspectRatio', 'none')" not in features
+assert "index === 0 ? 'flag-pattern-' + c.id : null" in features
+assert "stripeOnlyCountries.has(ownerId)" in features, 'Conquest flags must preserve stripe choice'
 assert 'refitProportionalCountry(country)' in features, 'Detailed North Sea map should refit flags'
 assert 'window.GeoPrzygodaFitFlag' in features
 
