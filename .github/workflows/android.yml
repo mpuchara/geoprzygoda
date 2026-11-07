@@ -50,6 +50,7 @@ jobs:
           node --check app/src/main/assets/battle.js
           node --check app/src/main/assets/rival_ui.js
           node --check app/src/main/assets/encyclopedia.js
+          node --check app/src/main/assets/plan7.js
       - name: Verify 238 ISO flags against pinned upstream source
         run: python3 scripts/check_flags.py
       - name: Create offline visual audit gallery

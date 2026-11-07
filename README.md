@@ -247,3 +247,20 @@ na Samsungu/Android WebView.
 ### Testy
 
 CI sprawdza wszystkie 251 JSON, waliduje oznaczenia lat, wykonuje testy rysowania flag, nawigacji w historycznej osi czasu i odtwarzania pseudonimu po ponownym uruchomieniu. Testy Chromium i Android Lint nie zastępują pomiaru płynności na fizycznym telefonie.
+
+
+## Plan nr 7 — Tryby gry, punkty i znajomi 🎮
+
+Na pasku obok ⚙️ Ustawień znajduje się przycisk **🎮 Tryby gry** z animowanym menu. Wszystkie tryby działają lokalnie, bez serwera i bez logowania.
+
+- **⚔️ Wielka kampania** korzysta z dotychczasowych rzeczywistych granic prowincji, animacji oraz mechaniki podbojów. Pozwala wybrać własne państwo, sąsiedzki sojusz i utworzyć **własną flagę drużyny** (trzy pasy, kolory, gwiazda albo koło). Flaga gracza jest widoczna w interfejsie kampanii; oficjalne flagi mapy pozostają poprawne i niezmienione.
+- **🏰 Podróż w czasie** udostępnia oś czasu, władców, historyczne nazwy i potwierdzone flagi dla sześciu krajów z Planu 6: Polski, Niderlandów, Niemiec, Francji, USA i Austrii. Nie powstają zmyślone mapy dawnego świata.
+- **🏆 Dobrowolne wyzwania** oferują codziennie trzy pytania o stolicę, państwo lub flagę. Za poprawne odpowiedzi są nagrody 15, 15 i 20 punktów. Można pominąć cały dzień bez kary. To ten sam zestaw pytań na dany dzień urządzenia, a za ukończone zadanie nie przyznaje się punktów ponownie.
+- **🛒 Sklep odkrywcy** umożliwia kupowanie motywów mapy, ramek profilu, tytułów i lekkich efektów za punkty uzyskane w zabawie; żadnych rzeczywistych płatności. Włączone motywy nie zmieniają barw oficjalnych flag państw.
+- **👥 Quiz dla dwojga** daje dwóm graczom po pięć pytań na jednym telefonie. Wynik można udostępnić przy pomocy systemowego interfejsu (gdy telefon obsługuje funkcję share) lub skopiować tekst. Tryb sieciowy wymaga późniejszego osobnego projektu i serwera.
+
+Stan punktów, ukończone zagadki, zakupy, wybrane nagrody i własne flagi zapisuje się lokalnie pod kluczem geo7-progress-v1. Usunięcie danych aplikacji usunie również ten stan. Pseudonim gracza nadal zapisywany jest osobno pod geo-player-name (Plan 6).
+
+**Wydajność:** kod Planu 7 jest odrębnym plikiem JS/CSS, a czasochłonne listy są tworzone dopiero po wejściu do danego trybu. Historię konkretnego kraju wczytuje się z lokalnego JSON na żądanie. W menu nie wykonuje się animacji geometrii mapy; obsługiwane jest ograniczenie ruchu systemu Android.
+
+**Testy:** scripts/check_flag_render.cjs w Chromium sprawdza menu, przyznawanie nagród tylko raz, zakupy, zapis po ponownym wczytaniu strony, własną flagę kampanii, historię i quiz dwóch osób. scripts/check_assets.py pilnuje kompletności zasobów. Wymagany pozostaje test dotyku, płynności i WebView na rzeczywistym telefonie Samsung.

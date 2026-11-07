@@ -147,6 +147,16 @@ assert "readStore('geo-player-name').trim()" in features
 assert "id=\"setting-edit-name\"" in features
 assert 'encyclopediaScript.src=\'encyclopedia.js\'' in features
 
+# Plan 7 is optional and never changes the world geometry or sourced history.
+plan7 = (ROOT / 'app/src/main/assets/plan7.js').read_text(encoding='utf-8')
+assert (ROOT / 'app/src/main/assets/plan7.css').is_file(), 'Plan 7 styles missing'
+assert "plan7Script.src = 'plan7.js'" in features, 'Plan 7 loader missing'
+for token in ('open-game-modes','geo7-progress-v1','challengeSet(day)',
+              'flagForCountry(id)','history/', 'navigator.share',
+              'GeoPrzygodaBattle.start', 'geo7-overlay'):
+    assert token in plan7, f'Plan 7 component missing: {token}'
+
+
 # Additional 1:10m detail is an offline asset applied to existing country paths;
 # it must not replace their ids or flag patterns.
 detail_data = json.loads((ROOT / 'app/src/main/assets/benelux-10m.json').read_text(encoding='utf-8'))

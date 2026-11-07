@@ -291,6 +291,111 @@ async function run() {
       throw Error('Saved username was not restored');
     await page.evaluate(() => localStorage.removeItem('geo-player-name'));
 
+    // Plan 7: test real offline UI interactions in Chromium, not just asset names.
+    await page.waitForFunction(() => !!window.GeoPrzygodaPlan7,
+      null, { timeout: 12000 });
+    await page.click('#open-game-modes');
+    const plan7Menu = await page.evaluate(() => ({
+      open: !document.getElementById('geo7-overlay').classList.contains('hidden'),
+      modes: document.querySelectorAll('#geo7-content .geo7-mode').length,
+      currentPoints: window.GeoPrzygodaPlan7.points
+    }));
+    if(!plan7Menu.open || plan7Menu.modes !== 5 || plan7Menu.currentPoints !== 0)
+      throw Error('Plan 7 mode menu failure: '+JSON.stringify(plan7Menu));
+
+    await page.evaluate(() => window.GeoPrzygodaPlan7.open('challenges'));
+    const plan7Challenges = await page.evaluate(() => {
+      const tasks = document.querySelectorAll('#geo7-content .geo7-task');
+      if (tasks.length !== 3 || [...tasks].some(x => x.querySelectorAll('.geo7-answer').length !== 4))
+        return { count: tasks.length, error:'Missing daily tasks' };
+      const first=tasks[0], heading=first.querySelector('.geo7-task-heading').textContent;
+      const name=heading.replace(/^.*Jaka jest stolica państwa /,'').replace(/\?$/, '');
+      const country=COUNTRY_DATA.find(c=>c.n===name);
+      const correct=[...first.querySelectorAll('.geo7-answer')].find(b=>b.textContent===country?.cap);
+      if(!correct) return { count:tasks.length, error:'No correct capital answer: '+heading };
+      correct.click();
+      const third=document.querySelectorAll('#geo7-content .geo7-task')[2];
+      const flag=third.querySelector('img');
+      const code=flag?.getAttribute('src')?.match(/flags\/([a-z]{2})\.svg$/)?.[1];
+      const target=COUNTRY_DATA.find(c=>c.code?.toLowerCase()===code);
+      const targetAnswer=[...third.querySelectorAll('.geo7-answer')].find(b=>b.textContent===target?.n);
+      if(!targetAnswer) return { count:tasks.length, error:'No correct flag answer '+code };
+      targetAnswer.click();
+      return { count:tasks.length, points:window.GeoPrzygodaPlan7.points,
+        completed:window.GeoPrzygodaPlan7.completedToday };
+    });
+    if(plan7Challenges.error || plan7Challenges.points !== 35 || plan7Challenges.completed !== 2)
+      throw Error('Plan 7 daily reward failure: '+JSON.stringify(plan7Challenges));
+    await page.evaluate(() => window.GeoPrzygodaPlan7.open('shop'));
+    const plan7Shop = await page.evaluate(() => {
+      const gold=[...document.querySelectorAll('.geo7-shop-item')].find(x=>x.textContent.includes('Złota ramka'));
+      gold?.querySelector('button')?.click();
+      return { points:window.GeoPrzygodaPlan7.points,
+        inventory:window.GeoPrzygodaPlan7.inventory };
+    });
+    if(plan7Shop.points !== 0 || !plan7Shop.inventory.includes('frame-gold'))
+      throw Error('Plan 7 reward shop failure: '+JSON.stringify(plan7Shop));
+
+    await page.evaluate(() => window.GeoPrzygodaPlan7.open('flags'));
+    await page.evaluate(() => {
+      const color=document.querySelector('.geo7-color');
+      color.value='#12aabb';
+      color.dispatchEvent(new Event('input',{bubbles:true}));
+      [...document.querySelectorAll('.geo7-button')].find(b=>b.textContent.includes('Zapisz flagę')).click();
+    });
+    const customFlag = await page.evaluate(() => ({
+      src:window.GeoPrzygodaPlan7.flagForCountry('POL'),
+      visible:!!document.querySelector('#geo7-content .geo7-flag-preview img')
+    }));
+    if(!customFlag.src.startsWith('data:image/svg+xml;') || !customFlag.visible)
+      throw Error('Plan 7 custom flag failure');
+
+    const mapWidthBeforeHistory = await page.evaluate(() => document.getElementById('world-map').viewBox.baseVal.width);
+    await page.evaluate(() => window.GeoPrzygodaPlan7.open('time'));
+    await page.waitForFunction(() => !!document.querySelector('.geo7-timeline-slider'),
+      null, {timeout:12000});
+    const plan7History = await page.evaluate(() => ({
+      max:document.querySelector('.geo7-timeline-slider').max,
+      originalMap:document.getElementById('world-map').viewBox.baseVal.width
+    }));
+    if(Number(plan7History.max)<3 || plan7History.originalMap !== mapWidthBeforeHistory)
+      throw Error('Plan 7 historical mode failure: '+JSON.stringify(plan7History));
+
+    await page.evaluate(() => window.GeoPrzygodaPlan7.open('friends'));
+    await page.evaluate(() => [...document.querySelectorAll('#geo7-content button')]
+      .find(b=>b.textContent.includes('Rozpocznij pojedynek')).click());
+    const plan7Duel = await page.evaluate(() => {
+      const answers=[...document.querySelectorAll('#geo7-content .geo7-answer')];
+      if(answers.length!==4)return { answers:answers.length };
+      answers[0].click();
+      return { answers:answers.length, disabled:answers.every(b=>b.disabled),
+        next:[...document.querySelectorAll('#geo7-content button')].some(b=>b.textContent.includes('Dalej')) };
+    });
+    if(plan7Duel.answers!==4 || !plan7Duel.disabled || !plan7Duel.next)
+      throw Error('Plan 7 local duel failure: '+JSON.stringify(plan7Duel));
+    await page.reload({waitUntil:'load'});
+    await page.waitForFunction(() => !!window.GeoPrzygodaPlan7,
+      null, {timeout:12000});
+    const persistedPlan7 = await page.evaluate(() => ({
+      points:window.GeoPrzygodaPlan7.points,
+      completed:window.GeoPrzygodaPlan7.completedToday,
+      inventory:window.GeoPrzygodaPlan7.inventory,
+      savedFlag:!!window.GeoPrzygodaPlan7.flagForCountry('POL'),
+      map:!!document.getElementById('world-map')
+    }));
+    if(persistedPlan7.points!==0 || persistedPlan7.completed!==2 ||
+       !persistedPlan7.inventory.includes('frame-gold') ||
+       !persistedPlan7.savedFlag || !persistedPlan7.map)
+      throw Error('Plan 7 persistence failure: '+JSON.stringify(persistedPlan7));
+    // Battle UI shows the player's banner, without replacing the atlas flags.
+    const banner=await page.evaluate(()=>{
+      window.GeoPrzygodaBattle.start('POL','BLR',0,'free');
+      const shown=!!document.querySelector('#battle-title .geo7-campaign-flag');
+      window.GeoPrzygodaBattle.stop();
+      return shown;
+    });
+    if(!banner) throw Error('Plan 7 player banner missing in campaign');
+
     const summary = {
       chromium: chrome,
       checkedSvgFiles: Object.keys(iso).length,
@@ -306,6 +411,7 @@ async function run() {
       plan6Encyclopedia: plan6,
       plan6History: historyCheck,
       plan6RememberedName: remembered,
+      plan7Menu, plan7Challenges, plan7Shop, plan7History, plan7Duel, persistedPlan7,
       browserErrors: pageErrors
     };
     fs.writeFileSync(path.join(reportDir,'report.json'), JSON.stringify(summary,null,2));
