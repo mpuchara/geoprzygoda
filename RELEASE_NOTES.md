@@ -1,10 +1,11 @@
-GeoPrzygoda — Kampania podbojów i animacje na mapie 🌍⚔️
+GeoPrzygoda — wyraźniejsze podbijanie terenów i większa mapa 🌍⚔️
 
-- Tryb „Bitwa o terytoria” ma teraz nazwę **Kampania podbojów**, a przycisk **Rozpocznij natarcie**.
-- Podbój państw pokazuje nieregularny, przesuwający się front — bez prostego pionowego paska.
-- Dla Polski i Białorusi animacja rusza z okolic Białegostoku ku Mińskowi, a następnie stopniowo wypełnia obszar Białorusi.
-- Inne sąsiednie państwa mają inne kierunki natarcia; zaznaczane są cele, a w razie porażki front się cofa.
-- Zajmowane fragmenty pozostają w granicach rzeczywistych kształtów państw; wyniki rozgrywki są fikcyjne.
-- Zachowano ekran kolorowej rywalizacji, wyszukiwanie krajów, flagi, muzykę, quiz i historię podbojów.
+- Zajmowany teren ma wyraźniejszy, nieregularny obrys zamiast prostej pionowej kreski.
+- W trakcie natarcia okno bitwy zmniejsza się, żeby odsłonić więcej mapy.
+- Zachowano organiczne natarcie od granicy w kierunku stolicy — np. z okolic Białegostoku w stronę Mińska.
+- Gdy obrona wygra, zajmowany obszar się cofa; zwycięstwo zmienia kolory zdobytego państwa.
+- Wszystkie flagi, historia, rywalizacja i muzyka nadal działają bez internetu.
 
-**Instalacja:** pobierz GeoPrzygoda.apk na Androida z tego wydania.
+To zabawa geograficzna, nie prawdziwa symulacja walk ani podział na prowincje.
+
+**Instalacja:** pobierz GeoPrzygoda.apk z tego wydania na Androida.
