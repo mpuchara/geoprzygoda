@@ -440,6 +440,8 @@ async function run() {
             errors.push(id + ': clipped image extends beyond polygon or wrong geometry');
           if (overlay.getAttribute('pointer-events') !== 'none')
             errors.push(id + ': overlay blocks touches');
+          if (/url\(/.test(piece.style.fill))
+            errors.push(id + ': Android still depends on faulty SVG pattern painting');
           const image = overlay.querySelector('image');
           if (!image || image.getAttribute('href') !== 'flag-textures/' + code.toLowerCase() + '.png')
             errors.push(id + ': wrong or missing PNG');
