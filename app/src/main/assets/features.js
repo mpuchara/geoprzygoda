@@ -300,10 +300,12 @@
   // The stacked GPU paint servers caused Android emulator stalls at zoom.
   // The proven 1.0.26 objectBoundingBox SVG pattern (with preserved emblem
   // aspect ratio) already clips itself perfectly to the real 1:10m path.
-  function geo8SyncPhoto(piece, country) {
+  function geo8SyncPhoto(piece, country, measuredBox = null) {
     if (!piece?.isConnected || !country || app.classList.contains('battle-running')) return;
-    let box;
-    try { box = piece.getBBox(); } catch { return; }
+    let box = measuredBox;
+    if (!box) {
+      try { box = piece.getBBox(); } catch { return; }
+    }
     if (!box || box.width <= 0 || box.height <= 0) return;
     let clip = piece._geo8PhotoClip, image = piece._geo8PhotoImage;
     if (!clip || !image || !image.isConnected) {
@@ -334,15 +336,19 @@
     const geometry = piece.getAttribute('d') || '';
     if (path.getAttribute('d') !== geometry) path.setAttribute('d',geometry);
     path.setAttribute('clip-rule',piece.getAttribute('fill-rule')||'evenodd');
-    for (const [attr,value] of Object.entries({x:box.x,y:box.y,width:box.width,height:box.height}))
-      image.setAttribute(attr,String(value));
+    for (const [attr,value] of Object.entries({x:box.x,y:box.y,width:box.width,height:box.height})) {
+      const expected = String(value);
+      if (image.getAttribute(attr) !== expected) image.setAttribute(attr,expected);
+    }
     const asset = 'flag-textures/' + country.code.toLowerCase() + '.png';
     if (image.getAttribute('href') !== asset) {
       image.setAttribute('href',asset);
       image.setAttributeNS('http://www.w3.org/1999/xlink','href',asset);
     }
-    image.setAttribute('preserveAspectRatio',stripeOnlyCountries.has(country.id)
-      ? 'none' : (emblemBackgrounds.has(country.id) ? 'xMidYMid meet' : 'xMidYMid slice'));
+    const fit = stripeOnlyCountries.has(country.id)
+      ? 'none' : (emblemBackgrounds.has(country.id) ? 'xMidYMid meet' : 'xMidYMid slice');
+    if (image.getAttribute('preserveAspectRatio') !== fit)
+      image.setAttribute('preserveAspectRatio',fit);
   }
   let geo8ZoomPieceIndex = 0, geo8ZoomPieces = null;
   function geo8PhotoBatch() {
@@ -375,7 +381,7 @@
       try { box = piece.getBBox(); } catch { continue; }
       if (box.x > view.x + view.width || box.x + box.width < view.x ||
           box.y > view.y + view.height || box.y + box.height < view.y) continue;
-      geo8SyncPhoto(piece,country);
+      geo8SyncPhoto(piece,country,box);
     }
     if (geo8ZoomIndex < flagCountries.length)
       geo8ZoomFrame = requestAnimationFrame(geo8PhotoBatch);
