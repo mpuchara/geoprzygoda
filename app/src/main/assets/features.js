@@ -102,7 +102,7 @@
   const flagDefs = document.createElementNS(ns, 'defs');
   flagDefs.id = 'country-flag-patterns';
   map.insertBefore(flagDefs, map.firstChild);
-  const flagPaths = [];
+  const flagPaths = new Map();
   // Keep complex symbols in their actual flag proportions. Pure stripe
   // patterns can still fill an irregular silhouette without visible distortion.
   // The background matches each flag, filling gaps around its centered emblem.
@@ -132,9 +132,14 @@
         box.width <= 0 || box.height <= 0) return null;
     const id = patternId || 'flag-fitted-' + c.id + '-' + partIndex;
     const original = document.getElementById(id);
+    const geometryKey = [asset, background || '', plainBands,
+      box.x.toFixed(3), box.y.toFixed(3), box.width.toFixed(3), box.height.toFixed(3)].join(':');
+    if (original && original.dataset.textureGeometry === geometryKey)
+      return 'url(#' + id + ')';
     const pattern = original || document.createElementNS(ns, 'pattern');
     pattern.id = id;
     pattern.replaceChildren();
+    pattern.dataset.textureGeometry = geometryKey;
     // Country coordinates, rather than normalized 0..1 boxes, are essential:
     // normalized boxes stretch symbols even when preserveAspectRatio is set.
     pattern.setAttribute('patternUnits', 'userSpaceOnUse');
@@ -146,14 +151,15 @@
     // *entire* icon visible (e.g. the small Union Jack on Australia's flag).
     // For all other detailed flags "slice" covers the full silhouette without
     // distorting any part of the SVG; only extreme aspect ratios crop edges.
-    if (background) {
-      const backing = document.createElementNS(ns, 'rect');
-      for (const [attr, value] of Object.entries({
-        x: box.x, y: box.y, width: box.width, height: box.height
-      })) backing.setAttribute(attr, String(value));
-      backing.setAttribute('fill', background);
-      pattern.append(backing);
-    }
+    // Always draw a plain country-colored tile *under* the texture. Some
+    // Android WebView versions silently fail to paint nested SVG images.
+    // An image decoding/loading failure must never make a country disappear.
+    const backing = document.createElementNS(ns, 'rect');
+    for (const [attr, value] of Object.entries({
+      x: box.x, y: box.y, width: box.width, height: box.height
+    })) backing.setAttribute(attr, String(value));
+    backing.setAttribute('fill', background || piece.getAttribute('fill') || '#a8d77e');
+    pattern.append(backing);
     const image = document.createElementNS(ns, 'image');
     image.setAttribute('href', asset);
     image.setAttributeNS('http://www.w3.org/1999/xlink', 'href', asset);
@@ -180,13 +186,13 @@
     if (!owner || !piece || !/^[A-Z]{2}$/.test(owner.code))
       return null;
     return createProportionalFlag({ id: ownerId + '-on-' + targetId },
-      piece, index, 'flags/' + owner.code.toLowerCase() + '.svg', backing,
+      piece, index, 'flag-textures/' + owner.code.toLowerCase() + '.png', backing,
       stripeOnlyCountries.has(ownerId));
   };
   for (const c of COUNTRY_DATA) {
     const path = $('land-' + c.id);
     if (!c.mapped || !path || !/^[A-Z]{2}$/.test(c.code)) continue;
-    const url = 'flags/' + c.code.toLowerCase() + '.svg';
+    const url = 'flag-textures/' + c.code.toLowerCase() + '.png';
     // The first fragment keeps the legacy "flag-pattern-ID" alias, but it is
     // now a fitted userSpaceOnUse SVG pattern, never an objectBBox fallback.
     // Other fragments (mainland, distant islands) each get independent fits.
@@ -199,7 +205,7 @@
       );
       if (!fitted) return; // Preserve original terrain color if geometry is invalid.
       piece.dataset.geoprzygodaFittedFlag = fitted;
-      flagPaths.push([piece, fitted]);
+      flagPaths.set(piece, fitted);
     });
   }
 
@@ -211,15 +217,13 @@
     const pieces = [...primary.parentElement.querySelectorAll('path.land')];
     pieces.forEach((piece, index) => {
       const fitted = createProportionalFlag(
-        c, piece, index, 'flags/' + c.code.toLowerCase() + '.svg', background,
+        c, piece, index, 'flag-textures/' + c.code.toLowerCase() + '.png', background,
         stripeOnlyCountries.has(id),
         index === 0 ? 'flag-pattern-' + id : null
       );
       if (!fitted) return;
       piece.dataset.geoprzygodaFittedFlag = fitted;
-      const entry = flagPaths.find(entry => entry[0] === piece);
-      if (entry) entry[1] = fitted;
-      else flagPaths.push([piece, fitted]);
+      flagPaths.set(piece, fitted);
       if (map.classList.contains('flag-fill') &&
           !(window.GeoPrzygodaBattle && window.GeoPrzygodaBattle.active)) {
         piece.style.fill = fitted;
@@ -325,7 +329,7 @@
         if (map.classList.contains('flag-fill')) {
           extra.style.fill = 'url(#flag-pattern-' + id + ')';
         }
-        flagPaths.push([extra, 'url(#flag-pattern-' + id + ')']);
+        flagPaths.set(extra, 'url(#flag-pattern-' + id + ')');
         anchor.append(extra);
       }
     } else if (typeof detail.d === 'string' && detail.d[0] === 'M') {
