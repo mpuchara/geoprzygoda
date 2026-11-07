@@ -1,20 +1,11 @@
-GeoPrzygoda — dokładniejsze granice Holandii! 🇳🇱🌊
+GeoPrzygoda — poprawione proporcje flag 🇹🇷 🇸🇦 i zachowana Holandia 🇳🇱
 
-- Holandia ma teraz bardziej szczegółowy obrys wybrzeża, wysp, zatok i ujść rzek (Natural Earth 1:10m).
-- Dopasowano również obrysy Belgii i Niemiec, aby wspólne granice lepiej się łączyły.
-- Flagi, kolory, napisy, informacje o krajach i rywalizacja pozostają bez zmian.
-- Wszystkie nowe dane działają lokalnie — aplikacja nie potrzebuje internetu.
+- Turcja ma nadal czerwony kształt kraju, ale biały księżyc i gwiazda nie są już poziomo rozciągnięte.
+- Arabia Saudyjska zachowuje proporcje napisu i miecza oraz zielone tło.
+- Poprawki działają także po włączeniu Kampanii podbojów.
+- Zachowane zostały nowsze szczegółowe granice Holandii, Belgii i Niemiec (Natural Earth 1:10m).
+- Wciąż działają wyszukiwarka, nieregularne podbijanie regionów, muzyka, quiz i gra offline.
 
-GeoPrzygoda — podbijanie terenu jak na filmie! 🗺️⚔️
+Używamy tego samego repozytorium w obu rozmowach. Gotowy APK zawiera połączone poprawki z głównej gałęzi projektu.
 
-- Marsz od granicy do stolicy, np. Białystok → Mińsk, pozostał bez zmian.
-- Teraz front stopniowo przejmuje nieregularne małe sektory wewnątrz państwa.
-- Kolorowanie obejmuje najpierw sektory obok marszu, a później obszary wokół stolicy.
-- Nie ma prostej pionowej kreski; kontury sektorów są nieregularne.
-- Widoczna mała flaga idzie wraz z oddziałem. Panel jest mały podczas bitwy.
-- Zwycięstwo pozwala zdobyć cały kraj, porażka cofa oddział i przywraca tereny.
-- Zachowane flagi na mapie, wyszukiwarka krajów, Historia, Quiz i muzyka.
-
-Granice małych sektorów są wymyślone do gry, nie pokazują prawdziwych prowincji. To fikcyjna animacja geograficzna, nie symulacja rzeczywistych walk.
-
-**Instalacja:** pobierz GeoPrzygoda.apk na Androida z tego wydania.
+**Instalacja:** pobierz GeoPrzygoda.apk z tego wydania na Androidzie.
