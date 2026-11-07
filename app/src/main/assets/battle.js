@@ -451,6 +451,61 @@
     });
     return { grid, sectors };
   }
+  // Actual Natural Earth admin-1 region paths, clipped to the country outline.
+  function createProvinceSectors(targetId, goal, routeNodes, make, clipId) {
+    const provinces = provinceData && provinceData[targetId];
+    if (!Array.isArray(provinces) || provinces.length < 2) return null;
+    const grid = make('g');
+    grid.classList.add('battle-fictional-sectors', 'battle-real-provinces');
+    grid.setAttribute('clip-path', 'url(#' + clipId + ')');
+    const entry = routeNodes[1] || routeNodes[0];
+    const axisX = goal.x - entry.x, axisY = goal.y - entry.y;
+    const axisSq = Math.max(.001, axisX * axisX + axisY * axisY);
+    const range = Math.sqrt(axisSq);
+    const sectors = [];
+    for (const p of provinces) {
+      if (!p || typeof p.d !== 'string' || !p.d.startsWith('M') ||
+          !Array.isArray(p.b) || p.b.length !== 4) continue;
+      const cx = (p.b[0] + p.b[2]) / 2;
+      const cy = (p.b[1] + p.b[3]) / 2;
+      const along = clamp01(((cx - entry.x) * axisX + (cy - entry.y) * axisY) / axisSq);
+      const cross = Math.abs((cx - entry.x) * axisY - (cy - entry.y) * axisX) / range;
+      const baseline = Math.min(.95, .03 + along * .62 + .24 * clamp01(cross / range));
+      const outline = make('path');
+      outline.setAttribute('d', p.d);
+      outline.classList.add('battle-fictional-sector-line', 'battle-province-outline');
+      outline.setAttribute('fill-rule', 'evenodd');
+      outline.dataset.provinceName = p.name || '';
+      grid.append(outline);
+      sectors.push({
+        d: p.d, outline, threshold: baseline, base: baseline,
+        revealed: false, weight: Math.max(.0001, Number(p.area) || .0001),
+        center: {x:cx,y:cy}, neighbors: Array.isArray(p.neighbors) ? p.neighbors : []
+      });
+    }
+    if (sectors.length !== provinces.length) return null;
+    // Traverse real shared edges from the entry, not isolated map rectangles.
+    const first = sectors.reduce((winner, sector, i) => (
+      Math.hypot(sector.center.x-entry.x, sector.center.y-entry.y) <
+      Math.hypot(sectors[winner].center.x-entry.x, sectors[winner].center.y-entry.y)
+        ? i : winner
+    ), 0);
+    const pending = new Set(sectors.map((_, i) => i));
+    const captured = new Set();
+    let previous = .015;
+    while (pending.size) {
+      const candidates = [...pending].filter(i =>
+        !captured.size || sectors[i].neighbors.some(n => captured.has(n)));
+      const pool = candidates.length ? candidates : [...pending]; // disconnected islands
+      pool.sort((a,b) => sectors[a].base - sectors[b].base);
+      const next = !captured.size ? first : pool[0];
+      previous = Math.min(.98, Math.max(previous + .82 / sectors.length, sectors[next].base));
+      sectors[next].threshold = previous;
+      pending.delete(next);
+      captured.add(next);
+    }
+    return {grid, sectors, real: true};
+  }
   function clearAdvance() {
     if (advanceFrame !== null) cancelAnimationFrame(advanceFrame);
     advanceFrame = null;
@@ -498,19 +553,30 @@
     }
     if (scene.sectors) {
       let capturedCount = 0;
+      let capturedArea = 0, totalArea = 0;
       for (const cell of scene.sectors) {
         const captured = progress >= .999 || (progress > 0 && progress >= cell.threshold);
         if (captured !== cell.revealed) {
           cell.revealed = captured;
           cell.outline.classList.toggle('battle-fictional-sector-captured', captured);
         }
+        const weight = cell.weight || 1;
+        totalArea += weight;
         if (captured) {
           capturedCount++;
+          capturedArea += weight;
           parts.push(cell.d);
         }
       }
       const count = $('battle-sector-count');
-      if (count) count.textContent = capturedCount + '/' + scene.sectors.length + ' sektorów';
+      if (count) count.textContent = capturedCount + '/' + scene.sectors.length +
+        (scene.realProvinces ? ' prowincji' : ' sektorów (umownych)');
+      if (scene.realProvinces && totalArea) {
+        const conqueredPct = progress >= .999 ? 100 : Math.round(capturedArea / totalArea * 100);
+        $('battle-conquest-fill').style.width = conqueredPct + '%';
+        $('battle-progress-label').textContent = conqueredPct + '%';
+        $('battle-progress').setAttribute('aria-valuenow', String(conqueredPct));
+      }
     }
     if(progress>=1){
       parts.length=0;
@@ -629,13 +695,14 @@
       [box.x,box.y],[box.x+box.width,box.y],
       [box.x,box.y+box.height],[box.x+box.width,box.y+box.height]
     ].map(corner=>Math.hypot(corner[0]-goal.x,corner[1]-goal.y)));
-    const { grid, sectors } = createBattleSectors(
-      box, goal, routeNodes, seed, radius, make, clip.id
-    );
+    const sectorLayer = createProvinceSectors(targetId, goal, routeNodes, make, clip.id)
+      || createBattleSectors(box, goal, routeNodes, seed, radius, make, clip.id);
+    const {grid, sectors} = sectorLayer;
     host.append(ink, grid, graphics);
     advanceScene={
       nodes:[ink,grid,graphics,clip],host,frontShape:ink,route,unit,glow,
-      goal,entry,sourceCity,seed,routeNodes,box,radius,sectors
+      goal,entry,sourceCity,seed,routeNodes,box,radius,sectors,
+      realProvinces: !!sectorLayer.real
     };
     setAdvanceProgress(0);
   }
