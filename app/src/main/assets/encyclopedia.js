@@ -93,11 +93,14 @@
     historyButton.type='button';
     const historyPanel=el('section','geo6-history-panel');
     historyPanel.hidden=true;
+    // Keep this as a closure value: data-* attributes are used throughout
+    // the map to drive navigation and should not control loading state.
+    let historyInitialized=false;
     historyButton.addEventListener('click',()=>{
       historyPanel.hidden = !historyPanel.hidden;
       historyButton.setAttribute('aria-expanded',String(!historyPanel.hidden));
-      if (!historyPanel.hidden && !historyPanel.dataset.loaded) {
-        historyPanel.dataset.loaded='yes';
+      if (!historyPanel.hidden && !historyInitialized) {
+        historyInitialized=true;
         renderHistory(id,historyPanel);
       }
     });
