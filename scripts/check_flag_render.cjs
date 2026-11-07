@@ -270,8 +270,15 @@ async function run() {
     if(plan6.countriesInDom !== 1 || plan6.facts < 7 || !plan6.hasBorder ||
        plan6.cached > 8) throw Error('Plan 6 country details failure: '+JSON.stringify(plan6));
     await page.click('#info-POL .geo6-history-button');
-    await page.waitForFunction(() => !!document.querySelector('#info-POL .geo6-slider'),
+    await page.waitForFunction(() =>
+      !!document.querySelector('#info-POL .geo6-slider') ||
+      document.querySelector('#info-POL .geo6-history-panel')?.textContent.includes('Nie udało się'),
       null, { timeout: 12000 });
+    const historyDebug=await page.evaluate(() => ({
+      rendered:!!document.querySelector('#info-POL .geo6-slider'),
+      markup:document.querySelector('#info-POL .geo6-history-panel')?.innerHTML.slice(0,1400)
+    }));
+    if (!historyDebug.rendered) throw Error('History render failure: '+JSON.stringify(historyDebug));
     const historyCheck=await page.evaluate(() => ({
       historyEvents: document.querySelectorAll('#info-POL .geo6-year').length,
       historicalFlags: document.querySelectorAll('#info-POL .geo6-old-flag').length,
