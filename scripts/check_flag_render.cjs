@@ -273,6 +273,7 @@ async function run() {
       if(response.url().includes('/history/'))console.log('HISTORY NETWORK',response.status(),response.url());
     });
     page.on('console',msg=>{if(msg.type()==='error'||msg.text().includes('GEO6_'))console.log('BROWSER MSG',msg.type(),msg.text());});
+    page.on('pageerror',err=>console.log('BROWSER PAGEERROR',err.stack||err.message));
     await page.click('#info-POL .geo6-history-button');
     await page.waitForTimeout(2000);
     console.log('HISTORY DIAG',JSON.stringify(await page.evaluate(() => ({
@@ -281,7 +282,9 @@ async function run() {
       panelHidden:document.querySelector('#info-POL .geo6-history-panel')?.hidden,
       content:document.querySelector('#info-POL .geo6-history-panel')?.innerHTML.slice(0,1300),
       global:window.GeoPrzygodaEncyclopedia?.stats(),
-      dataLoaded:document.querySelector('#info-POL .geo6-history-panel')?.dataset.loaded
+      dataLoaded:document.querySelector('#info-POL .geo6-history-panel')?.dataset.loaded,
+      phase:document.querySelector('#info-POL .geo6-history-panel')?.dataset.phase,
+      pageErrorsFromGlobal:window.__geo6Errors
     }))));
     await page.waitForFunction(() =>
       !!document.querySelector('#info-POL .geo6-slider') ||
