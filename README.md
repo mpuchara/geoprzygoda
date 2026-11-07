@@ -102,3 +102,12 @@ Rywalizacja ma kolorowe, animowane tło w kolorach startowego ekranu. Na ekranie
 Na filmie wzorcowym podbój nie jest pojedynczą pionową kreską: wzdłuż marszu przejmowane są małe obszary. Dlatego do **istniejącej animacji w stronę stolicy** dodano małe nieregularne sektory na mapie. Ich przejęcie następuje falami, najpierw przy trasie oddziału, potem w pobliżu stolicy. Gdy bitwa się kończy, zachowane są te same zasady, co wcześniej: wygrana zdobywa całe państwo, przegrana cofa front. Panel bitwy pozostaje zmniejszony w czasie animacji.
 
 Podziały sektorów są generowane do zabawy i nie stanowią prawdziwych granic województw, prowincji ani powiatów.
+
+
+## Nieodkształcone symbole na flagach 🇹🇷 🇸🇦
+
+Flaga Turcji i Arabii Saudyjskiej ma teraz wzory o **prawidłowych proporcjach**: półksiężyc, gwiazda, napis i miecz nie są naciągane wraz z długim lub wysokim kształtem państwa. Pełen obszar kraju pozostaje w jego kolorze, a cały symbol mieści się na mapie. Korekta działa również podczas rywalizacji i nie zmienia granic ani wcześniejszych flag Francji, USA i Australii. Poprawiona linia brzegowa Holandii (Natural Earth 1:10m) nadal jest obecna.
+
+## Współpraca dwóch rozmów nad jedną grą
+
+Wszystkie zadania dotyczą **jednego** repozytorium GitHub: mpuchara/geoprzygoda. Każdą zmianę należy rozpoczynać od **najnowszego main**, zrobić na osobnej gałęzi, sprawdzić testy Android/JavaScript i dopiero potem połączyć z main. Jeśli równoległa rozmowa zdąży wcześniej połączyć własne zmiany, trzeba uwzględnić nowy main i rozwiązać konflikty zamiast nadpisywać cudzą poprawkę. Wydania APK powstają z połączonego main, dzięki czemu zawierają poprawki z obu rozmów. Same czaty nie wymieniają wiadomości automatycznie.
