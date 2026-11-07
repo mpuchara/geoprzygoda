@@ -75,7 +75,7 @@ def main():
             id_ = props.get("ISO_A3_EH")
         if id_ not in mapped:
             id_ = by_iso2.get(props.get("ISO_A2_EH"))
-        if id_ not in mapped:
+        if id_ not in mapped and props.get("ADM0_A3") != "IOA":
             continue
         geometry = feature["geometry"]
         polygons = (geometry["coordinates"] if geometry["type"] == "MultiPolygon"
@@ -83,7 +83,13 @@ def main():
         for polygon in polygons:
             part = process_polygon(polygon)
             if part:
-                result.setdefault(id_, []).append(part)
+                # Natural Earth groups Cocos and Christmas Island under IOA.
+                # Preserve each island's real 1:10m shape and correct ISO ID.
+                target = id_
+                if props.get("ADM0_A3") == "IOA":
+                    target = "CCK" if polygon[0][0][0] < 100 else "CXR"
+                if target in mapped:
+                    result.setdefault(target, []).append(part)
 
     world = {}
     for id_, parts in result.items():
