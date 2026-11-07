@@ -24,26 +24,32 @@
   let lastSaved = null;
   let battlePaused = false;
   let battleSpeed = 1;
-  let provinceData = null;
-  let provinceLoading = null;
-  function loadProvinceData() {
-    if (provinceData) return Promise.resolve(provinceData);
-    if (!provinceLoading) {
-      provinceLoading = fetch('world-provinces-10m.json')
-        .then(response => {
-          if (!response.ok) throw new Error('No offline admin-1 geometry');
-          return response.json();
-        })
-        .then(data => {
-          if (data.projection !== 'Mercator 1080x1080, 3 decimal SVG precision' ||
-              !data.countries || !Array.isArray(data.countries.BLR))
-            throw new Error('Bad administrative region data');
-          provinceData = data.countries;
-          return provinceData;
-        })
-        .catch(() => null); // Older builds still work with fictional sectors.
-    }
-    return provinceLoading;
+  // Keep only the province geometry of the active/previous target in memory.
+  // Previous versions parsed the entire 20+ MB world province file at once.
+  const provinceData = new Map();
+  const provinceLoading = new Map();
+  function loadProvinceData(targetId) {
+    if (!targetId || !playable.has(targetId)) return Promise.resolve(null);
+    if (provinceData.has(targetId)) return Promise.resolve(provinceData.get(targetId));
+    if (provinceLoading.has(targetId)) return provinceLoading.get(targetId);
+    const task = fetch('provinces/' + targetId.toLowerCase() + '.json')
+      .then(response => {
+        if (!response.ok) throw new Error('No offline regions for ' + targetId);
+        return response.json();
+      })
+      .then(data => {
+        if (!Array.isArray(data) || !data.every(region =>
+            typeof region.d === 'string' && Array.isArray(region.b))) {
+          throw new Error('Incorrect administrative region data');
+        }
+        provinceData.set(targetId, data);
+        while (provinceData.size > 2) provinceData.delete(provinceData.keys().next().value);
+        return data;
+      })
+      .catch(() => null)
+      .finally(() => provinceLoading.delete(targetId));
+    provinceLoading.set(targetId, task);
+    return task;
   }
   try {
     lastSaved = JSON.parse(localStorage.getItem(key) || 'null');
@@ -454,7 +460,7 @@
   }
   // Actual Natural Earth admin-1 region paths, clipped to the country outline.
   function createProvinceSectors(targetId, goal, routeNodes, make, clipId) {
-    const provinces = provinceData && provinceData[targetId];
+    const provinces = provinceData.get(targetId);
     if (!Array.isArray(provinces) || provinces.length < 2) return null;
     const grid = make('g');
     grid.classList.add('battle-fictional-sectors', 'battle-real-provinces');
@@ -518,9 +524,12 @@
   function setAdvanceProgress(fraction) {
     const progress = clamp01(fraction);
     const percent = Math.round(progress*100);
-    $('battle-conquest-fill').style.width = percent + '%';
-    $('battle-progress-label').textContent = percent + '%';
-    $('battle-progress').setAttribute('aria-valuenow',String(percent));
+    const currentPercent = Number($('battle-progress').getAttribute('aria-valuenow'));
+    if ((!advanceScene || !advanceScene.realProvinces) && percent !== currentPercent) {
+      $('battle-conquest-fill').style.width = percent + '%';
+      $('battle-progress-label').textContent = percent + '%';
+      $('battle-progress').setAttribute('aria-valuenow', String(percent));
+    }
     if (!advanceScene) return;
     const scene=advanceScene;
     const {box,routeNodes,frontShape,unit,route,goal,entry} = scene;
@@ -570,20 +579,32 @@
         }
       }
       const count = $('battle-sector-count');
-      if (count) count.textContent = capturedCount + '/' + scene.sectors.length +
-        (scene.realProvinces ? ' prowincji' : ' sektorów (umownych)');
+      if (count && capturedCount !== scene.lastCapturedCount) {
+        count.textContent = capturedCount + '/' + scene.sectors.length +
+          (scene.realProvinces ? ' prowincji' : ' sektorów (umownych)');
+        scene.lastCapturedCount = capturedCount;
+      }
       if (scene.realProvinces && totalArea) {
         const conqueredPct = progress >= .999 ? 100 : Math.round(capturedArea / totalArea * 100);
-        $('battle-conquest-fill').style.width = conqueredPct + '%';
-        $('battle-progress-label').textContent = conqueredPct + '%';
-        $('battle-progress').setAttribute('aria-valuenow', String(conqueredPct));
+        if (conqueredPct !== Number($('battle-progress').getAttribute('aria-valuenow'))) {
+          $('battle-conquest-fill').style.width = conqueredPct + '%';
+          $('battle-progress-label').textContent = conqueredPct + '%';
+          $('battle-progress').setAttribute('aria-valuenow', String(conqueredPct));
+        }
       }
     }
     if(progress>=1){
       parts.length=0;
       parts.push('M'+(box.x-2)+','+(box.y-2)+'h'+(box.width+4)+'v'+(box.height+4)+'h-'+(box.width+4)+'Z');
     }
-    frontShape.setAttribute('d',parts.join(''));
+    // Rebuilding a province-size SVG path every 16 ms caused heavy Android
+    // WebView geometry work. Captured geometry changes only on sector changes.
+    const geometryKey = scene.sectors
+      ? parts.length + ':' + String(progress >= 1) : progress;
+    if (scene.lastGeometryKey !== geometryKey) {
+      frontShape.setAttribute('d', parts.join(''));
+      scene.lastGeometryKey = geometryKey;
+    }
     // The unit follows the invasion route; it retreats on unsuccessful attacks.
     const march=clamp01(progress/.55);
     const index=march*(routeNodes.length-1);
@@ -714,12 +735,19 @@
     const source = advanceScene?.sourceCity;
     let previous = performance.now(), elapsed = 0;
     stage.textContent = source ? '📍 Start: ' + source : '⚔️ Początek natarcia';
+    let lastPaint = 0;
     function frame(now) {
       if (!fighting || !game) { advanceFrame = null; return; }
       const delta = Math.min(120, Math.max(0, now - previous));
       previous = now;
       if (!battlePaused) elapsed += delta * battleSpeed;
       const t = clamp01(elapsed / duration);
+      // 30 FPS is enough for this map; avoids 60 heavy SVG updates per second.
+      if (t < 1 && now - lastPaint < 30) {
+        advanceFrame = requestAnimationFrame(frame);
+        return;
+      }
+      lastPaint = now;
       const progress = won ? t : (t < .60 ? t / .60 * .59 : (1-t) / .40 * .59);
       setAdvanceProgress(progress);
       if (battlePaused) stage.textContent = '⏸ Bitwa wstrzymana';
@@ -863,7 +891,7 @@
     $('battle-message').textContent = 'Dotknij sąsiedniego kraju lub wybierz go z listy. Zobacz, jak zmienia się linia frontu.';
     updatePanel(opponent);
     focusCountry(player);
-    loadProvinceData(); // Local bundled geometry; no Internet permission needed.
+    loadProvinceData(selectedTarget); // Only the chosen country; no Internet.
     save();
   }
   function resume() {
@@ -880,7 +908,7 @@
     app.classList.add('battle-running');
     $('battle-message').textContent = 'Wznowiono grę. Wybierz teren do ataku.';
     updatePanel(game.opponent);
-    loadProvinceData();
+    loadProvinceData(selectedTarget);
   }
   function chooseTarget(id) {
     if (!game || fighting) return;
@@ -893,6 +921,7 @@
       return;
     }
     selectedTarget = id;
+    loadProvinceData(id);
     $('battle-target').value = id;
     $('battle-message').textContent = 'Cel: ' + countryLabel(id) + '. Wciśnij „Rozpocznij natarcie”.';
     refreshOwnership();
@@ -905,7 +934,7 @@
     const defenderId = selectedTarget;
     $('battle-attack').disabled = true;
     $('battle-message').textContent = '🗺️ Wczytywanie granic regionów...';
-    await loadProvinceData();
+    await loadProvinceData(defenderId);
     if (!game || game !== currentGame || !fighting) return;
     const defendingOwner = ownerOf(defenderId);
     const attacker = playable.get(game.player);

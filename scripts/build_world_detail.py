@@ -106,14 +106,26 @@ def main():
     if len(world) < 220 or "NLD" not in world or "POL" not in world:
         raise RuntimeError(f"Not enough detailed boundaries: {len(world)}")
 
+    # A tiny index exposes bounding boxes; Android loads detailed geometry
+    # only for visible countries instead of parsing the entire world at once.
+    detail_dir = DEST.parent / "world-detail"
+    detail_dir.mkdir(parents=True, exist_ok=True)
+    metadata = {}
+    total = 0
+    for cid, item in sorted(world.items()):
+        chunk = json.dumps(item, ensure_ascii=False, separators=(",", ":"))
+        (detail_dir / (cid.lower() + ".json")).write_text(chunk, encoding="utf-8")
+        total += len(chunk.encode("utf-8"))
+        metadata[cid] = {"b": item["b"], "v": item["v"]}
     DEST.write_text(json.dumps({
         "source": "Natural Earth 1:10m Admin-0 countries (public domain)",
         "projection": "Mercator 1080x1080, 3 decimal SVG precision",
-        "countries": world
+        "countries": metadata,
     }, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
-    print(f"Built {len(world)} high-resolution country outlines; "
+    print(f"Built {len(world)} indexed high-resolution country outlines; "
           f"total vertices {sum(c['v'] for c in world.values()):,}; "
-          f"asset {DEST.stat().st_size:,} bytes.")
+          f"detail chunks {total:,} bytes, index {DEST.stat().st_size:,} bytes.")
+
 
 
 if __name__ == "__main__":

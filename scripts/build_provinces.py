@@ -130,14 +130,26 @@ def main():
 
     if len(result.get("POL", [])) < 10 or len(result.get("BLR", [])) < 5:
         raise RuntimeError("Natural Earth admin-1 lacks expected Polish/Belarusian regions")
+    # Keep one tiny manifest plus country-specific offline chunks. Previously
+    # a single battle loaded 20+ MB / 4575 province paths on a phone.
+    output = DEST.parent / "provinces"
+    output.mkdir(parents=True, exist_ok=True)
+    counts = {}
+    total_size = 0
+    for cid, subdivisions in sorted(result.items()):
+        data = json.dumps(subdivisions, ensure_ascii=False, separators=(",", ":"))
+        (output / (cid.lower() + ".json")).write_text(data, encoding="utf-8")
+        counts[cid] = len(subdivisions)
+        total_size += len(data.encode("utf-8"))
     DEST.write_text(json.dumps({
         "source": "Natural Earth 1:10m admin-1 states/provinces (public domain)",
         "source_commit": SOURCE_COMMIT,
         "projection": "Mercator 1080x1080, 3 decimal SVG precision",
-        "countries": result,
+        "country_counts": counts,
     }, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
-    print(f"Built {sum(map(len, result.values()))} real admin-1 regions "
-          f"across {len(result)} countries; {DEST.stat().st_size:,} bytes.")
+    print(f"Built {sum(counts.values())} real admin-1 regions across "
+          f"{len(counts)} country-specific files; {total_size:,} total bytes "
+          f"(manifest {DEST.stat().st_size:,} bytes).")
 
 
 if __name__ == "__main__":

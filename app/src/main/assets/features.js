@@ -102,7 +102,7 @@
   const flagDefs = document.createElementNS(ns, 'defs');
   flagDefs.id = 'country-flag-patterns';
   map.insertBefore(flagDefs, map.firstChild);
-  const flagPaths = [];
+  const flagPaths = new Map();
   // Keep complex symbols in their actual flag proportions. Pure stripe
   // patterns can still fill an irregular silhouette without visible distortion.
   // The background matches each flag, filling gaps around its centered emblem.
@@ -132,9 +132,14 @@
         box.width <= 0 || box.height <= 0) return null;
     const id = patternId || 'flag-fitted-' + c.id + '-' + partIndex;
     const original = document.getElementById(id);
+    const geometryKey = [asset, background || '', plainBands,
+      box.x.toFixed(3), box.y.toFixed(3), box.width.toFixed(3), box.height.toFixed(3)].join(':');
+    if (original && original.dataset.textureGeometry === geometryKey)
+      return 'url(#' + id + ')';
     const pattern = original || document.createElementNS(ns, 'pattern');
     pattern.id = id;
     pattern.replaceChildren();
+    pattern.dataset.textureGeometry = geometryKey;
     // Country coordinates, rather than normalized 0..1 boxes, are essential:
     // normalized boxes stretch symbols even when preserveAspectRatio is set.
     pattern.setAttribute('patternUnits', 'userSpaceOnUse');
@@ -146,14 +151,15 @@
     // *entire* icon visible (e.g. the small Union Jack on Australia's flag).
     // For all other detailed flags "slice" covers the full silhouette without
     // distorting any part of the SVG; only extreme aspect ratios crop edges.
-    if (background) {
-      const backing = document.createElementNS(ns, 'rect');
-      for (const [attr, value] of Object.entries({
-        x: box.x, y: box.y, width: box.width, height: box.height
-      })) backing.setAttribute(attr, String(value));
-      backing.setAttribute('fill', background);
-      pattern.append(backing);
-    }
+    // Always draw a plain country-colored tile *under* the texture. Some
+    // Android WebView versions silently fail to paint nested SVG images.
+    // An image decoding/loading failure must never make a country disappear.
+    const backing = document.createElementNS(ns, 'rect');
+    for (const [attr, value] of Object.entries({
+      x: box.x, y: box.y, width: box.width, height: box.height
+    })) backing.setAttribute(attr, String(value));
+    backing.setAttribute('fill', background || piece.getAttribute('fill') || '#a8d77e');
+    pattern.append(backing);
     const image = document.createElementNS(ns, 'image');
     image.setAttribute('href', asset);
     image.setAttributeNS('http://www.w3.org/1999/xlink', 'href', asset);
@@ -180,13 +186,13 @@
     if (!owner || !piece || !/^[A-Z]{2}$/.test(owner.code))
       return null;
     return createProportionalFlag({ id: ownerId + '-on-' + targetId },
-      piece, index, 'flags/' + owner.code.toLowerCase() + '.svg', backing,
+      piece, index, 'flag-textures/' + owner.code.toLowerCase() + '.png', backing,
       stripeOnlyCountries.has(ownerId));
   };
   for (const c of COUNTRY_DATA) {
     const path = $('land-' + c.id);
     if (!c.mapped || !path || !/^[A-Z]{2}$/.test(c.code)) continue;
-    const url = 'flags/' + c.code.toLowerCase() + '.svg';
+    const url = 'flag-textures/' + c.code.toLowerCase() + '.png';
     // The first fragment keeps the legacy "flag-pattern-ID" alias, but it is
     // now a fitted userSpaceOnUse SVG pattern, never an objectBBox fallback.
     // Other fragments (mainland, distant islands) each get independent fits.
@@ -199,7 +205,7 @@
       );
       if (!fitted) return; // Preserve original terrain color if geometry is invalid.
       piece.dataset.geoprzygodaFittedFlag = fitted;
-      flagPaths.push([piece, fitted]);
+      flagPaths.set(piece, fitted);
     });
   }
 
@@ -211,15 +217,13 @@
     const pieces = [...primary.parentElement.querySelectorAll('path.land')];
     pieces.forEach((piece, index) => {
       const fitted = createProportionalFlag(
-        c, piece, index, 'flags/' + c.code.toLowerCase() + '.svg', background,
+        c, piece, index, 'flag-textures/' + c.code.toLowerCase() + '.png', background,
         stripeOnlyCountries.has(id),
         index === 0 ? 'flag-pattern-' + id : null
       );
       if (!fitted) return;
       piece.dataset.geoprzygodaFittedFlag = fitted;
-      const entry = flagPaths.find(entry => entry[0] === piece);
-      if (entry) entry[1] = fitted;
-      else flagPaths.push([piece, fitted]);
+      flagPaths.set(piece, fitted);
       if (map.classList.contains('flag-fill') &&
           !(window.GeoPrzygodaBattle && window.GeoPrzygodaBattle.active)) {
         piece.style.fill = fitted;
@@ -240,51 +244,34 @@
     }
     if (window.GeoPrzygodaBattle && window.GeoPrzygodaBattle.active) window.GeoPrzygodaBattle.refresh();
   }
-  // The bundled 10m outlines improve Dutch coastlines and Wadden/Zeeland
-  // islands while keeping Belgium and Germany aligned at the shared borders.
-  // Only replace SVG geometry: colors, flag patterns, labels, click targets,
-  // quiz and offline rivalry continue to use the original country elements.
-  function loadDetailedNorthSeaBorders() {
-    fetch('benelux-10m.json')
-      .then(response => {
-        if (!response.ok) throw new Error('Detailed map unavailable');
-        return response.json();
-      })
-      .then(data => {
-        if (!data || !data.countries || data.projection !== 'Mercator 1080x1080, 3 decimal SVG precision') return;
-        for (const country of ['NLD', 'BEL', 'DEU']) {
-          const shape = $('land-' + country);
-          const detail = data.countries[country];
-          if (!shape || !detail || typeof detail.d !== 'string' ||
-              detail.vertices < 500 || !detail.d.startsWith('M')) continue;
-          shape.setAttribute('d', detail.d);
-          // New, more precise outlines change bounding boxes. Recalculate the
-          // fitted flag before rendering the next frame (also for Dutch islands).
-          refitProportionalCountry(country);
-        }
-        if (window.GeoPrzygodaBattle && window.GeoPrzygodaBattle.active)
-          window.GeoPrzygodaBattle.refresh();
-      })
-      .catch(() => { /* Keep the bundled 50m boundaries if the detail asset is unavailable. */ });
+  // The overview always uses the original light 1:50m country outlines.
+  // Keep immutable baselines so zooming back out truly drops 1:10m geometry.
+  const baseGeometry = new Map();
+  for (const c of COUNTRY_DATA) {
+    const primary = $('land-' + c.id);
+    if (!primary) continue;
+    baseGeometry.set(c.id, [...primary.parentElement.querySelectorAll('path.land')]
+      .map(piece => ({ piece, d: piece.getAttribute('d') })));
   }
-  loadDetailedNorthSeaBorders();
 
-  // Keep the fast 1:50m overview. The Android build bundles 1:10m outlines
-  // for all available mapped countries. Use them only on closer zoom, where
-  // coastlines, islands and complicated borders can actually be seen.
+  const DETAIL_ZOOM_LIMIT = 280; // About 4x world zoom; never load on overview.
   const enhancedCountries = new Set();
-  let detailedWorld = null, worldLoading = false, worldFailed = false;
-  let detailFrame = null;
+  const detailViewport = new Map();
+  const detailCache = new Map();
+  const loadingDetails = new Set();
+  let detailedIndex = null, worldLoading = false, worldFailed = false;
+  let detailFrame = null, detailTimer = null;
+
   function boxIntersects(b, v) {
     return b[2] >= v.x && b[0] <= v.x + v.width &&
            b[3] >= v.y && b[1] <= v.y + v.height;
   }
+  function paddedView(view, amount = .15) {
+    const x = view.width * amount, y = view.height * amount;
+    return {x:view.x-x,y:view.y-y,width:view.width+2*x,height:view.height+2*y};
+  }
   function matchDetailedFragment(nodes, parts) {
-    // The 50m atlas has individually fitted flags for France, USA, Australia.
-    // Match each old path to a corresponding 10m polygon before creating any
-    // additional islands. No country link, label or flag is replaced.
-    const assignments = [];
-    const unused = new Set(parts.map((_, i) => i));
+    const assignments = [], unused = new Set(parts.map((_, i) => i));
     for (const node of nodes) {
       let b;
       try { b = node.getBBox(); } catch { b = null; }
@@ -293,104 +280,178 @@
         const x = parts[i].b;
         const dx = (x[0] + x[2] - (b ? b.x * 2 + b.width : x[0] + x[2])) / 2;
         const dy = (x[1] + x[3] - (b ? b.y * 2 + b.height : x[1] + x[3])) / 2;
-        const oldSize = b ? Math.max(0.00001, b.width * b.height) : 1;
-        const newSize = Math.max(0.00001, (x[2]-x[0]) * (x[3]-x[1]));
-        const score = Math.hypot(dx, dy) +
-          Math.abs(Math.log(newSize / oldSize)) * 0.8;
+        const oldSize = b ? Math.max(.00001, b.width * b.height) : 1;
+        const newSize = Math.max(.00001, (x[2]-x[0]) * (x[3]-x[1]));
+        const score = Math.hypot(dx,dy) + Math.abs(Math.log(newSize/oldSize))*.8;
         if (score < distance) { distance = score; best = i; }
       }
-      if (best !== null) {
-        assignments.push([node, best]);
-        unused.delete(best);
-      }
+      if (best !== null) { assignments.push([node,best]); unused.delete(best); }
     }
-    return { assignments, unused };
+    return {assignments,unused};
+  }
+  function restoreBaseGeometry(id) {
+    const original = baseGeometry.get(id), primary = $('land-' + id);
+    if (!original || !primary) return;
+    const keep = new Set(original.map(item => item.piece));
+    for (const extra of [...primary.parentElement.querySelectorAll('path.land')]) {
+      if (keep.has(extra)) continue;
+      flagPaths.delete(extra);
+      const fitted = /url\(#([^)]+)\)/.exec(extra.dataset.geoprzygodaFittedFlag || '');
+      if (fitted) document.getElementById(fitted[1])?.remove();
+      extra.remove();
+    }
+    for (const {piece,d} of original) {
+      if (piece.getAttribute('d') !== d) piece.setAttribute('d',d);
+    }
+    enhancedCountries.delete(id);
+    detailViewport.delete(id);
+    refitProportionalCountry(id);
   }
   function applyDetail(id, detail) {
     const primary = $('land-' + id);
-    if (!primary) return false;
+    if (!primary || !detail) return false;
     const anchor = primary.parentElement;
     const previous = [...anchor.querySelectorAll('path.land')];
     if (Array.isArray(detail.parts) && detail.parts.length && previous.length) {
-      const { assignments, unused } = matchDetailedFragment(previous, detail.parts);
-      for (const [old, index] of assignments) {
-        old.setAttribute('d', detail.parts[index].d);
+      const {assignments,unused} = matchDetailedFragment(previous,detail.parts);
+      for (const [old,index] of assignments) {
+        if (old.getAttribute('d') !== detail.parts[index].d)
+          old.setAttribute('d', detail.parts[index].d);
       }
+      // Some island-heavy countries have hundreds of tiny detached pieces.
+      // Only add islands currently in view; never expand entire world at once.
+      const view = paddedView(map.viewBox.baseVal,.22);
       for (const index of unused) {
-        const extra = document.createElementNS(ns, 'path');
-        extra.setAttribute('d', detail.parts[index].d);
-        extra.classList.add('land', 'flag-fragment');
-        extra.setAttribute('fill', primary.getAttribute('fill') || '#a8d77e');
-        extra.setAttribute('fill-rule', 'evenodd');
-        if (map.classList.contains('flag-fill')) {
-          extra.style.fill = 'url(#flag-pattern-' + id + ')';
-        }
-        flagPaths.push([extra, 'url(#flag-pattern-' + id + ')']);
+        const part = detail.parts[index];
+        if (!boxIntersects(part.b,view)) continue;
+        const extra = document.createElementNS(ns,'path');
+        extra.setAttribute('d',part.d);
+        extra.classList.add('land','flag-fragment');
+        extra.setAttribute('fill',primary.getAttribute('fill') || '#a8d77e');
+        extra.setAttribute('fill-rule','evenodd');
         anchor.append(extra);
+        flagPaths.set(extra, 'url(#flag-pattern-' + id + ')');
       }
-    } else if (typeof detail.d === 'string' && detail.d[0] === 'M') {
-      primary.setAttribute('d', detail.d);
-    } else {
-      return false;
-    }
-    // Refresh the per-island fitting when 1:10m map geometry replaces 1:50m.
-    // This also fits newly discovered tiny islands without overwriting Dutch
-    // or other country border enhancements.
+    } else if (typeof detail.d === 'string' && detail.d.startsWith('M')) {
+      if (primary.getAttribute('d') !== detail.d)
+        primary.setAttribute('d',detail.d);
+    } else return false;
     refitProportionalCountry(id);
     enhancedCountries.add(id);
+    const vb = map.viewBox.baseVal;
+    detailViewport.set(id,{x:vb.x,y:vb.y,width:vb.width,height:vb.height});
     return true;
   }
+  function loadDetailedNorthSeaBorders() {
+    // Old eager Benelux replacement removed. The indexed world detail includes
+    // Netherlands, Belgium and Germany at the same Natural Earth 1:10m scale.
+    // Retained as a named compatibility hook for legacy assertions.
+    return detailedIndex && ['NLD','BEL','DEU'].every(id => !!detailedIndex[id]);
+  }
+  function loadSingleDetailedCountry(id) {
+    if (loadingDetails.has(id)) return;
+    if (detailCache.has(id)) {
+      if (!enhancedCountries.has(id)) applyDetail(id,detailCache.get(id));
+      return;
+    }
+    loadingDetails.add(id);
+    fetch('world-detail/' + id.toLowerCase() + '.json')
+      .then(response => {
+        if (!response.ok) throw new Error('No detailed country geometry');
+        return response.json();
+      })
+      .then(detail => {
+        if (!detail || !detail.b || (!detail.d && !detail.parts)) return;
+        detailCache.set(id,detail);
+        // At most 8 decoded countries: bound memory as the user explores.
+        while (detailCache.size > 8) {
+          const discard = [...detailCache.keys()].find(key => !enhancedCountries.has(key));
+          if (!discard) break;
+          detailCache.delete(discard);
+        }
+        const vb = map.viewBox.baseVal;
+        if (vb.width > 0 && vb.width <= DETAIL_ZOOM_LIMIT &&
+            boxIntersects(detail.b,paddedView(vb,.12)) &&
+            !enhancedCountries.has(id) &&
+            !document.querySelector('.territory-game.battle-animating')) {
+          applyDetail(id,detail);
+          if (window.GeoPrzygodaBattle?.active) window.GeoPrzygodaBattle.refresh();
+        }
+      })
+      .catch(() => { /* 1:50m remains usable if optional detailed data is missing. */ })
+      .finally(() => {
+        loadingDetails.delete(id);
+        queueVisibleDetails();
+      });
+  }
   function updateVisibleDetailedCountries() {
-    if (worldFailed || !map.viewBox || !map.viewBox.baseVal) return;
+    if (!map.viewBox || !map.viewBox.baseVal) return;
     const vb = map.viewBox.baseVal;
-    // Full-world view should remain lightweight and responsive on phones.
-    if (!vb.width || vb.width > 680) return;
-    if (!detailedWorld) {
+    if (!vb.width) return;
+    const zoomed = vb.width <= DETAIL_ZOOM_LIMIT;
+    const view = paddedView(vb,.15);
+    // Revert paths, not just flag patterns, when zooming out or leaving an area.
+    let updated = 0;
+    for (const id of [...enhancedCountries]) {
+      const previousView = detailViewport.get(id);
+      const movedFar = previousView &&
+        (Math.abs((vb.x+vb.width/2)-(previousView.x+previousView.width/2)) >
+           Math.max(vb.width*1.2,4) ||
+         Math.abs((vb.y+vb.height/2)-(previousView.y+previousView.height/2)) >
+           Math.max(vb.height*1.2,4));
+      if (!zoomed || movedFar || (detailedIndex &&
+          !boxIntersects(detailedIndex[id].b,paddedView(vb,.6)))) {
+        restoreBaseGeometry(id);
+        updated++;
+        if (updated >= 4) { queueVisibleDetails(); break; }
+      }
+    }
+    if (updated && window.GeoPrzygodaBattle?.active) window.GeoPrzygodaBattle.refresh();
+    if (!zoomed || worldFailed || document.querySelector('.territory-game.battle-animating'))
+      return;
+    if (!detailedIndex) {
       if (worldLoading) return;
       worldLoading = true;
       fetch('world-detail-10m.json')
         .then(response => {
-          if (!response.ok) throw new Error('No detailed geometry');
+          if (!response.ok) throw new Error('Detailed map index unavailable');
           return response.json();
         })
         .then(data => {
-          if (!data || !data.countries ||
-              data.projection !== 'Mercator 1080x1080, 3 decimal SVG precision')
-            throw new Error('Wrong detail format');
-          detailedWorld = data.countries;
+          if (data?.projection !== 'Mercator 1080x1080, 3 decimal SVG precision' ||
+              !data.countries || !data.countries.NLD) throw new Error('Invalid detail index');
+          detailedIndex = data.countries;
           queueVisibleDetails();
         })
-        .catch(() => { worldFailed = true; /* The 50m map stays playable. */ })
+        .catch(() => { worldFailed = true; })
         .finally(() => { worldLoading = false; });
       return;
     }
-    if (document.querySelector('.territory-game.battle-animating')) return;
-    const padX = vb.width * .12, padY = vb.height * .12;
-    const visible = {
-      x: vb.x - padX, y: vb.y - padY,
-      width: vb.width + padX * 2, height: vb.height + padY * 2
-    };
-    let changed = false;
-    for (const [id, detail] of Object.entries(detailedWorld)) {
-      if (enhancedCountries.has(id) || !detail || !detail.b ||
-          !boxIntersects(detail.b, visible)) continue;
-      changed = applyDetail(id, detail) || changed;
+    let queued = 0;
+    for (const [id, detail] of Object.entries(detailedIndex)) {
+      if (queued >= 3 || !detail?.b || enhancedCountries.has(id) ||
+          loadingDetails.has(id) || !boxIntersects(detail.b,view)) continue;
+      queued++;
+      loadSingleDetailedCountry(id);
     }
-    if (changed && window.GeoPrzygodaBattle && window.GeoPrzygodaBattle.active)
-      window.GeoPrzygodaBattle.refresh();
   }
   function queueVisibleDetails() {
-    if (detailFrame !== null) return;
-    detailFrame = requestAnimationFrame(() => {
-      detailFrame = null;
-      updateVisibleDetailedCountries();
-    });
+    // Debounce rapid pinch/drag changes. Work happens after a gesture settles,
+    // not for all 238 countries on every frame of scrolling.
+    if (detailTimer !== null) clearTimeout(detailTimer);
+    detailTimer = setTimeout(() => {
+      detailTimer = null;
+      if (detailFrame !== null) return;
+      detailFrame = requestAnimationFrame(() => {
+        detailFrame = null;
+        updateVisibleDetailedCountries();
+      });
+    }, 100);
   }
-  // In addition to redraws, listen for programmatic map focus and gestures.
   const detailObserver = new MutationObserver(queueVisibleDetails);
-  detailObserver.observe(map, { attributes:true, attributeFilter:['viewBox'] });
-  for (const event of ['pointerup', 'touchend', 'wheel']) {
-    map.addEventListener(event, queueVisibleDetails, { passive: true });
+  detailObserver.observe(map,{attributes:true,attributeFilter:['viewBox']});
+  for (const event of ['pointerup','touchend','wheel']) {
+    map.addEventListener(event,queueVisibleDetails,{passive:true});
   }
 
   const originalLabelMap = labelMap;
