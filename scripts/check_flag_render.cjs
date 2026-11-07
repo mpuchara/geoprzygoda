@@ -10,7 +10,7 @@ const http = require('node:http');
 const { chromium } = require('./flag-browser/node_modules/playwright-core');
 
 const root = path.resolve(__dirname, '../app/src/main/assets');
-const reportDir = path.resolve(__dirname, '../flag-render-evidence');
+const reportDir = path.resolve(__dirname, 'flag-render-evidence');
 const manifest = JSON.parse(fs.readFileSync(path.resolve(__dirname, 'flag_reference.json'), 'utf8'));
 const iso = manifest.iso_alpha3_to_alpha2;
 const fixed = ['NLD','AUT','FRA','USA','AUS','TUR','GBR','JPN','CAN','SAU','NPL','MCO','VAT','KIR'];
