@@ -68,3 +68,39 @@
 #world-map .battle-attacking .land{animation:battle-soft-border 1.5s ease-in-out infinite alternate;stroke-dasharray:none!important;stroke:#fce3ac!important;stroke-width:2!important;vector-effect:non-scaling-stroke}
 @keyframes battle-soft-border{from{stroke-opacity:.6}to{stroke-opacity:1}}
 @media(prefers-reduced-motion:reduce){#world-map .battle-attacking .land{animation:none}}
+
+
+/* Fictional provinces with irregular Voronoi borders reveal one by one as the
+   capital-directed, organic front moves. They are not real administrative areas. */
+#world-map .battle-fictional-sectors{pointer-events:none}
+#world-map .battle-fictional-sector-line{
+  fill:none;stroke:#1c4b55;stroke-opacity:.68;stroke-width:.9;
+  vector-effect:non-scaling-stroke;stroke-linejoin:round;
+}
+#world-map .battle-fictional-sector-line.battle-fictional-sector-captured{
+  stroke:#fff9da;stroke-opacity:.82;stroke-width:1.2;
+}
+#world-map .battle-unit-banner{
+  stroke:#f8ffe9;stroke-width:.8;vector-effect:non-scaling-stroke;
+  filter:drop-shadow(0 0 2px #132745);
+}
+/* Do not cover the invasion with a giant settings panel. */
+.territory-game.battle-cinematic > label,
+.territory-game.battle-cinematic > .battle-select,
+.territory-game.battle-cinematic > .battle-stats,
+.territory-game.battle-cinematic > .country-picker,
+.territory-game.battle-cinematic > .battle-actions,
+.territory-game.battle-cinematic > .battle-disclaimer{display:none!important}
+.territory-game.battle-cinematic{
+  max-height:min(36dvh,275px);overflow:auto;
+}
+.territory-game.battle-cinematic .battlefield{padding:9px 10px 8px}
+.territory-game.battle-cinematic .battle-title{margin-top:3px}
+.territory-game.battle-cinematic .battle-message{margin-top:7px}
+@media(max-width:650px){
+ .territory-game.battle-cinematic{
+   width:min(360px,calc(100vw - 18px));max-height:34dvh;
+   left:50%;transform:translateX(-50%)
+ }
+}
+@media(prefers-reduced-motion:reduce){#world-map .battle-unit-banner{filter:none}}
