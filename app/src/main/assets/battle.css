@@ -52,3 +52,47 @@
 .battle-progress-track{height:13px;border-radius:99px;background:#e7e9d0;border:1px solid #a3baa7;overflow:hidden}
 .battle-progress-track span{display:block;width:0;height:100%;border-radius:99px;background:linear-gradient(90deg,#58ad83,#b6db69);transition:none}
 @media(prefers-reduced-motion:reduce){#world-map .battle-attacking .land{animation:none}}
+
+
+/* A jagged territorial front and fictional province-like Voronoi sectors.
+   No straight wipe across an entire nation. */
+#world-map .battle-sector-grid,
+#world-map .battle-advance-overlay,
+#world-map .battle-front-troops{pointer-events:none}
+#world-map .battle-sector-outline{
+  fill:none;stroke:#29464c;stroke-width:.85;stroke-opacity:.53;
+  stroke-linejoin:round;vector-effect:non-scaling-stroke;
+  transition:stroke-opacity .15s
+}
+#world-map .battle-sector-outline.conquered-sector{
+  stroke:#fff8da;stroke-opacity:.78;stroke-width:1.15
+}
+#world-map .battle-front-flag{
+  stroke:#f9fff7;stroke-width:.8;vector-effect:non-scaling-stroke;
+  filter:drop-shadow(0 0 2px #112b39);
+  pointer-events:none
+}
+#world-map .battle-front-line{
+  fill:none;stroke:#fffad7;stroke-width:2.5;stroke-dasharray:4 2;
+  vector-effect:non-scaling-stroke;filter:drop-shadow(0 0 3px #fbe57a)
+}
+/* A shorter panel during the animation lets the map take center stage. */
+.territory-game.battle-cinematic > label,
+.territory-game.battle-cinematic > .battle-select,
+.territory-game.battle-cinematic > .battle-stats,
+.territory-game.battle-cinematic > .country-picker,
+.territory-game.battle-cinematic > .battle-actions,
+.territory-game.battle-cinematic > .battle-disclaimer{display:none!important}
+.territory-game.battle-cinematic{max-height:min(36dvh,275px);overflow:auto}
+.territory-game.battle-cinematic .battlefield{padding:9px 10px 8px}
+.territory-game.battle-cinematic .battle-title{margin-top:3px}
+.territory-game.battle-cinematic .battle-message{margin-top:7px}
+@media(max-width:650px){
+  .territory-game.battle-cinematic{
+    width:min(360px,calc(100vw - 18px));max-height:34dvh;
+    left:50%;transform:translateX(-50%)
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  #world-map .battle-front-flag{filter:none}
+}
