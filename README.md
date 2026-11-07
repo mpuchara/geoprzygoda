@@ -122,3 +122,12 @@ Rywalizacja ma kolorowe, animowane tło w kolorach startowego ekranu. Na ekranie
 Na filmie wzorcowym podbój nie jest pojedynczą pionową kreską: wzdłuż marszu przejmowane są małe obszary. Dlatego do **istniejącej animacji w stronę stolicy** dodano małe nieregularne sektory na mapie. Ich przejęcie następuje falami, najpierw przy trasie oddziału, potem w pobliżu stolicy. Gdy bitwa się kończy, zachowane są te same zasady, co wcześniej: wygrana zdobywa całe państwo, przegrana cofa front. Panel bitwy pozostaje zmniejszony w czasie animacji.
 
 Podziały sektorów są generowane do zabawy i nie stanowią prawdziwych granic województw, prowincji ani powiatów.
+
+
+## Flagi bez rozciągania symboli 🇹🇷 🇸🇦
+
+Turcja ma teraz czerwone tło na całym swoim obszarze, ale półksiężyc i gwiazda nie są rozciągane poziomo. Podobnie flaga Arabii Saudyjskiej zachowuje proporcje napisu i miecza na zielonym tle. Wzory dopasowują się także do szczegółowej mapy świata Natural Earth 1:10m po przybliżeniu. Funkcja działa w Rywalizacji i po wyjściu z bitwy; granice państw nie są zmieniane przez tę poprawkę.
+
+## Dwie rozmowy, wspólny kod
+
+Przy rozwijaniu GeoPrzygody w dwóch rozmowach wspólnym źródłem jest repozytorium GitHub **mpuchara/geoprzygoda**. Każdą nową poprawkę zaczynamy od aktualnego `main`, wykonujemy na odrębnej gałęzi i łączymy dopiero po testach i sprawdzeniu, czy nie pojawiły się nowe commity z drugiej rozmowy. Nowy APK publikowany z `main` zawiera połączone poprawki (np. Turcji i Holandii) i nie nadpisuje innych zmian. Rozmowy nie mają automatycznej komunikacji między sobą — współdzielą repozytorium.
