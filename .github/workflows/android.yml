@@ -44,6 +44,10 @@ jobs:
         run: |
           python3 -m pip install --disable-pip-version-check --no-cache-dir "CairoSVG==2.7.1"
           python3 scripts/build_flag_textures.py
+      - name: Pre-render precise 1:50m flag-filled world for Android WebView
+        run: |
+          python3 -m pip install --disable-pip-version-check --no-cache-dir "Pillow==11.3.0"
+          python3 scripts/build_flag_overview.py
       - name: Validate extra JavaScript syntax
         run: |
           node --check app/src/main/assets/features.js
@@ -70,6 +74,15 @@ jobs:
         with:
           name: GeoPrzygoda-Android
           path: app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 30
+      - name: Save rasterized world flag map for visual inspection
+        uses: actions/upload-artifact@v4
+        with:
+          name: GeoPrzygoda-World-Flag-Raster
+          path: |
+            app/src/main/assets/flag-overview.png
+            app/src/main/assets/flag-overview.json
           if-no-files-found: error
           retention-days: 30
       - name: Save flag audit gallery
