@@ -112,6 +112,10 @@ assert 'refitProportionalCountry(id)' in features, 'Detailed map should refit fl
 assert 'window.GeoPrzygodaFitFlag' in features
 
 assert 'flag-textures/' in features, 'Map must use WebView-compatible local PNG textures'
+assert 'function prepareFlagBatch()' in features, 'Flags must not block startup'
+assert 'window.GeoPrzygodaFlagStatus' in features, 'Flag initialization must be testable'
+assert "const paint = 'url(#' + id + ') ' + fallbackColor" in features, 'SVG paint fallback must work when patterns fail'
+assert 'deferredDetailParts' in features, 'Panned-to islands must not disappear'
 assert 'backing.setAttribute' in features and "piece.getAttribute('fill')" in features, (
     'A failed flag texture must show the original country color')
 assert 'battle.js' in text and 'battle.css' in text, 'Battle resources missing from HTML'

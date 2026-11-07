@@ -22,7 +22,8 @@ const stripes = new Set([
 ]);
 
 function mime(file) {
-  return file.endsWith('.svg') ? 'image/svg+xml' :
+  return file.endsWith('.png') ? 'image/png' :
+    file.endsWith('.svg') ? 'image/svg+xml' :
     file.endsWith('.json') ? 'application/json' :
     file.endsWith('.js') ? 'application/javascript' :
     file.endsWith('.css') ? 'text/css' : 'text/html';
@@ -76,6 +77,10 @@ async function run() {
       { timeout: 15000 });
     await page.evaluate(() => document.getElementById('skip-name')?.click());
     await page.waitForTimeout(300);
+    // Flags are intentionally prepared across idle frames rather than blocking
+    // the first map paint. Wait for all visible overview flags before auditing.
+    await page.waitForFunction(() => window.GeoPrzygodaFlagStatus?.().complete,
+      null, { timeout: 30000 });
 
     // The same JavaScript and SVG patterns as the actual Android game.
     // Check actual fills, pattern references and image aspect ratios on every
@@ -98,6 +103,10 @@ async function run() {
             errors.push(id + ': missing flag fill');
             continue;
           }
+          // SVG 1.1 permits a terrain-color fallback after a paint server.
+          // This remains visible if Android WebView fails the entire pattern.
+          if (!/\)\s*#[0-9a-f]{3,8}\b/i.test(piece.style.fill))
+            errors.push(id + ': missing fallback color outside pattern');
           const pattern = document.getElementById(actual);
           const image = pattern?.querySelector('image');
           if (!pattern || !image) {

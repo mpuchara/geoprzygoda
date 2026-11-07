@@ -134,8 +134,12 @@
     const original = document.getElementById(id);
     const geometryKey = [asset, background || '', plainBands,
       box.x.toFixed(3), box.y.toFixed(3), box.width.toFixed(3), box.height.toFixed(3)].join(':');
+    // SVG paint fallback survives even if Android WebView cannot resolve the
+    // *entire* pattern. The rect inside the pattern only covers PNG failures.
+    const fallbackColor = piece.getAttribute('fill') || background || '#a8d77e';
+    const paint = 'url(#' + id + ') ' + fallbackColor;
     if (original && original.dataset.textureGeometry === geometryKey)
-      return 'url(#' + id + ')';
+      return paint;
     const pattern = original || document.createElementNS(ns, 'pattern');
     pattern.id = id;
     pattern.replaceChildren();
@@ -175,7 +179,7 @@
     image.setAttribute('preserveAspectRatio', fit);
     pattern.append(image);
     if (!original) flagDefs.append(pattern);
-    return 'url(#' + pattern.id + ')';
+    return paint;
   }
   // Battles may draw the victor's flag on a completely different shape.
   // Fit its symbol to the *captured* country; never reuse the old country's
@@ -189,13 +193,17 @@
       piece, index, 'flag-textures/' + owner.code.toLowerCase() + '.png', backing,
       stripeOnlyCountries.has(ownerId));
   };
-  for (const c of COUNTRY_DATA) {
+  // Build fitted flag patterns in frame-sized batches, not a single blocking
+  // getBBox()/SVG construction pass over all 238 countries at startup.
+  // The original terrain fill is visible until its flag is ready.
+  const flagCountries = COUNTRY_DATA.filter(c =>
+    c.mapped && /^[A-Z]{2}$/.test(c.code) && $('land-' + c.id));
+  let flagInitIndex = 0;
+  let flagInitFrame = null;
+  function prepareCountryFlag(c) {
     const path = $('land-' + c.id);
-    if (!c.mapped || !path || !/^[A-Z]{2}$/.test(c.code)) continue;
+    if (!path) return;
     const url = 'flag-textures/' + c.code.toLowerCase() + '.png';
-    // The first fragment keeps the legacy "flag-pattern-ID" alias, but it is
-    // now a fitted userSpaceOnUse SVG pattern, never an objectBBox fallback.
-    // Other fragments (mainland, distant islands) each get independent fits.
     const pieces = [...path.parentElement.querySelectorAll('path.land')];
     pieces.forEach((piece, index) => {
       const fitted = createProportionalFlag(
@@ -203,11 +211,34 @@
         stripeOnlyCountries.has(c.id),
         index === 0 ? 'flag-pattern-' + c.id : null
       );
-      if (!fitted) return; // Preserve original terrain color if geometry is invalid.
+      if (!fitted) return; // Keep original country color if geometry is invalid.
       piece.dataset.geoprzygodaFittedFlag = fitted;
       flagPaths.set(piece, fitted);
+      if (flagsEnabled && mode !== 'quiz') piece.style.fill = fitted;
     });
   }
+  function prepareFlagBatch() {
+    flagInitFrame = null;
+    if (!flagsEnabled || mode === 'quiz') return;
+    const start = performance.now();
+    let count = 0;
+    while (flagInitIndex < flagCountries.length && count < 6) {
+      prepareCountryFlag(flagCountries[flagInitIndex++]);
+      count++;
+      if (performance.now() - start >= 8) break;
+    }
+    queueFlagPreparation();
+  }
+  function queueFlagPreparation() {
+    if (flagInitFrame !== null || flagInitIndex >= flagCountries.length ||
+        !flagsEnabled || mode === 'quiz') return;
+    flagInitFrame = requestAnimationFrame(prepareFlagBatch);
+  }
+  // Diagnostic hook for the bundled headless-browser regression test.
+  window.GeoPrzygodaFlagStatus = () => ({
+    ready: flagInitIndex, total: flagCountries.length,
+    complete: flagInitIndex === flagCountries.length
+  });
 
   function refitProportionalCountry(id) {
     const c = byId.get(id);
@@ -233,7 +264,10 @@
   let flagsApplied = null;
   function renderFlags() {
     const enabled = flagsEnabled && mode !== 'quiz';
-    if (enabled === flagsApplied) return;
+    if (enabled === flagsApplied) {
+      if (enabled) queueFlagPreparation();
+      return;
+    }
     flagsApplied = enabled;
     map.classList.toggle('flag-fill', enabled);
     for (const [path, fill] of flagPaths) {
@@ -242,6 +276,7 @@
       if (enabled) path.style.fill = fill;
       else path.style.removeProperty('fill');
     }
+    if (enabled) queueFlagPreparation();
     if (window.GeoPrzygodaBattle && window.GeoPrzygodaBattle.active) window.GeoPrzygodaBattle.refresh();
   }
   // The overview always uses the original light 1:50m country outlines.
@@ -259,6 +294,8 @@
   const detailViewport = new Map();
   const detailCache = new Map();
   const loadingDetails = new Set();
+  // Islands outside the first close-up must appear on later pans, too.
+  const deferredDetailParts = new Map();
   let detailedIndex = null, worldLoading = false, worldFailed = false;
   let detailFrame = null, detailTimer = null;
 
@@ -305,6 +342,7 @@
     }
     enhancedCountries.delete(id);
     detailViewport.delete(id);
+    deferredDetailParts.delete(id);
     refitProportionalCountry(id);
   }
   function applyDetail(id, detail) {
@@ -321,18 +359,24 @@
       // Some island-heavy countries have hundreds of tiny detached pieces.
       // Only add islands currently in view; never expand entire world at once.
       const view = paddedView(map.viewBox.baseVal,.22);
+      const deferred = new Map();
       for (const index of unused) {
         const part = detail.parts[index];
-        if (!boxIntersects(part.b,view)) continue;
+        if (!boxIntersects(part.b,view)) {
+          deferred.set(index, part);
+          continue;
+        }
         const extra = document.createElementNS(ns,'path');
         extra.setAttribute('d',part.d);
         extra.classList.add('land','flag-fragment');
         extra.setAttribute('fill',primary.getAttribute('fill') || '#a8d77e');
         extra.setAttribute('fill-rule','evenodd');
         anchor.append(extra);
-        flagPaths.set(extra, 'url(#flag-pattern-' + id + ')');
       }
+      if (deferred.size) deferredDetailParts.set(id,deferred);
+      else deferredDetailParts.delete(id);
     } else if (typeof detail.d === 'string' && detail.d.startsWith('M')) {
+      deferredDetailParts.delete(id);
       if (primary.getAttribute('d') !== detail.d)
         primary.setAttribute('d',detail.d);
     } else return false;
@@ -409,6 +453,28 @@
     if (updated && window.GeoPrzygodaBattle?.active) window.GeoPrzygodaBattle.refresh();
     if (!zoomed || worldFailed || document.querySelector('.territory-game.battle-animating'))
       return;
+    // Add only newly visible island fragments on a settled pan. Do not
+    // rebuild the whole country's 1:10m shape while the map is moving.
+    for (const [id, deferred] of deferredDetailParts) {
+      if (!enhancedCountries.has(id)) continue;
+      const primary = $('land-' + id);
+      if (!primary) continue;
+      let added = 0;
+      for (const [index, part] of deferred) {
+        if (!boxIntersects(part.b,view)) continue;
+        const extra = document.createElementNS(ns,'path');
+        extra.setAttribute('d',part.d);
+        extra.classList.add('land','flag-fragment');
+        extra.setAttribute('fill',primary.getAttribute('fill') || '#a8d77e');
+        extra.setAttribute('fill-rule','evenodd');
+        primary.parentElement.append(extra);
+        deferred.delete(index);
+        if (++added >= 12) break;
+      }
+      if (added) refitProportionalCountry(id);
+      if (!deferred.size) deferredDetailParts.delete(id);
+      if (added >= 12) queueVisibleDetails();
+    }
     if (!detailedIndex) {
       if (worldLoading) return;
       worldLoading = true;
