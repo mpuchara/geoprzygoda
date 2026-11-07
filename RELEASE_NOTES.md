@@ -1,11 +1,13 @@
-GeoPrzygoda — wyraźniejsze podbijanie terenów i większa mapa 🌍⚔️
+GeoPrzygoda — podbijanie terenu jak na filmie! 🗺️⚔️
 
-- Zajmowany teren ma wyraźniejszy, nieregularny obrys zamiast prostej pionowej kreski.
-- W trakcie natarcia okno bitwy zmniejsza się, żeby odsłonić więcej mapy.
-- Zachowano organiczne natarcie od granicy w kierunku stolicy — np. z okolic Białegostoku w stronę Mińska.
-- Gdy obrona wygra, zajmowany obszar się cofa; zwycięstwo zmienia kolory zdobytego państwa.
-- Wszystkie flagi, historia, rywalizacja i muzyka nadal działają bez internetu.
+- Marsz od granicy do stolicy, np. Białystok → Mińsk, pozostał bez zmian.
+- Teraz front stopniowo przejmuje nieregularne małe sektory wewnątrz państwa.
+- Kolorowanie obejmuje najpierw sektory obok marszu, a później obszary wokół stolicy.
+- Nie ma prostej pionowej kreski; kontury sektorów są nieregularne.
+- Widoczna mała flaga idzie wraz z oddziałem. Panel jest mały podczas bitwy.
+- Zwycięstwo pozwala zdobyć cały kraj, porażka cofa oddział i przywraca tereny.
+- Zachowane flagi na mapie, wyszukiwarka krajów, Historia, Quiz i muzyka.
 
-To zabawa geograficzna, nie prawdziwa symulacja walk ani podział na prowincje.
+Granice małych sektorów są wymyślone do gry, nie pokazują prawdziwych prowincji. To fikcyjna animacja geograficzna, nie symulacja rzeczywistych walk.
 
-**Instalacja:** pobierz GeoPrzygoda.apk z tego wydania na Androida.
+**Instalacja:** pobierz GeoPrzygoda.apk na Androida z tego wydania.
