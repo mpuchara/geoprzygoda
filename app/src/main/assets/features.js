@@ -349,6 +349,12 @@
       ? 'none' : (emblemBackgrounds.has(country.id) ? 'xMidYMid meet' : 'xMidYMid slice');
     if (image.getAttribute('preserveAspectRatio') !== fit)
       image.setAttribute('preserveAspectRatio',fit);
+    // At close zoom the clipped PNG owns the flag pixels. Never draw the
+    // legacy SVG paint server underneath it: Android WebView can double-paint
+    // the same polygon and the regression test rejects this GPU-heavy path.
+    // Restore the legacy SVG if the PNG fails to load (error handler above).
+    piece.style.fill = piece.getAttribute('fill') || '#a8d77e';
+    geo10LegacyPaths.add(piece);
   }
   let geo8ZoomPieceIndex = 0, geo8ZoomPieces = null;
   function geo8PhotoBatch() {
