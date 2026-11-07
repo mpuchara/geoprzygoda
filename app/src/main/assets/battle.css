@@ -158,3 +158,39 @@
     max-height:44dvh;padding:6px 10px;
   }
 }
+
+/* Plan 4: province borders and a compact touch-friendly live battle HUD. */
+.battle-mode-row{margin:12px 0 8px}
+.battle-mode-row label{display:block;margin:8px 0 5px;font-weight:750;font-size:12px}
+.battle-mode-row [hidden]{display:none!important}
+.battle-duel{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.battle-duel img{display:block;width:39px;height:26px;object-fit:contain;border-radius:3px;border:1px solid #f1fffb77;background:#ebf6f7;flex:none}
+.battle-duel .battle-balance{flex:1;margin:0;line-height:1.4;text-align:center}
+.battle-live-controls{display:none;align-items:center;justify-content:center;gap:10px;margin-top:7px}
+.battle-live-controls button,.battle-live-controls select{
+  min-height:31px;border-radius:9px;border:1px solid #93bdc5;
+  background:#20455a;color:#f4fdff;font-weight:800;font-size:11px;
+  padding:5px 12px;touch-action:manipulation
+}
+.battle-live-controls button[aria-pressed="true"]{background:#f6d982;color:#17354d}
+.battle-live-controls label{font-size:10px!important;font-weight:700;color:#e9f6fc;margin:0!important}
+.territory-game.battle-animating .battle-head{color:#f6fcff}
+.territory-game.battle-animating .battle-live-controls{display:flex}
+.territory-game.battle-paused .battlefield .army-left,
+.territory-game.battle-paused .battlefield .army-right,
+ .territory-game.battle-paused .battlefield .army-middle{animation-play-state:paused}
+.territory-game.battle-paused .battlefield .army-left,
+.territory-game.battle-paused .battlefield .army-right,
+.territory-game.battle-paused .battlefield .army-middle{animation-play-state:paused}
+#world-map .battle-real-provinces .battle-province-outline{
+  fill:none;stroke:#173e56;stroke-width:1.05;stroke-opacity:.9;
+  stroke-linejoin:round;vector-effect:non-scaling-stroke
+}
+#world-map .battle-real-provinces .battle-province-outline.battle-fictional-sector-captured{
+  stroke:#fff5a8;stroke-width:1.55;stroke-opacity:1
+}
+@media(max-width:650px){
+  .territory-game.battle-animating{max-height:34dvh}
+  .battle-duel img{width:32px;height:22px}
+  .battle-live-controls{margin-top:5px}
+}
