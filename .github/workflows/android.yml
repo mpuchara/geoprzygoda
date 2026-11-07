@@ -43,6 +43,10 @@ jobs:
           node --check app/src/main/assets/features.js
           node --check app/src/main/assets/battle.js
           node --check app/src/main/assets/rival_ui.js
+      - name: Verify 238 ISO flags against pinned upstream source
+        run: python3 scripts/check_flags.py
+      - name: Create offline visual audit gallery
+        run: python3 scripts/build_flag_gallery.py flag-gallery.html
       - name: Check bundled game
         run: python3 scripts/check_assets.py
       - name: Compile APK and run Android lint
@@ -52,6 +56,13 @@ jobs:
         with:
           name: GeoPrzygoda-Android
           path: app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 30
+      - name: Save flag audit gallery
+        uses: actions/upload-artifact@v4
+        with:
+          name: GeoPrzygoda-Flag-Gallery
+          path: flag-gallery.html
           if-no-files-found: error
           retention-days: 30
       - name: Save Android lint report
@@ -76,6 +87,10 @@ jobs:
         with:
           name: GeoPrzygoda-Android
           path: release
+      - uses: actions/download-artifact@v4
+        with:
+          name: GeoPrzygoda-Flag-Gallery
+          path: release
       - name: Prepare download
         run: |
           mv release/app-debug.apk release/GeoPrzygoda.apk
@@ -87,7 +102,7 @@ jobs:
           GH_REPO: ${{ github.repository }}
         run: |
           gh release create "android-1.0.${GITHUB_RUN_NUMBER}" \
-            release/GeoPrzygoda.apk release/GeoPrzygoda.apk.sha256 \
+            release/GeoPrzygoda.apk release/GeoPrzygoda.apk.sha256 release/flag-gallery.html \
             --target "$GITHUB_SHA" \
             --title "GeoPrzygoda 1.0.${GITHUB_RUN_NUMBER}" \
             --notes-file RELEASE_NOTES.md \
