@@ -133,6 +133,94 @@
     advanceScene.outline.remove();
     advanceScene = null;
   }
+  // Geography-first, irregular conquest front. This is a fictional visual
+  // effect, but it follows the actual country polygon, never a vertical wipe.
+  function gapBetween(a, b) {
+    const dx = Math.max(0, a.x - (b.x + b.width), b.x - (a.x + a.width));
+    const dy = Math.max(0, a.y - (b.y + b.height), b.y - (a.y + a.height));
+    return dx * dx + dy * dy;
+  }
+  function pathBox(path) {
+    try {
+      const box = path.getBBox();
+      if (box.width > 0 && box.height > 0) return box;
+    } catch { /* tiny map geometry may not have a visible bounding box */ }
+    return null;
+  }
+  function borderPoints(path, maxPoints = 48) {
+    let length;
+    try { length = path.getTotalLength(); } catch { return []; }
+    if (!Number.isFinite(length) || length <= 0) return [];
+    const points = [];
+    const n = Math.max(20, Math.min(maxPoints, Math.ceil(length / 2)));
+    for (let i = 0; i < n; i++) {
+      const pt = path.getPointAtLength(length * i / n);
+      if (Number.isFinite(pt.x) && Number.isFinite(pt.y)) points.push({ x: pt.x, y: pt.y });
+    }
+    return points;
+  }
+  function ownedBorderPaths(targetBox) {
+    const target = byId.get(selectedTarget);
+    // A newly captured neighboring country can be the best starting point.
+    const owned = landsOf(game.player)
+      .sort((a, b) => {
+        const A = { x: a.b[0], y: a.b[1], width: a.b[2] - a.b[0], height: a.b[3] - a.b[1] };
+        const B = { x: b.b[0], y: b.b[1], width: b.b[2] - b.b[0], height: b.b[3] - b.b[1] };
+        return gapBetween(targetBox, A) - gapBetween(targetBox, B);
+      }).slice(0, 7);
+    const pieces = [];
+    for (const c of owned) {
+      for (const path of countryPieces(c.id)) {
+        const box = pathBox(path);
+        if (box) pieces.push({ path, box });
+        if (pieces.length >= 110) break;
+      }
+      if (pieces.length >= 110) break;
+    }
+    return pieces.sort((a, b) => gapBetween(targetBox, a.box) - gapBetween(targetBox, b.box)).slice(0, 10);
+  }
+  function startingPoint(targetPath, targetBox, sources) {
+    const points = borderPoints(targetPath, 68);
+    let closest = null, minDistance = Infinity;
+    for (const source of sources.slice().sort((a, b) =>
+      gapBetween(targetBox, a.box) - gapBetween(targetBox, b.box)).slice(0, 4)) {
+      const ownPoints = borderPoints(source.path, 55);
+      for (const a of points) {
+        for (const b of ownPoints) {
+          const distance = (a.x - b.x) ** 2 + (a.y - b.y) ** 2;
+          if (distance < minDistance) { minDistance = distance; closest = a; }
+        }
+      }
+    }
+    if (closest) return closest;
+    // No available border: start from the side nearest our home country.
+    const home = byId.get(game.player);
+    if (home) {
+      const hx = home.x, hy = home.y;
+      const fallback = points.reduce((best, point) => {
+        const d = (point.x - hx) ** 2 + (point.y - hy) ** 2;
+        return d < best.distance ? { point, distance: d } : best;
+      }, { point: null, distance: Infinity });
+      if (fallback.point) return fallback.point;
+    }
+    return { x: targetBox.x + targetBox.width / 2, y: targetBox.y + targetBox.height / 2 };
+  }
+  function jaggedFront(origin, radius, seed) {
+    // Several smooth waves produce an uneven frontier, never a straight cut.
+    // No randomness per frame: the outline stays coherent during movement.
+    const segments = 72;
+    const points = [];
+    for (let i = 0; i < segments; i++) {
+      const angle = Math.PI * 2 * i / segments;
+      const bend = 1 + 0.105 * Math.sin(5 * angle + seed * 0.41)
+        + 0.063 * Math.sin(11 * angle + seed * 1.17)
+        + 0.028 * Math.sin(19 * angle + seed * 0.73);
+      const x = origin.x + Math.cos(angle) * radius * bend;
+      const y = origin.y + Math.sin(angle) * radius * bend;
+      points.push(x.toFixed(2) + ',' + y.toFixed(2));
+    }
+    return 'M' + points.join('L') + 'Z';
+  }
   function setAdvanceProgress(fraction) {
     const progress = Math.max(0, Math.min(1, fraction));
     const percent = Math.round(progress * 100);
@@ -140,14 +228,15 @@
     $('battle-progress-label').textContent = percent + '%';
     $('battle-progress').setAttribute('aria-valuenow', String(percent));
     if (!advanceScene) return;
-    const { box, reverse, rect, line } = advanceScene;
-    const width = Math.max(0.01, box.width * progress);
-    const x = reverse ? box.x + box.width - width : box.x;
-    const frontX = reverse ? x : x + width;
-    rect.setAttribute('x', String(x));
-    rect.setAttribute('width', String(width));
-    line.setAttribute('x1', String(frontX));
-    line.setAttribute('x2', String(frontX));
+    for (const wave of advanceScene.waves) {
+      // Radius grows from the nearest shared border, not from the west edge.
+      // The sqrt curve makes early gains easy to see on small screens.
+      const radius = Math.max(0.025, wave.maxRadius * 1.36 * Math.sqrt(progress));
+      const contour = jaggedFront(wave.origin, radius, wave.seed);
+      wave.mask.setAttribute('d', contour);
+      wave.edge.setAttribute('d', contour);
+      wave.edge.style.display = progress > 0.002 && progress < 0.998 ? '' : 'none';
+    }
   }
   function createAdvance(targetId) {
     clearAdvance();
@@ -156,70 +245,66 @@
     const host = primary.parentElement;
     const paths = [...countryPieces(targetId)];
     if (!paths.length) return;
-    let box;
-    try { box = host.getBBox(); } catch { return; }
-    if (!box || box.width <= 0 || box.height <= 0) return;
+    const boxes = paths.map(path => ({ path, box: pathBox(path) })).filter(item => item.box);
+    if (!boxes.length) return;
     const svg = primary.ownerSVGElement;
     const ns = 'http://www.w3.org/2000/svg';
-    const make = name => document.createElementNS(ns, name);
+    const make = tag => document.createElementNS(ns, tag);
     let defs = svg.querySelector('defs');
-    if (!defs) {
-      defs = make('defs');
-      svg.insertBefore(defs, svg.firstChild);
-    }
+    if (!defs) { defs = make('defs'); svg.insertBefore(defs, svg.firstChild); }
     const wipe = make('clipPath');
     wipe.id = 'battle-advance-wipe';
     wipe.setAttribute('clipPathUnits', 'userSpaceOnUse');
-    const rect = make('rect');
-    rect.setAttribute('y', String(box.y - 1));
-    rect.setAttribute('height', String(box.height + 2));
-    wipe.append(rect);
-    defs.append(wipe);
     const outline = make('clipPath');
     outline.id = 'battle-advance-outline';
     outline.setAttribute('clipPathUnits', 'userSpaceOnUse');
     const ink = make('g');
     ink.classList.add('battle-advance-overlay');
     ink.setAttribute('clip-path', 'url(#battle-advance-wipe)');
+    const front = make('g');
+    front.classList.add('battle-advance-front');
+    front.setAttribute('clip-path', 'url(#battle-advance-outline)');
+    front.style.pointerEvents = 'none';
     const attackerShape = $('land-' + game.player);
     const fill = map.classList.contains('flag-fill')
       ? 'url(#flag-pattern-' + game.player + ')'
       : (attackerShape && attackerShape.getAttribute('fill')) || '#77cfa3';
     for (const path of paths) {
       const stencil = path.cloneNode(false);
-      stencil.removeAttribute('id');
-      stencil.removeAttribute('class');
-      stencil.removeAttribute('style');
+      stencil.removeAttribute('id'); stencil.removeAttribute('class'); stencil.removeAttribute('style');
       outline.append(stencil);
       const colored = path.cloneNode(false);
-      colored.removeAttribute('id');
-      colored.removeAttribute('class');
-      colored.removeAttribute('style');
-      colored.setAttribute('fill', fill);
-      colored.setAttribute('stroke', 'none');
+      colored.removeAttribute('id'); colored.removeAttribute('class'); colored.removeAttribute('style');
+      colored.setAttribute('fill', fill); colored.setAttribute('stroke', 'none');
       ink.append(colored);
     }
-    defs.append(outline);
-    const front = make('line');
-    front.classList.add('battle-front-line');
-    front.setAttribute('y1', String(box.y - 1));
-    front.setAttribute('y2', String(box.y + box.height + 1));
-    front.setAttribute('clip-path', 'url(#battle-advance-outline)');
-    const targetCenter = box.x + box.width / 2;
-    // Advance from the closest already-owned territory, including captured land.
-    let nearest = Infinity;
-    let reverse = false;
-    for (const owned of landsOf(game.player)) {
-      const node = $('land-' + owned.id);
-      if (!node) continue;
-      const otherBox = node.parentElement.getBBox();
-      const center = otherBox.x + otherBox.width / 2;
-      const distance = Math.abs(center - targetCenter);
-      if (distance < nearest) { nearest = distance; reverse = center > targetCenter; }
+    const main = boxes.slice().sort((a, b) =>
+      b.box.width * b.box.height - a.box.width * a.box.height);
+    const sources = ownedBorderPaths(main[0].box);
+    const waves = [];
+    // Major land pieces advance separately. Tiny islets are recolored when
+    // the battle ends without asking the phone to animate hundreds of paths.
+    for (const item of main.slice(0, 24)) {
+      const box = item.box;
+      const origin = startingPoint(item.path, box, sources);
+      const corners = [
+        [box.x, box.y], [box.x + box.width, box.y],
+        [box.x, box.y + box.height], [box.x + box.width, box.y + box.height]
+      ];
+      const maxRadius = Math.max(...corners.map(([x, y]) => Math.hypot(x - origin.x, y - origin.y)));
+      const mask = make('path');
+      wipe.append(mask);
+      const edge = make('path');
+      edge.classList.add('battle-front-line');
+      front.append(edge);
+      const seed = targetId.split('').reduce((sum, ch) => sum + ch.charCodeAt(0), 0)
+        + waves.length * 23;
+      waves.push({ mask, edge, origin, maxRadius, seed });
     }
+    defs.append(wipe, outline);
     host.append(ink, front);
     host.classList.add('battle-attacking');
-    advanceScene = { host, ink, front, wipe, outline, rect, line: front, box, reverse };
+    advanceScene = { host, ink, front, wipe, outline, waves };
     setAdvanceProgress(0);
   }
   function playAdvance(targetId, won, duration) {
@@ -329,6 +414,7 @@
     game = null;
     selectedTarget = null;
     panel.classList.add('hidden');
+    panel.classList.remove('battle-animating');
     app.classList.remove('battle-running');
     $('battlefield').classList.add('hidden');
     $('battlefield').classList.remove('running');
@@ -406,6 +492,7 @@
     const won = attackerRoll >= defenderRoll;
     const turn = game.round;
     $('battle-attack').disabled = true;
+    panel.classList.add('battle-animating');
     const field = $('battlefield');
     field.classList.remove('hidden');
     field.classList.remove('running');
@@ -423,6 +510,7 @@
       setAdvanceProgress(won ? 1 : 0);
       clearAdvance();
       fighting = false;
+      panel.classList.remove('battle-animating');
       field.classList.remove('running');
       $('battle-stage').textContent = won ? '🏆 Teren zdobyty!' : '🛡️ Obrona zwyciężyła';
       game.round += 1;
