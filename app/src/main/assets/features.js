@@ -782,4 +782,13 @@
     if(active)window.GeoPrzygodaEncyclopedia?.enhance(active.id.slice(5));
   };
   document.body.append(encyclopediaScript);
+
+  // Plan 7 is a separate, offline UI; do not touch generated map geometry.
+  const plan7Style = document.createElement('link');
+  plan7Style.rel = 'stylesheet';
+  plan7Style.href = 'plan7.css';
+  document.head.append(plan7Style);
+  const plan7Script = document.createElement('script');
+  plan7Script.src = 'plan7.js';
+  document.body.append(plan7Script);
 })();
