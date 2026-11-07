@@ -145,9 +145,9 @@ jobs:
             adb install -r emulator-apk/app-debug.apk
             adb shell am start -n pl.mpuchara.geoprzygoda/.MainActivity
             sleep 15
-            PID=$(adb shell pidof pl.mpuchara.geoprzygoda | tr -d '\r')
-            test -n "$PID"
-            adb forward tcp:9222 "localabstract:webview_devtools_remote_$PID"
+            adb shell screencap -p /sdcard/geoprzygoda.png
+            adb pull /sdcard/geoprzygoda.png webview-evidence/initial-screen.png
+            adb forward tcp:9222 "localabstract:webview_devtools_remote_$(adb shell pidof pl.mpuchara.geoprzygoda | tr -d '\r')"
             node scripts/check_android_webview.cjs
             adb shell screencap -p /sdcard/geoprzygoda.png
             adb pull /sdcard/geoprzygoda.png webview-evidence/phone-screen.png
