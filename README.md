@@ -203,3 +203,14 @@ Do testów istniejących od zgłoszenia #17 dołączono walidację,
 oraz kolejne zrzuty z zoomu małych krajów i wysp.
 Testy przeglądarkowe na Chromium nie są testami ręcznymi
 na Samsungu/Android WebView.
+
+## Plan nr 4 — bitwy z prawdziwymi granicami prowincji 🌍⚔️
+
+- Przy tworzeniu APK skrypt `scripts/build_provinces.py` pobiera przypięte dane **Natural Earth Admin-1 1:10m** i zapisuje lokalny plik `world-provinces-10m.json` dla mapy bitew. Aplikacja na telefonie nie potrzebuje Internetu.
+- Jeśli kraj ma podział Admin-1 w danych, podczas bitwy widać **rzeczywiste obrysy regionów**, a front przejmuje kolejne regiony w kierunku stolicy. Przy ataku Polski na Białoruś marsz zaczyna się przy Białymstoku i zmierza ku Mińskowi. Udział zdobytego obszaru na pasku liczony jest na podstawie powierzchni zaznaczonych regionów w odwzorowaniu mapy.
+- Dla wysp i mikropaństw bez danych Admin-1 gra nadal działa, wyświetlając wyraźnie oznaczone **umowne sektory**. Granice państw są zawsze zachowywane przez przycinanie nakładek do oryginalnego konturu.
+- Dolny pasek bitwy zawiera **dwie prawdziwe flagi SVG**, procent podboju, **Pauza/Wznów** i prędkość **1×/2×/4×**. Przytrzymanie pauzy zatrzymuje czas przebiegu bitwy, nie tylko grafikę.
+- W Rywalizacji można wybrać **1 na 1**, **Sojusze** (sąsiad jako sprzymierzeniec) albo **Losowe wyzwanie** (losowany sąsiad). Cała punktacja sił i skuteczności pozostaje fikcyjna.
+- W każdej turze zwycięstwo wciąż przypisuje cały pokonany kraj po zakończeniu stopniowej animacji. **Nie ma jeszcze trwałego zapisu pojedynczych zdobytych prowincji między turami**.
+- Dane Natural Earth Admin-1 nie obejmują każdej jednostki administracyjnej na świecie, a niektóre granice mogą być generalizowane; wynik podboju to gra, nie odwzorowanie prawdziwych konfliktów.
+- Flagi pozostają tymi samymi 238 plikami SVG, z testami zgodności ISO oraz poprawionymi proporcjami z Planu nr 3. Testy automatyczne nie zastępują oględzin w Android WebView.

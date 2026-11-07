@@ -22,6 +22,29 @@
   let advanceScene = null;
   let historyFocus = null;
   let lastSaved = null;
+  let battlePaused = false;
+  let battleSpeed = 1;
+  let provinceData = null;
+  let provinceLoading = null;
+  function loadProvinceData() {
+    if (provinceData) return Promise.resolve(provinceData);
+    if (!provinceLoading) {
+      provinceLoading = fetch('world-provinces-10m.json')
+        .then(response => {
+          if (!response.ok) throw new Error('No offline admin-1 geometry');
+          return response.json();
+        })
+        .then(data => {
+          if (data.projection !== 'Mercator 1080x1080, 3 decimal SVG precision' ||
+              !data.countries || !Array.isArray(data.countries.BLR))
+            throw new Error('Bad administrative region data');
+          provinceData = data.countries;
+          return provinceData;
+        })
+        .catch(() => null); // Older builds still work with fictional sectors.
+    }
+    return provinceLoading;
+  }
   try {
     lastSaved = JSON.parse(localStorage.getItem(key) || 'null');
   } catch { lastSaved = null; }
@@ -37,9 +60,10 @@
     '<label for="battle-target">Sąsiedni teren do zdobycia</label><select id="battle-target" class="battle-select"></select>' +
     '<div id="battlefield" class="battlefield hidden" role="status" aria-live="polite">' +
     '<div class="battle-soldiers"><span class="army-left">🪖 🛡️ 🪖</span><span class="army-middle">⚔️</span><span class="army-right">🪖 🛡️ 🪖</span></div>' +
-    '<div id="battle-balance" class="battle-balance"></div>' +
+    '<div class="battle-duel"><img id="battle-flag-left" alt="Flaga atakującego"><span id="battle-balance" class="battle-balance"></span><img id="battle-flag-right" alt="Flaga obrońcy"></div>' +
     '<div class="battle-progress-caption"><span id="battle-stage">Przygotowanie</span><small id="battle-sector-count">0 sektorów</small><strong id="battle-progress-label">0%</strong></div>' +
-    '<div id="battle-progress" class="battle-progress-track" role="progressbar" aria-label="Postęp zdobywania terenu" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="battle-conquest-fill"></span></div></div>' +
+    '<div id="battle-progress" class="battle-progress-track" role="progressbar" aria-label="Procent zdobytego terytorium" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="battle-conquest-fill"></span></div>' +
+    '<div class="battle-live-controls"><button id="battle-pause" type="button" aria-pressed="false">⏸ Pauza</button><label for="battle-speed">Prędkość</label><select id="battle-speed" aria-label="Prędkość bitwy"><option value="1">1×</option><option value="2">2×</option><option value="4">4×</option></select></div></div>' +
     '<div id="battle-message" class="battle-message" aria-live="polite">Wybierz sąsiada i rozpocznij bitwę!</div>' +
     '<div class="battle-actions"><button id="battle-attack" class="battle-primary">⚔️ Rozpocznij natarcie</button>' +
     '<button id="battle-history" class="battle-secondary">📜 Historia</button></div>' +
@@ -74,6 +98,38 @@
   rivalHistory.className = 'rival-history-button';
   rivalHistory.textContent = '📜 Historia i scenariusze';
   rivalStart.after(rivalHistory);
+  const battleModeRow = document.createElement('div');
+  battleModeRow.className = 'battle-mode-row';
+  battleModeRow.innerHTML =
+    '<label for="battle-game-mode">🎮 Tryb bitwy</label>' +
+    '<select id="battle-game-mode" class="rival-select">' +
+    '<option value="free">⚔️ 1 na 1</option><option value="alliance">🤝 Sojusze</option>' +
+    '<option value="random">🎲 Losowe wyzwanie</option></select>' +
+    '<label for="battle-ally" id="battle-ally-label" hidden>Wybierz sojusznika</label>' +
+    '<select id="battle-ally" class="rival-select" hidden></select>';
+  rivalStart.before(battleModeRow);
+  function updateAllyChoices() {
+    const mode = $('battle-game-mode').value;
+    $('battle-ally-label').hidden = mode !== 'alliance';
+    $('battle-ally').hidden = mode !== 'alliance';
+    if (mode !== 'alliance') return;
+    const player = $('rival-first').dataset.country;
+    const allies = [...(neighbors.get(player) || [])].map(id => playable.get(id))
+      .filter(Boolean).sort((a, b) => a.n.localeCompare(b.n, 'pl'));
+    const preferred = $('battle-ally').value;
+    $('battle-ally').replaceChildren();
+    for (const c of allies) {
+      const option = document.createElement('option');
+      option.value = c.id;
+      option.textContent = c.n;
+      $('battle-ally').append(option);
+    }
+    if (allies.some(c => c.id === preferred)) $('battle-ally').value = preferred;
+  }
+  $('battle-game-mode').addEventListener('change', updateAllyChoices);
+  new MutationObserver(updateAllyChoices).observe($('rival-first'), {
+    attributes: true, attributeFilter: ['data-country']
+  });
 
   function ownerOf(id) {
     return game && game.owners[id] && playable.has(game.owners[id]) ? game.owners[id] : id;
@@ -104,7 +160,8 @@
       player: raw.player,
       opponent: raw.opponent,
       handicap: [0, 0.15, 0.3].includes(raw.handicap) ? raw.handicap : 0,
-      scenario: raw.scenario === 'commonwealth' ? 'commonwealth' : 'free',
+      scenario: ['commonwealth', 'alliance', 'random'].includes(raw.scenario) ? raw.scenario : 'free',
+      ally: playable.has(raw.ally) ? raw.ally : null,
       round: Math.max(1, Math.min(10000, Number(raw.round) || 1)),
       owners,
       log: Array.isArray(raw.log) ? raw.log.filter(x => typeof x === 'string').slice(-70) : []
@@ -395,6 +452,61 @@
     });
     return { grid, sectors };
   }
+  // Actual Natural Earth admin-1 region paths, clipped to the country outline.
+  function createProvinceSectors(targetId, goal, routeNodes, make, clipId) {
+    const provinces = provinceData && provinceData[targetId];
+    if (!Array.isArray(provinces) || provinces.length < 2) return null;
+    const grid = make('g');
+    grid.classList.add('battle-fictional-sectors', 'battle-real-provinces');
+    grid.setAttribute('clip-path', 'url(#' + clipId + ')');
+    const entry = routeNodes[1] || routeNodes[0];
+    const axisX = goal.x - entry.x, axisY = goal.y - entry.y;
+    const axisSq = Math.max(.001, axisX * axisX + axisY * axisY);
+    const range = Math.sqrt(axisSq);
+    const sectors = [];
+    for (const p of provinces) {
+      if (!p || typeof p.d !== 'string' || !p.d.startsWith('M') ||
+          !Array.isArray(p.b) || p.b.length !== 4) continue;
+      const cx = (p.b[0] + p.b[2]) / 2;
+      const cy = (p.b[1] + p.b[3]) / 2;
+      const along = clamp01(((cx - entry.x) * axisX + (cy - entry.y) * axisY) / axisSq);
+      const cross = Math.abs((cx - entry.x) * axisY - (cy - entry.y) * axisX) / range;
+      const baseline = Math.min(.95, .03 + along * .62 + .24 * clamp01(cross / range));
+      const outline = make('path');
+      outline.setAttribute('d', p.d);
+      outline.classList.add('battle-fictional-sector-line', 'battle-province-outline');
+      outline.setAttribute('fill-rule', 'evenodd');
+      outline.dataset.provinceName = p.name || '';
+      grid.append(outline);
+      sectors.push({
+        d: p.d, outline, threshold: baseline, base: baseline,
+        revealed: false, weight: Math.max(.0001, Number(p.area) || .0001),
+        center: {x:cx,y:cy}, neighbors: Array.isArray(p.neighbors) ? p.neighbors : []
+      });
+    }
+    if (sectors.length !== provinces.length) return null;
+    // Traverse real shared edges from the entry, not isolated map rectangles.
+    const first = sectors.reduce((winner, sector, i) => (
+      Math.hypot(sector.center.x-entry.x, sector.center.y-entry.y) <
+      Math.hypot(sectors[winner].center.x-entry.x, sectors[winner].center.y-entry.y)
+        ? i : winner
+    ), 0);
+    const pending = new Set(sectors.map((_, i) => i));
+    const captured = new Set();
+    let previous = .015;
+    while (pending.size) {
+      const candidates = [...pending].filter(i =>
+        !captured.size || sectors[i].neighbors.some(n => captured.has(n)));
+      const pool = candidates.length ? candidates : [...pending]; // disconnected islands
+      pool.sort((a,b) => sectors[a].base - sectors[b].base);
+      const next = !captured.size ? first : pool[0];
+      previous = Math.min(.98, Math.max(previous + .82 / sectors.length, sectors[next].base));
+      sectors[next].threshold = previous;
+      pending.delete(next);
+      captured.add(next);
+    }
+    return {grid, sectors, real: true};
+  }
   function clearAdvance() {
     if (advanceFrame !== null) cancelAnimationFrame(advanceFrame);
     advanceFrame = null;
@@ -442,19 +554,30 @@
     }
     if (scene.sectors) {
       let capturedCount = 0;
+      let capturedArea = 0, totalArea = 0;
       for (const cell of scene.sectors) {
         const captured = progress >= .999 || (progress > 0 && progress >= cell.threshold);
         if (captured !== cell.revealed) {
           cell.revealed = captured;
           cell.outline.classList.toggle('battle-fictional-sector-captured', captured);
         }
+        const weight = cell.weight || 1;
+        totalArea += weight;
         if (captured) {
           capturedCount++;
+          capturedArea += weight;
           parts.push(cell.d);
         }
       }
       const count = $('battle-sector-count');
-      if (count) count.textContent = capturedCount + '/' + scene.sectors.length + ' sektorów';
+      if (count) count.textContent = capturedCount + '/' + scene.sectors.length +
+        (scene.realProvinces ? ' prowincji' : ' sektorów (umownych)');
+      if (scene.realProvinces && totalArea) {
+        const conqueredPct = progress >= .999 ? 100 : Math.round(capturedArea / totalArea * 100);
+        $('battle-conquest-fill').style.width = conqueredPct + '%';
+        $('battle-progress-label').textContent = conqueredPct + '%';
+        $('battle-progress').setAttribute('aria-valuenow', String(conqueredPct));
+      }
     }
     if(progress>=1){
       parts.length=0;
@@ -573,40 +696,44 @@
       [box.x,box.y],[box.x+box.width,box.y],
       [box.x,box.y+box.height],[box.x+box.width,box.y+box.height]
     ].map(corner=>Math.hypot(corner[0]-goal.x,corner[1]-goal.y)));
-    const { grid, sectors } = createBattleSectors(
-      box, goal, routeNodes, seed, radius, make, clip.id
-    );
+    const sectorLayer = createProvinceSectors(targetId, goal, routeNodes, make, clip.id)
+      || createBattleSectors(box, goal, routeNodes, seed, radius, make, clip.id);
+    const {grid, sectors} = sectorLayer;
     host.append(ink, grid, graphics);
     advanceScene={
       nodes:[ink,grid,graphics,clip],host,frontShape:ink,route,unit,glow,
-      goal,entry,sourceCity,seed,routeNodes,box,radius,sectors
+      goal,entry,sourceCity,seed,routeNodes,box,radius,sectors,
+      realProvinces: !!sectorLayer.real
     };
     setAdvanceProgress(0);
   }
-  function playAdvance(targetId,won,duration) {
+  function playAdvance(targetId, won, duration, complete) {
     createAdvance(targetId);
-    const stage=$('battle-stage');
-    const location=advanceScene?.goal.city;
-    const source=advanceScene?.sourceCity;
-    const started=performance.now();
-    stage.textContent=source ? '📍 Start: '+source : '⚔️ Początek natarcia';
-    if(reduced){
-      setAdvanceProgress(won?1:0);
-      stage.textContent=won?'🏆 Zwycięstwo':'🛡️ Obrona';
-      return;
-    }
-    function frame(now){
-      const t=clamp01((now-started)/duration);
-      const progress=won?t:(t<.60?t/.60*.59:(1-t)/.40*.59);
+    const stage = $('battle-stage');
+    const location = advanceScene?.goal.city;
+    const source = advanceScene?.sourceCity;
+    let previous = performance.now(), elapsed = 0;
+    stage.textContent = source ? '📍 Start: ' + source : '⚔️ Początek natarcia';
+    function frame(now) {
+      if (!fighting || !game) { advanceFrame = null; return; }
+      const delta = Math.min(120, Math.max(0, now - previous));
+      previous = now;
+      if (!battlePaused) elapsed += delta * battleSpeed;
+      const t = clamp01(elapsed / duration);
+      const progress = won ? t : (t < .60 ? t / .60 * .59 : (1-t) / .40 * .59);
       setAdvanceProgress(progress);
-      if(t<.15)stage.textContent=source?'📍 Start: '+source:'⚔️ Przekroczenie granicy';
-      else if(!won && t>=.60)stage.textContent='🛡️ Obrońcy odzyskują teren';
-      else if(progress<.55)stage.textContent=location?'➡️ Kierunek: '+location:'➡️ Natarcie w głąb kraju';
-      else stage.textContent='🗺️ Zajmowanie kolejnych regionów';
-      if(t<1 && fighting && game)advanceFrame=requestAnimationFrame(frame);
-      else advanceFrame=null;
+      if (battlePaused) stage.textContent = '⏸ Bitwa wstrzymana';
+      else if (t < .15) stage.textContent = source ? '📍 Start: ' + source : '⚔️ Przekroczenie granicy';
+      else if (!won && t >= .60) stage.textContent = '🛡️ Obrońcy odzyskują teren';
+      else if (progress < .55) stage.textContent = location ? '➡️ Kierunek: ' + location : '➡️ Natarcie w głąb kraju';
+      else stage.textContent = '🗺️ Zajmowanie kolejnych regionów';
+      if (t < 1) advanceFrame = requestAnimationFrame(frame);
+      else {
+        advanceFrame = null;
+        complete(); // Resolution uses the same animation clock as pause/speed.
+      }
     }
-    advanceFrame=requestAnimationFrame(frame);
+    advanceFrame = requestAnimationFrame(frame);
   }
   function restoreOriginalColors() {
     for (const c of regions) {
@@ -679,6 +806,9 @@
     const size = lands.reduce((total, c) => total + c.area, 0);
     const commonwealth = game.scenario === 'commonwealth';
     $('battle-title').textContent = commonwealth ? '🏰 Rzeczpospolita Obojga Narodów (scenariusz)' :
+      game.scenario === 'alliance' ? '🤝 Sojusz: ' + leader.n +
+        ' i ' + (playable.get(game.ally)?.n || 'sojusznik') :
+      game.scenario === 'random' ? '🎲 Losowe wyzwanie: ' + leader.n :
       leader.flag + ' ' + leader.n + ' – Twoje państwo';
     $('battle-stats').textContent = 'Tereny: ' + lands.length + ' · Powierzchnia (na mapie): ' +
       Math.round(size).toLocaleString('pl-PL') + ' km² · Tura: ' + game.round;
@@ -695,18 +825,21 @@
     battleTimer = null;
     clearAdvance();
     fighting = false;
+    battlePaused = false;
+    $('battle-pause').setAttribute('aria-pressed', 'false');
+    $('battle-pause').textContent = '⏸ Pauza';
     if (game) save();
     game = null;
     selectedTarget = null;
     panel.classList.add('hidden');
-    panel.classList.remove('battle-animating');
+    panel.classList.remove('battle-animating', 'battle-paused');
     app.classList.remove('battle-running');
     $('battlefield').classList.add('hidden');
     $('battlefield').classList.remove('running');
     restoreOriginalColors();
     paint();
   }
-  function start(player, opponent, handicap = 0, scenario = 'free') {
+  function start(player, opponent, handicap = 0, scenario = 'free', ally = null) {
     if (!playable.has(player) || !playable.has(opponent) || player === opponent) {
       announce('Wybierz dwa różne państwa na mapie.');
       return;
@@ -717,9 +850,11 @@
     game = {
       v: 1, player, opponent,
       handicap: [0, 0.15, 0.3].includes(handicap) ? handicap : 0,
-      scenario, round: 1, owners: {}, log: []
+      scenario, ally: scenario === 'alliance' && neighbors.get(player)?.has(ally)
+        ? ally : null, round: 1, owners: {}, log: []
     };
     if (scenario === 'commonwealth') game.owners.LTU = 'POL';
+    if (game.ally) game.owners[game.ally] = player;
     note(scenario === 'commonwealth'
       ? '🏰 Start scenariusza: Polska i Litwa jako jedno państwo w uproszczonej grze.'
       : '🏁 Rozpoczyna się rywalizacja: ' + countryLabel(player) + ' kontra ' + countryLabel(opponent) + '.');
@@ -728,6 +863,7 @@
     $('battle-message').textContent = 'Dotknij sąsiedniego kraju lub wybierz go z listy. Zobacz, jak zmienia się linia frontu.';
     updatePanel(opponent);
     focusCountry(player);
+    loadProvinceData(); // Local bundled geometry; no Internet permission needed.
     save();
   }
   function resume() {
@@ -744,6 +880,7 @@
     app.classList.add('battle-running');
     $('battle-message').textContent = 'Wznowiono grę. Wybierz teren do ataku.';
     updatePanel(game.opponent);
+    loadProvinceData();
   }
   function chooseTarget(id) {
     if (!game || fighting) return;
@@ -761,47 +898,59 @@
     refreshOwnership();
     if (window.GeoPrzygodaPicker) window.GeoPrzygodaPicker.refreshBattle();
   }
-  function attack() {
+  async function attack() {
     if (!game || fighting || !selectedTarget || !frontier().includes(selectedTarget)) return;
     fighting = true;
+    const currentGame = game;
     const defenderId = selectedTarget;
+    $('battle-attack').disabled = true;
+    $('battle-message').textContent = '🗺️ Wczytywanie granic regionów...';
+    await loadProvinceData();
+    if (!game || game !== currentGame || !fighting) return;
     const defendingOwner = ownerOf(defenderId);
     const attacker = playable.get(game.player);
     const defender = playable.get(defenderId);
     const conquered = landsOf(game.player).length;
     const enemyLands = landsOf(defendingOwner).length;
-    // Entirely fictional strength values; independent of real armed forces.
+    // Fictional game points, NOT real military statistics.
     const attackerRoll = Math.round(36 + Math.min(20, conquered * 3) + Math.random() * 38 -
-                                    game.handicap * 35);
+                                    game.handicap * 35 + (game.ally ? 8 : 0));
     const defenderRoll = Math.round(35 + Math.min(20, enemyLands * 3) + Math.random() * 35);
     const won = attackerRoll >= defenderRoll;
     const turn = game.round;
-    $('battle-attack').disabled = true;
+    battlePaused = false;
+    battleSpeed = Number($('battle-speed').value) || 1;
+    $('battle-pause').textContent = '⏸ Pauza';
+    $('battle-pause').setAttribute('aria-pressed', 'false');
+    panel.classList.remove('battle-paused');
     panel.classList.add('battle-animating');
     const field = $('battlefield');
     field.classList.remove('hidden');
     field.classList.remove('running');
     void field.offsetWidth;
     field.classList.add('running');
-    $('battle-balance').textContent = attacker.flag + ' ' + attackerRoll +
-      ' pkt ⚔️ ' + defenderRoll + ' pkt ' + defender.flag;
+    $('battle-flag-left').src = 'flags/' + attacker.code.toLowerCase() + '.svg';
+    $('battle-flag-left').alt = 'Flaga ' + attacker.n;
+    $('battle-flag-right').src = 'flags/' + defender.code.toLowerCase() + '.svg';
+    $('battle-flag-right').alt = 'Flaga ' + defender.n;
+    $('battle-balance').textContent = attackerRoll + ' pkt ⚔️ ' + defenderRoll + ' pkt';
     $('battle-message').textContent = 'Trwa bitwa o ' + defender.n + '...';
     focusCountry(defenderId);
     const duration = reduced ? 250 : 6500;
-    playAdvance(defenderId, won, duration);
-    battleTimer = setTimeout(() => {
-      if (!game) return;
-      battleTimer = null;
+    playAdvance(defenderId, won, duration, () => {
+      if (!game || game !== currentGame) return;
       setAdvanceProgress(won ? 1 : 0);
       clearAdvance();
       fighting = false;
-      panel.classList.remove('battle-animating');
+      battlePaused = false;
+      panel.classList.remove('battle-animating', 'battle-paused');
       field.classList.remove('running');
       $('battle-stage').textContent = won ? '🏆 Teren zdobyty!' : '🛡️ Obrona zwyciężyła';
       game.round += 1;
       if (won) {
         game.owners[defenderId] = game.player;
-        $('battle-message').textContent = '🏆 Zwycięstwo! ' + defender.n + ' przechodzi pod kontrolę ' + attacker.n + ' w naszej grze!';
+        $('battle-message').textContent = '🏆 Zwycięstwo! ' + defender.n +
+          ' przechodzi pod kontrolę ' + attacker.n + ' w naszej grze!';
         note('Tura ' + turn + ': ' + attacker.n + ' zdobywa ' + defender.n +
              ' (' + attackerRoll + ':' + defenderRoll + ').');
       } else {
@@ -810,7 +959,7 @@
              ' (' + defenderRoll + ':' + attackerRoll + ').');
       }
       updatePanel(won ? null : defenderId);
-    }, duration);
+    });
   }
   function renderHistory() {
     const list = $('battle-history-list');
@@ -850,16 +999,34 @@
   }
   rivalStart.addEventListener('click', () => {
     const first = $('rival-first').dataset.country;
-    const other = $('rival-opponent').value;
+    let other = $('rival-opponent').value;
     const penalty = Number($('rival-disadvantage').value);
+    const gameMode = $('battle-game-mode').value;
+    const ally = gameMode === 'alliance' ? $('battle-ally').value : null;
+    if (gameMode === 'random') {
+      const choices = [...(neighbors.get(first) || [])]
+        .filter(id => playable.has(id) && id !== first);
+      if (choices.length) other = choices[Math.floor(Math.random() * choices.length)];
+    }
     const close = rivalry.querySelector('[data-extra-close="rivalry-overlay"]');
     if (close) close.click();
-    start(first, other, penalty);
+    start(first, other, penalty, gameMode, ally);
   });
   rivalHistory.addEventListener('click', openHistory);
   $('battle-history').addEventListener('click', openHistory);
   $('battle-exit').addEventListener('click', stop);
   $('battle-attack').addEventListener('click', attack);
+  $('battle-pause').addEventListener('click', () => {
+    if (!fighting) return;
+    battlePaused = !battlePaused;
+    $('battle-pause').textContent = battlePaused ? '▶ Wznów' : '⏸ Pauza';
+    $('battle-pause').setAttribute('aria-pressed', String(battlePaused));
+    panel.classList.toggle('battle-paused', battlePaused);
+    if (battlePaused) $('battle-stage').textContent = '⏸ Bitwa wstrzymana';
+  });
+  $('battle-speed').addEventListener('change', () => {
+    battleSpeed = Number($('battle-speed').value) || 1;
+  });
   $('battle-target').addEventListener('change', e => chooseTarget(e.target.value));
   $('battle-history-close').addEventListener('click', closeHistory);
   history.addEventListener('click', e => { if (e.target === history) closeHistory(); });
