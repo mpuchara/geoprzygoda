@@ -172,8 +172,13 @@
     geo8Raster.style.display = visible ? '' : 'none';
     geo8Borders.style.display = visible ? '' : 'none';
     geo8SelectedBorder.style.display = visible && geo8SelectedBorder.getAttribute('d') ? '' : 'none';
-    map.classList.toggle('geo8-zoom-flags', flagsEnabled && mode !== 'quiz' && !overview);
-    if (!overview && visible === false) geo8QueueZoomPhotos();
+    const zoomFlags = flagsEnabled && mode !== 'quiz' && !overview;
+    const wasZoom = map.classList.contains('geo8-zoom-flags');
+    map.classList.toggle('geo8-zoom-flags', zoomFlags);
+    if (zoomFlags !== wasZoom) {
+      if (zoomFlags) geo8QueueZoomPhotos();
+      else geo10RestoreColors();
+    }
   }
 
 
@@ -181,6 +186,48 @@
   // clipped PNGs only for countries currently in the viewport, in small frames.
   // This is independent of the robust single-image world overview.
   let geo8ZoomFrame = null, geo8ZoomIndex = 0, geo8PhotoSerial = 0;
+  // Plan 10: restore the known working GeoPrzygoda 1.0.26 paint-server
+  // technique as a lazy close-up fallback. The source is the original local
+  // SVG, not the nested PNG that disappears on some Samsung WebViews.
+  // Unlike 1.0.26, stretch is allowed only for simple stripe flags; every
+  // emblem, star and cross keeps its correct aspect ratio.
+  const geo10LegacyPaths = new Set();
+  function geo10LegacyFlag(country) {
+    const id = 'geo10-legacy-flag-' + country.id;
+    if (document.getElementById(id)) return id;
+    const pattern = document.createElementNS(ns,'pattern');
+    pattern.id = id;
+    pattern.setAttribute('patternUnits','objectBoundingBox');
+    pattern.setAttribute('patternContentUnits','objectBoundingBox');
+    pattern.setAttribute('x','0');
+    pattern.setAttribute('y','0');
+    pattern.setAttribute('width','1');
+    pattern.setAttribute('height','1');
+    const backing = document.createElementNS(ns,'rect');
+    backing.setAttribute('x','0');backing.setAttribute('y','0');
+    backing.setAttribute('width','1');backing.setAttribute('height','1');
+    backing.setAttribute('fill',emblemBackgrounds.get(country.id) || '#ffffff');
+    pattern.append(backing);
+    const image = document.createElementNS(ns,'image');
+    const asset = 'flags/' + country.code.toLowerCase() + '.svg';
+    image.setAttribute('href',asset);
+    image.setAttributeNS('http://www.w3.org/1999/xlink','href',asset);
+    image.setAttribute('x','0');image.setAttribute('y','0');
+    image.setAttribute('width','1');image.setAttribute('height','1');
+    image.setAttribute('preserveAspectRatio',stripeOnlyCountries.has(country.id)
+      ? 'none' : 'xMidYMid meet');
+    pattern.append(image);
+    flagDefs.append(pattern);
+    return id;
+  }
+  function geo10RestoreColors() {
+    if (app.classList.contains('battle-running')) return;
+    for(const piece of geo10LegacyPaths) {
+      if (!piece.isConnected) { geo10LegacyPaths.delete(piece); continue; }
+      piece.style.fill = piece.dataset.geoprzygodaFittedFlag ||
+        piece.getAttribute('fill') || '#a8d77e';
+    }
+  }
   function geo8SyncPhoto(piece, country) {
     if (!piece || !piece.parentNode || !country) return;
     let box;
@@ -215,6 +262,13 @@
     }
     image.setAttribute('preserveAspectRatio', stripeOnlyCountries.has(country.id)
       ? 'none' : (emblemBackgrounds.has(country.id) ? 'xMidYMid meet' : 'xMidYMid slice'));
+    if (map.classList.contains('geo8-zoom-flags') &&
+        !app.classList.contains('battle-running')) {
+      const fallback = geo10LegacyFlag(country);
+      piece.style.fill = 'url(#' + fallback + ') ' +
+        (piece.getAttribute('fill') || '#a8d77e');
+      geo10LegacyPaths.add(piece);
+    }
   }
   function geo8PhotoBatch() {
     geo8ZoomFrame = null;
@@ -225,13 +279,17 @@
       const country = flagCountries[geo8ZoomIndex++];
       const primary = $('land-' + country.id);
       if (!primary) continue;
-      let box;
-      try { box = primary.getBBox(); } catch { continue; }
-      if (box.x > view.x + view.width || box.x + box.width < view.x ||
-          box.y > view.y + view.height || box.y + box.height < view.y) continue;
-      for (const piece of primary.parentElement.querySelectorAll('path.land'))
+      let painted = false;
+      for (const piece of primary.parentElement.querySelectorAll('path.land')) {
+        let box;
+        try { box = piece.getBBox(); } catch { continue; }
+        if (box.x > view.x + view.width || box.x + box.width < view.x ||
+            box.y > view.y + view.height || box.y + box.height < view.y) continue;
         geo8SyncPhoto(piece,country);
-      countriesDone++;
+        painted = true;
+        if (performance.now() - start > 7) break;
+      }
+      if (painted) countriesDone++;
       if (performance.now() - start > 7) break;
     }
     if (geo8ZoomIndex < flagCountries.length)
@@ -482,8 +540,27 @@
     const x = view.width * amount, y = view.height * amount;
     return {x:view.x-x,y:view.y-y,width:view.width+2*x,height:view.height+2*y};
   }
-  function matchDetailedFragment(nodes, parts) {
+  function matchDetailedFragment(nodes, parts, countryId) {
     const assignments = [], unused = new Set(parts.map((_, i) => i));
+    // For a country with distant islands, its 1:50m single path's bounding
+    // box may span oceans (e.g. Netherlands + Caribbean). Anchor that path
+    // to the real geographic label, not the midpoint of the giant box.
+    if (nodes.length === 1 && parts.length > 1) {
+      const c = byId.get(countryId);
+      if (c) {
+        let best = 0, score = Infinity;
+        parts.forEach((part,i) => {
+          const b = part.b;
+          const dx = Math.max(b[0]-c.x,0,c.x-b[2]);
+          const dy = Math.max(b[1]-c.y,0,c.y-b[3]);
+          const size = Math.max(1e-6,(b[2]-b[0])*(b[3]-b[1]));
+          const value = Math.hypot(dx,dy) - Math.min(size,250)/100000;
+          if (value < score) {score=value;best=i;}
+        });
+        return {assignments:[[nodes[0],best]],
+          unused:new Set(parts.map((_,i)=>i).filter(i=>i!==best))};
+      }
+    }
     for (const node of nodes) {
       let b;
       try { b = node.getBBox(); } catch { b = null; }
@@ -510,6 +587,7 @@
       extra._geoprzygodaTerrainUnderlay?.remove();
       extra._geo8PhotoImage?.remove();
       extra._geo8PhotoClip?.remove();
+      geo10LegacyPaths.delete(extra);
       flagPaths.delete(extra);
       const fitted = /url\(#([^)]+)\)/.exec(extra.dataset.geoprzygodaFittedFlag || '');
       if (fitted) document.getElementById(fitted[1])?.remove();
@@ -529,7 +607,7 @@
     const anchor = primary.parentElement;
     const previous = [...anchor.querySelectorAll('path.land')];
     if (Array.isArray(detail.parts) && detail.parts.length && previous.length) {
-      const {assignments,unused} = matchDetailedFragment(previous,detail.parts);
+      const {assignments,unused} = matchDetailedFragment(previous,detail.parts,id);
       for (const [old,index] of assignments) {
         if (old.getAttribute('d') !== detail.parts[index].d)
           old.setAttribute('d', detail.parts[index].d);
@@ -559,6 +637,7 @@
         primary.setAttribute('d',detail.d);
     } else return false;
     refitProportionalCountry(id);
+    if (geo8Android) geo8QueueZoomPhotos();
     enhancedCountries.add(id);
     const vb = map.viewBox.baseVal;
     detailViewport.set(id,{x:vb.x,y:vb.y,width:vb.width,height:vb.height});
@@ -649,7 +728,10 @@
         deferred.delete(index);
         if (++added >= 12) break;
       }
-      if (added) refitProportionalCountry(id);
+      if (added) {
+        refitProportionalCountry(id);
+        if (geo8Android) geo8QueueZoomPhotos();
+      }
       if (!deferred.size) deferredDetailParts.delete(id);
       if (added >= 12) queueVisibleDetails();
     }
