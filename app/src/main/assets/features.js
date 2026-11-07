@@ -166,8 +166,133 @@
   }
   loadDetailedNorthSeaBorders();
 
+  // Keep the fast 1:50m overview. The Android build bundles 1:10m outlines
+  // for all available mapped countries. Use them only on closer zoom, where
+  // coastlines, islands and complicated borders can actually be seen.
+  const enhancedCountries = new Set();
+  let detailedWorld = null, worldLoading = false, worldFailed = false;
+  let detailFrame = null;
+  function boxIntersects(b, v) {
+    return b[2] >= v.x && b[0] <= v.x + v.width &&
+           b[3] >= v.y && b[1] <= v.y + v.height;
+  }
+  function matchDetailedFragment(nodes, parts) {
+    // The 50m atlas has individually fitted flags for France, USA, Australia.
+    // Match each old path to a corresponding 10m polygon before creating any
+    // additional islands. No country link, label or flag is replaced.
+    const assignments = [];
+    const unused = new Set(parts.map((_, i) => i));
+    for (const node of nodes) {
+      let b;
+      try { b = node.getBBox(); } catch { b = null; }
+      let best = null, distance = Infinity;
+      for (const i of unused) {
+        const x = parts[i].b;
+        const dx = (x[0] + x[2] - (b ? b.x * 2 + b.width : x[0] + x[2])) / 2;
+        const dy = (x[1] + x[3] - (b ? b.y * 2 + b.height : x[1] + x[3])) / 2;
+        const oldSize = b ? Math.max(0.00001, b.width * b.height) : 1;
+        const newSize = Math.max(0.00001, (x[2]-x[0]) * (x[3]-x[1]));
+        const score = Math.hypot(dx, dy) +
+          Math.abs(Math.log(newSize / oldSize)) * 0.8;
+        if (score < distance) { distance = score; best = i; }
+      }
+      if (best !== null) {
+        assignments.push([node, best]);
+        unused.delete(best);
+      }
+    }
+    return { assignments, unused };
+  }
+  function applyDetail(id, detail) {
+    const primary = $('land-' + id);
+    if (!primary) return false;
+    const anchor = primary.parentElement;
+    const previous = [...anchor.querySelectorAll('path.land')];
+    if (Array.isArray(detail.parts) && detail.parts.length && previous.length) {
+      const { assignments, unused } = matchDetailedFragment(previous, detail.parts);
+      for (const [old, index] of assignments) {
+        old.setAttribute('d', detail.parts[index].d);
+      }
+      for (const index of unused) {
+        const extra = document.createElementNS(ns, 'path');
+        extra.setAttribute('d', detail.parts[index].d);
+        extra.classList.add('land', 'flag-fragment');
+        extra.setAttribute('fill', primary.getAttribute('fill') || '#a8d77e');
+        extra.setAttribute('fill-rule', 'evenodd');
+        if (map.classList.contains('flag-fill')) {
+          extra.style.fill = 'url(#flag-pattern-' + id + ')';
+        }
+        flagPaths.push([extra, 'url(#flag-pattern-' + id + ')']);
+        anchor.append(extra);
+      }
+    } else if (typeof detail.d === 'string' && detail.d[0] === 'M') {
+      primary.setAttribute('d', detail.d);
+    } else {
+      return false;
+    }
+    enhancedCountries.add(id);
+    return true;
+  }
+  function updateVisibleDetailedCountries() {
+    if (worldFailed || !map.viewBox || !map.viewBox.baseVal) return;
+    const vb = map.viewBox.baseVal;
+    // Full-world view should remain lightweight and responsive on phones.
+    if (!vb.width || vb.width > 400) return;
+    if (!detailedWorld) {
+      if (worldLoading) return;
+      worldLoading = true;
+      fetch('world-detail-10m.json')
+        .then(response => {
+          if (!response.ok) throw new Error('No detailed geometry');
+          return response.json();
+        })
+        .then(data => {
+          if (!data || !data.countries ||
+              data.projection !== 'Mercator 1080x1080, 3 decimal SVG precision')
+            throw new Error('Wrong detail format');
+          detailedWorld = data.countries;
+          queueVisibleDetails();
+        })
+        .catch(() => { worldFailed = true; /* The 50m map stays playable. */ })
+        .finally(() => { worldLoading = false; });
+      return;
+    }
+    if (document.querySelector('.territory-game.battle-animating')) return;
+    const padX = vb.width * .12, padY = vb.height * .12;
+    const visible = {
+      x: vb.x - padX, y: vb.y - padY,
+      width: vb.width + padX * 2, height: vb.height + padY * 2
+    };
+    let changed = false;
+    for (const [id, detail] of Object.entries(detailedWorld)) {
+      if (enhancedCountries.has(id) || !detail || !detail.b ||
+          !boxIntersects(detail.b, visible)) continue;
+      changed = applyDetail(id, detail) || changed;
+    }
+    if (changed && window.GeoPrzygodaBattle && window.GeoPrzygodaBattle.active)
+      window.GeoPrzygodaBattle.refresh();
+  }
+  function queueVisibleDetails() {
+    if (detailFrame !== null) return;
+    detailFrame = requestAnimationFrame(() => {
+      detailFrame = null;
+      updateVisibleDetailedCountries();
+    });
+  }
+  // In addition to redraws, listen for programmatic map focus and gestures.
+  const detailObserver = new MutationObserver(queueVisibleDetails);
+  detailObserver.observe(map, { attributes:true, attributeFilter:['viewBox'] });
+  for (const event of ['pointerup', 'touchend', 'wheel']) {
+    map.addEventListener(event, queueVisibleDetails, { passive: true });
+  }
+
   const originalLabelMap = labelMap;
-  labelMap = function () { originalLabelMap(); renderFlags(); };
+  labelMap = function () {
+    originalLabelMap();
+    renderFlags();
+    queueVisibleDetails();
+  };
+  queueVisibleDetails();
   $('setting-flags').checked = flagsEnabled;
   $('setting-flags').addEventListener('change', e => {
     flagsEnabled = e.target.checked;
