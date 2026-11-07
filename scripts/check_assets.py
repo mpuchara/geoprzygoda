@@ -74,6 +74,15 @@ assert "path.parentElement.querySelectorAll('path.land')" in features_text
 assert "function countryPieces(id)" in battle_text
 
 
+picker_js = (ROOT / 'app/src/main/assets/rival_ui.js').read_text(encoding='utf-8')
+assert 'rival_ui.js' in text and 'rival_ui.css' in text, 'Searchable rivalry UI assets missing'
+for marker in ('rival-country-search', 'battle-country-search', 'picker-flat-flag',
+               'new MutationObserver', "dispatchEvent(new Event"):
+    assert marker in picker_js, f'Missing flag search capability: {marker}'
+assert "openExtra(rivalry, 'rival-country-search')" in features_text, 'Rivalry search not focusable'
+assert 'window.GeoPrzygodaPicker.refreshBattle()' in battle_text, 'Battle search does not refresh'
+
+
 # All mapped countries with ISO alpha-2 codes must ship their vector flag.
 flag_dir = ROOT / 'app/src/main/assets/flags'
 flag_codes = {country['code'].lower() for country in data['countries']
