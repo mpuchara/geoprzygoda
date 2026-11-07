@@ -44,7 +44,7 @@
 /* Expanding, map-clipped conquest front, inspired by gradual border changes. */
 #world-map .battle-advance-overlay,
 #world-map .battle-front-line{pointer-events:none}
-#world-map .battle-front-line{stroke:#fffbd1;stroke-width:3.4;stroke-dasharray:6 3;vector-effect:non-scaling-stroke;filter:drop-shadow(0 0 2px #ffda49)}
+#world-map .battle-front-line{fill:none;stroke:#fffbd1;stroke-width:2.6;stroke-linejoin:round;stroke-linecap:round;stroke-dasharray:5 3;vector-effect:non-scaling-stroke;filter:drop-shadow(0 0 2px #ffda49)}
 #world-map .battle-attacking .land{stroke:#ffeb88!important;stroke-width:2.6!important;stroke-dasharray:5 4;vector-effect:non-scaling-stroke;animation:battle-front-dashes .5s linear infinite}
 @keyframes battle-front-dashes{to{stroke-dashoffset:-18}}
 .battle-progress-caption{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:10px 1px 5px;font-size:11px;font-weight:800;color:#2b5447}
@@ -52,3 +52,18 @@
 .battle-progress-track{height:13px;border-radius:99px;background:#e7e9d0;border:1px solid #a3baa7;overflow:hidden}
 .battle-progress-track span{display:block;width:0;height:100%;border-radius:99px;background:linear-gradient(90deg,#58ad83,#b6db69);transition:none}
 @media(prefers-reduced-motion:reduce){#world-map .battle-attacking .land{animation:none}}
+
+
+/* Reveal the map while the organic conquest front advances. */
+.territory-game.battle-animating{max-height:min(34dvh,300px);overflow-y:auto}
+.territory-game.battle-animating .battle-title,
+.territory-game.battle-animating .battle-stats,
+.territory-game.battle-animating > label,
+.territory-game.battle-animating > .battle-select,
+.territory-game.battle-animating > .country-picker,
+.territory-game.battle-animating .battle-actions,
+.territory-game.battle-animating .battle-disclaimer{display:none}
+.territory-game.battle-animating .battlefield{margin-top:8px}
+.territory-game.battle-animating .battle-message{margin-top:8px}
+@media(max-width:650px){.territory-game.battle-animating{max-height:33dvh}}
+@media(max-height:500px) and (orientation:landscape){.territory-game.battle-animating{max-height:calc(100dvh - 18px)}}
