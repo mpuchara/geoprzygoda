@@ -156,6 +156,8 @@
       geo8SelectedBorder.setAttribute('d', selected
         ? [...selected.querySelectorAll('path.land')].map(piece => piece.getAttribute('d') || '').join('')
         : '');
+      geo8SelectedBorder.style.display = selected && geo8Raster.style.display !== 'none'
+        ? '' : 'none';
     };
     new MutationObserver(syncSelected).observe(geo8CountryGroup,
       {subtree:true, attributes:true, attributeFilter:['class']});
