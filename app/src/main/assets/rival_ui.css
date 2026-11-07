@@ -1,0 +1,73 @@
+/* Same violet, mint and pink atmosphere as GeoPrzygoda's welcome animation. */
+#rivalry-overlay .extras-panel{position:relative;isolation:isolate;overflow-y:auto;
+  background:linear-gradient(145deg,#293557,#243454 48%,#174752);
+  border:1px solid #c6dcff70;box-shadow:0 22px 75px #071a37b0}
+#rivalry-overlay .extras-panel::before{content:"";position:absolute;z-index:-1;inset:-35%;pointer-events:none;
+  background:radial-gradient(ellipse at 15% 35%,#7954de85,transparent 45%),
+    radial-gradient(ellipse at 78% 72%,#19e2bb6c,transparent 43%),
+    radial-gradient(ellipse at 71% 10%,#db79b65f,transparent 43%);
+  filter:blur(20px);animation:rival-aurora 12s ease-in-out infinite alternate}
+@keyframes rival-aurora{from{transform:translate(-4%,2%) scale(1)}to{transform:translate(5%,-5%) scale(1.13)}}
+#rivalry-overlay .extras-panel h2{color:#f1f9ff}
+#rivalry-overlay .rival-label{color:#f2fcff;font-size:13px}
+#rivalry-overlay .rival-first{display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  border-radius:17px;padding:13px 15px;margin:15px 0;
+  border:1px solid #e2f4f58c;
+  background:linear-gradient(110deg,#6551a6ae,#23878a99 60%,#ad558d8c);
+  box-shadow:0 10px 25px #06172a50}
+.rival-first-caption{width:100%;font-size:10px;font-weight:900;letter-spacing:1.3px;color:#ebfaff}
+.country-picker{display:flex;flex-direction:column;gap:9px;margin:8px 0 14px}
+.picker-flat-flag{width:48px;height:32px;flex:0 0 48px;border:1px solid #e9f9ffb5;
+  border-radius:5px;background:white;object-fit:fill;box-shadow:0 2px 8px #00192e70}
+.picker-flag-fallback{width:48px;height:32px;flex:0 0 48px;display:grid;place-items:center;font-size:25px}
+.picker-name{display:flex;flex:1;flex-direction:column;gap:3px;min-width:0}
+.picker-name strong{color:inherit;font-size:14px;line-height:1.35;overflow-wrap:anywhere}
+.picker-name small{color:inherit;opacity:.75;font-size:10px;line-height:1.3}
+.picker-selected{display:flex;align-items:center;gap:12px;text-align:left;width:100%;
+  padding:12px 13px;min-height:65px;
+  background:linear-gradient(110deg,#5c55a1c4,#277e819c 65%,#5068a0b0);
+  border:1px solid #c9efede0;border-radius:15px;color:#f5fffb;
+  box-shadow:0 9px 25px #091c3455}
+.picker-caret{font-size:23px;color:#e9fcf3}
+.picker-search{display:block;width:100%;min-height:48px;padding:11px 13px;
+  border:1px solid #b8d9e19e;border-radius:13px;background:#0e3047e8;
+  color:#fff;font-size:14px;outline-offset:2px}
+.picker-search::placeholder{color:#c7dce5}
+.picker-search:focus{outline:2px solid #b4f0c0;border-color:#b4f0c0}
+.picker-results{max-height:min(26dvh,205px);overflow:auto;border-radius:13px;padding:5px;
+  background:#122e45ec;border:1px solid #acd9e558;scrollbar-width:thin}
+.picker-country-option{width:100%;min-height:52px;padding:8px 10px;display:flex;align-items:center;
+  gap:11px;text-align:left;color:#f2fff9;background:transparent;border:0;border-radius:10px}
+.picker-country-option+.picker-country-option{border-top:1px solid #ffffff16}
+.picker-country-option.picked,.picker-country-option:focus-visible{background:#315c74;outline:2px solid #b5f1c7;outline-offset:-2px}
+.picker-country-option .picker-flat-flag{width:41px;height:28px;flex-basis:41px}
+.picker-country-option .picker-name strong{font-size:12px}
+.picker-empty{padding:8px 10px;font-size:12px;color:#d0e7ec}
+#rivalry-overlay #rival-result{background:linear-gradient(135deg,#2a3b67,#285b60);color:#effef7;border:1px solid #bfe7dc6a}
+#rivalry-overlay #rival-result h3{color:#fbfff5}
+#rivalry-overlay #rival-result p{color:#d4e7de}
+#rivalry-overlay .rival-compare{background:linear-gradient(115deg,#c6edb9,#9ddfce)}
+#rivalry-overlay .rival-start-map{background:linear-gradient(105deg,#8865d8,#416ea7)!important;color:#fff!important}
+#rivalry-overlay .rival-history-button{background:#385b71a8;color:#f2faff;border:1px solid #cce7e75a}
+#rivalry-overlay .extra-note{color:#cee2e8!important}
+.territory-game{color:#f4fffb;color-scheme:dark;
+  background:radial-gradient(ellipse at 8% 8%,#635393 0,transparent 56%),
+             radial-gradient(ellipse at 94% 95%,#287e7d 0,transparent 60%),
+             linear-gradient(145deg,#1a2e4d,#1a4850);
+  border:1px solid #c5e7ef99;box-shadow:0 18px 55px #071b36ae}
+.territory-game .battle-head button{color:#fff;background:#375971}
+.territory-game .battle-title,.territory-game label{color:#f8fff9}
+.territory-game .battle-stats,.territory-game .battle-disclaimer{color:#d0e2ea!important}
+.territory-game .battle-message{background:#2a5260;color:#edffe9}
+.territory-game .battle-secondary{background:#3a6070;color:#fff}
+.territory-game .battle-primary{background:#b7f0c3;color:#153b43}
+.territory-game .battlefield{background:linear-gradient(130deg,#445b8f,#39896e);border-color:#b2e6c5}
+.territory-game .battle-balance,.territory-game .battle-progress-caption{color:#f0ffef}
+.territory-game .picker-results{max-height:17dvh}
+.territory-game .picker-selected{min-height:50px;padding:9px 12px}
+.territory-game .picker-flat-flag{width:40px;height:27px;flex-basis:40px}
+.territory-game .picker-search{font-size:12px;min-height:42px}
+.territory-game .picker-name strong{font-size:12px}
+@media(max-width:650px){#rivalry-overlay .extras-panel{max-height:calc(100dvh - 50px)}
+  .picker-results{max-height:24dvh}.picker-country-option{min-height:49px}}
+@media(prefers-reduced-motion:reduce){#rivalry-overlay .extras-panel::before{animation:none}}
