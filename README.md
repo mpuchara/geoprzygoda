@@ -169,3 +169,9 @@ generowana jest samodzielna galeria
 `python3 scripts/build_flag_gallery.py flag-gallery.html`.
 Plik `flag-gallery.html` jest publikowany razem z APK w wydaniach gry.
 Galeria nie zastępuje sprawdzania flag na kształtach państw w telefonie.
+
+Dodatkowa kontrola palety wykryła dziewięć przybliżonych kolorów tła
+w nakładkach flag z symbolami (USA, Australia, Brazylia, Chiny, Nowa
+Zelandia, Wielka Brytania, Pakistan, Albania, Szwajcaria). Zostały
+zamienione na dokładne wartości barw znajdujące się w źródłowych SVG.
+Test `scripts/check_flags.py` sprawdza również te dziewięć kolorów.
