@@ -101,6 +101,49 @@
   flagDefs.id = 'country-flag-patterns';
   map.insertBefore(flagDefs, map.firstChild);
   const flagPaths = [];
+  // The Turkish crescent/star and Saudi calligraphy must keep their real
+  // proportions. Ordinary country backgrounds are still filled completely.
+  // Other countries keep their existing patterns and map geometry.
+  const emblemBackgrounds = new Map([
+    ['TUR', '#e30a17'],
+    ['SAU', '#165d31']
+  ]);
+  function createProportionalFlag(c, piece, partIndex, asset, background) {
+    let box;
+    try { box = piece.getBBox(); } catch { return null; }
+    if (!box || !Number.isFinite(box.x + box.y + box.width + box.height) ||
+        box.width <= 0 || box.height <= 0) return null;
+    const id = 'flag-fitted-' + c.id + '-' + partIndex;
+    const original = document.getElementById(id);
+    const pattern = original || document.createElementNS(ns, 'pattern');
+    pattern.id = id;
+    pattern.replaceChildren();
+    // Country coordinates, rather than normalized 0..1 boxes, are essential:
+    // normalized boxes stretch symbols even when preserveAspectRatio is set.
+    pattern.setAttribute('patternUnits', 'userSpaceOnUse');
+    pattern.setAttribute('patternContentUnits', 'userSpaceOnUse');
+    for (const [attr, value] of Object.entries({
+      x: box.x, y: box.y, width: box.width, height: box.height
+    })) pattern.setAttribute(attr, String(value));
+    const backing = document.createElementNS(ns, 'rect');
+    for (const [attr, value] of Object.entries({
+      x: box.x, y: box.y, width: box.width, height: box.height
+    })) backing.setAttribute(attr, String(value));
+    backing.setAttribute('fill', background);
+    pattern.append(backing);
+    const image = document.createElementNS(ns, 'image');
+    image.setAttribute('href', asset);
+    image.setAttributeNS('http://www.w3.org/1999/xlink', 'href', asset);
+    for (const [attr, value] of Object.entries({
+      x: box.x, y: box.y, width: box.width, height: box.height
+    })) image.setAttribute(attr, String(value));
+    // "meet" preserves the moon, star, lettering and sword without cropping.
+    // The identical background color fills any extra area inside the country.
+    image.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+    pattern.append(image);
+    if (!original) flagDefs.append(pattern);
+    return 'url(#' + pattern.id + ')';
+  }
   for (const c of COUNTRY_DATA) {
     const path = $('land-' + c.id);
     if (!c.mapped || !path || !/^[A-Z]{2}$/.test(c.code)) continue;
@@ -121,10 +164,39 @@
     image.setAttribute('preserveAspectRatio', 'none');
     pattern.append(image);
     flagDefs.append(pattern);
-    // Each disconnected island gets its own flag, scaled to that polygon.
-    for (const piece of path.parentElement.querySelectorAll('path.land')) {
-      flagPaths.push([piece, 'url(#' + pattern.id + ')']);
-    }
+    // Flag patterns are per island for emblem-heavy countries so complex
+    // symbols are never stretched to the shape's map bounding box.
+    const pieces = [...path.parentElement.querySelectorAll('path.land')];
+    pieces.forEach((piece, index) => {
+      const background = emblemBackgrounds.get(c.id);
+      const fitted = background
+        ? createProportionalFlag(c, piece, index, url, background)
+        : null;
+      if (fitted) piece.dataset.geoprzygodaFittedFlag = fitted;
+      flagPaths.push([piece, fitted || 'url(#' + pattern.id + ')']);
+    });
+  }
+
+  function refitProportionalCountry(id) {
+    const c = byId.get(id);
+    const background = emblemBackgrounds.get(id);
+    const primary = $('land-' + id);
+    if (!c || !background || !primary) return;
+    const pieces = [...primary.parentElement.querySelectorAll('path.land')];
+    pieces.forEach((piece, index) => {
+      const fitted = createProportionalFlag(
+        c, piece, index, 'flags/' + c.code.toLowerCase() + '.svg', background
+      );
+      if (!fitted) return;
+      piece.dataset.geoprzygodaFittedFlag = fitted;
+      const entry = flagPaths.find(entry => entry[0] === piece);
+      if (entry) entry[1] = fitted;
+      else flagPaths.push([piece, fitted]);
+      if (map.classList.contains('flag-fill') &&
+          !(window.GeoPrzygodaBattle && window.GeoPrzygodaBattle.active)) {
+        piece.style.fill = fitted;
+      }
+    });
   }
   let flagsApplied = null;
   function renderFlags() {
@@ -230,6 +302,10 @@
     } else {
       return false;
     }
+    // Refresh the per-island fitting when 1:10m map geometry replaces 1:50m.
+    // This also fits newly discovered tiny islands without overwriting Dutch
+    // or other country border enhancements.
+    refitProportionalCountry(id);
     enhancedCountries.add(id);
     return true;
   }
