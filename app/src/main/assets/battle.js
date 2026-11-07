@@ -38,7 +38,7 @@
     '<div id="battlefield" class="battlefield hidden" role="status" aria-live="polite">' +
     '<div class="battle-soldiers"><span class="army-left">🪖 🛡️ 🪖</span><span class="army-middle">⚔️</span><span class="army-right">🪖 🛡️ 🪖</span></div>' +
     '<div id="battle-balance" class="battle-balance"></div>' +
-    '<div class="battle-progress-caption"><span id="battle-stage">Przygotowanie</span><strong id="battle-progress-label">0%</strong></div>' +
+    '<div class="battle-progress-caption"><span id="battle-stage">Przygotowanie</span><small id="battle-sector-count">0 sektorów</small><strong id="battle-progress-label">0%</strong></div>' +
     '<div id="battle-progress" class="battle-progress-track" role="progressbar" aria-label="Postęp zdobywania terenu" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="battle-conquest-fill"></span></div></div>' +
     '<div id="battle-message" class="battle-message" aria-live="polite">Wybierz sąsiada i rozpocznij bitwę!</div>' +
     '<div class="battle-actions"><button id="battle-attack" class="battle-primary">⚔️ Rozpocznij natarcie</button>' +
@@ -211,6 +211,43 @@
     }
     return out+'Z';
   }
+  // Two adjacent sector paths use the exact same notched edge, in reverse
+  // order. This removes the obvious straight Voronoi lines without cracks.
+  // The divisions remain fictional: country borders come from Natural Earth.
+  function irregularSectorPath(polygon, seed) {
+    const pointKey = p => p[0].toFixed(2) + ':' + p[1].toFixed(2);
+    const pretty = p => p[0].toFixed(3) + ',' + p[1].toFixed(3);
+    const edgePoints = (a, b) => {
+      const forward = pointKey(a) <= pointKey(b);
+      const start = forward ? a : b, end = forward ? b : a;
+      const name = pointKey(start) + '-' + pointKey(end);
+      let hash = (seed + 1) >>> 0;
+      for (const char of name) hash = (Math.imul(hash, 33) + char.charCodeAt(0)) >>> 0;
+      const dx = end[0] - start[0], dy = end[1] - start[1];
+      const length = Math.hypot(dx, dy);
+      const pieces = length > 5 ? 4 : length > 2 ? 3 : 2;
+      const amplitude = Math.min(1.15, length * .12);
+      const points = [];
+      for (let i = 1; i < pieces; i++) {
+        const t = i / pieces;
+        const offset = amplitude *
+          (.58 * Math.sin(hash * .001 + i * 2.71) +
+           .42 * Math.cos(hash * .013 + i * 5.13));
+        points.push([
+          start[0] + dx * t - dy / Math.max(.001, length) * offset,
+          start[1] + dy * t + dx / Math.max(.001, length) * offset
+        ]);
+      }
+      return forward ? points : points.reverse();
+    };
+    let d = 'M' + pretty(polygon[0]);
+    for (let i = 0; i < polygon.length; i++) {
+      const a = polygon[i], b = polygon[(i + 1) % polygon.length];
+      for (const bend of edgePoints(a, b)) d += 'L' + pretty(bend);
+      d += 'L' + pretty(b);
+    }
+    return d + 'Z';
+  }
   // Generate fictional small regions inside a country's real coastline.
   // Voronoi borders are irregular; they are NOT real administrative borders.
   function createBattleSectors(box, goal, routeNodes, seed, radius, make, clipId) {
@@ -261,9 +298,7 @@
         polygon = clipped;
       }
       if (polygon.length < 3) continue;
-      const d = polygon.map((p, k) =>
-        (k ? 'L' : 'M') + p[0].toFixed(3) + ',' + p[1].toFixed(3)
-      ).join('') + 'Z';
+      const d = irregularSectorPath(polygon, seed);
       const outline = make('path');
       outline.setAttribute('d', d);
       outline.classList.add('battle-fictional-sector-line');
@@ -292,8 +327,72 @@
       const jitter = (random(i, seed + 22) - .5) * .055;
       const threshold = Math.max(.02, Math.min(.98,
         Math.min(roadThreshold, capitalThreshold) + jitter));
-      sectors.push({ d, outline, threshold, revealed: false });
+      sectors.push({ d, outline, site, polygon, threshold, revealed: false });
     }
+    // Grow across touching sectors, rather than allowing isolated distant
+    // pieces to change ownership before the advancing front reaches them.
+    const links = sectors.map(() => new Set());
+    const sharedEdges = new Map();
+    const vertexKey = p => p[0].toFixed(2) + ':' + p[1].toFixed(2);
+    sectors.forEach((sector, index) => {
+      sector.polygon.forEach((a, edge) => {
+        const b = sector.polygon[(edge + 1) % sector.polygon.length];
+        const key = [vertexKey(a), vertexKey(b)].sort().join('|');
+        if (sharedEdges.has(key)) {
+          const neighbor = sharedEdges.get(key);
+          links[index].add(neighbor);
+          links[neighbor].add(index);
+        } else sharedEdges.set(key, index);
+      });
+    });
+    // The Voronoi network can have tiny disconnected corners at the bounding
+    // box edge, so connect each cell to its nearest seed as a safe fallback.
+    sectors.forEach((sector, i) => {
+      if (links[i].size || sectors.length < 2) return;
+      let nearest = -1, distance = Infinity;
+      sectors.forEach((other, j) => {
+        if (i === j) return;
+        const d = Math.hypot(sector.site.x - other.site.x, sector.site.y - other.site.y);
+        if (d < distance) { distance = d; nearest = j; }
+      });
+      if (nearest >= 0) {
+        links[i].add(nearest);
+        links[nearest].add(i);
+      }
+    });
+    const entry = routeNodes[1] || routeNodes[0];
+    let first = 0, closest = Infinity;
+    sectors.forEach((sector, i) => {
+      const d = Math.hypot(sector.site.x - entry.x, sector.site.y - entry.y);
+      if (d < closest) { closest = d; first = i; }
+    });
+    const best = sectors.map(() => Infinity);
+    const visited = new Set();
+    best[first] = .025;
+    while (visited.size < sectors.length) {
+      let next = -1, value = Infinity;
+      best.forEach((candidate, i) => {
+        if (!visited.has(i) && candidate < value) { value = candidate; next = i; }
+      });
+      if (next < 0 || !Number.isFinite(value)) {
+        // Extremely small disconnected polygons remain available by the end.
+        next = sectors.findIndex((_, i) => !visited.has(i));
+        if (next < 0) break;
+        best[next] = Math.min(.94, sectors[next].threshold + .1);
+      }
+      visited.add(next);
+      for (const neighbor of links[next]) {
+        if (!visited.has(neighbor)) {
+          best[neighbor] = Math.min(best[neighbor],
+            Math.max(sectors[neighbor].threshold, best[next] + .009));
+        }
+      }
+    }
+    sectors.forEach((sector, i) => {
+      sector.threshold = Math.min(.98, best[i]);
+      delete sector.polygon;
+      delete sector.site;
+    });
     return { grid, sectors };
   }
   function clearAdvance() {
@@ -315,7 +414,9 @@
     const {box,routeNodes,frontShape,unit,route,goal,entry} = scene;
     const base=Math.max(1.5,Math.min(box.width,box.height)*.15);
     const parts=[];
-    // Small adjacent bulges advance along a curved route, not a straight wipe.
+    // Sectors take priority: unlike a growing blob they reveal individual
+    // border-fitting provinces, as in a strategy-game conquest animation.
+    if (!scene.sectors || scene.sectors.length === 0) {
     for(let i=0;i<routeNodes.length;i++){
       const threshold=i/(routeNodes.length-1)*.49;
       const amount=clamp01((progress-threshold)/.15);
@@ -338,15 +439,22 @@
           scene.radius*1.45*side,scene.radius*1.45*side,scene.seed+11.5));
       }
     }
+    }
     if (scene.sectors) {
+      let capturedCount = 0;
       for (const cell of scene.sectors) {
         const captured = progress >= .999 || (progress > 0 && progress >= cell.threshold);
         if (captured !== cell.revealed) {
           cell.revealed = captured;
           cell.outline.classList.toggle('battle-fictional-sector-captured', captured);
         }
-        if (captured) parts.push(cell.d);
+        if (captured) {
+          capturedCount++;
+          parts.push(cell.d);
+        }
       }
+      const count = $('battle-sector-count');
+      if (count) count.textContent = capturedCount + '/' + scene.sectors.length + ' sektorów';
     }
     if(progress>=1){
       parts.length=0;
@@ -400,7 +508,9 @@
     ink.setAttribute('clip-path','url(#battle-organic-country-clip)');
     const attacker=$('land-'+game.player);
     const fill=map.classList.contains('flag-fill')
-      ? 'url(#flag-pattern-'+game.player+')'
+      ? (window.GeoPrzygodaFitFlag
+          ? window.GeoPrzygodaFitFlag(game.player,targetId,primary,0)
+          : 'url(#flag-pattern-'+game.player+')')
       : (attacker?.getAttribute('fill') || '#77cfa3');
     ink.setAttribute('fill',fill);
     ink.setAttribute('fill-rule','nonzero');
@@ -515,9 +625,12 @@
       const holder = ownerOf(c.id);
       const owner = playable.get(holder);
       const showFlag = map.classList.contains('flag-fill') && owner && owner.code;
-      for (const shape of countryPieces(c.id)) {
+      for (const [pieceIndex, shape] of [...countryPieces(c.id)].entries()) {
         if (showFlag) shape.style.fill = holder === c.id && shape.dataset.geoprzygodaFittedFlag
-          ? shape.dataset.geoprzygodaFittedFlag : 'url(#flag-pattern-' + holder + ')';
+          ? shape.dataset.geoprzygodaFittedFlag
+          : holder !== c.id && window.GeoPrzygodaFitFlag
+            ? window.GeoPrzygodaFitFlag(holder, c.id, shape, pieceIndex)
+            : 'url(#flag-pattern-' + holder + ')';
         else if (holder !== c.id) {
           const parent = $('land-' + holder);
           shape.style.fill = parent ? parent.getAttribute('fill') : '#b7d8a8';

@@ -155,6 +155,12 @@ for token in ('function createBattleSectors(', 'battle-fictional-sectors',
               'battle-unit-banner', 'scene.sectors'):
     assert token in battle, f'Country-sector conquest is missing: {token}'
 assert 'Białystok' in battle and 'function countryGoal(' in battle
+assert 'function irregularSectorPath(' in battle
+assert 'const sharedEdges = new Map()' in battle
+assert 'battle-sector-count' in battle
+assert 'window.GeoPrzygodaFitFlag' in battle and 'window.GeoPrzygodaFitFlag' in features_text
+assert "['CAN', '#ffffff']" in features_text
+assert 'vb.width > 680' in features_text
 assert '.battle-fictional-sector-line' in css, 'Sector borders must be visible'
 
 

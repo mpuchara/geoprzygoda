@@ -101,12 +101,18 @@
   flagDefs.id = 'country-flag-patterns';
   map.insertBefore(flagDefs, map.firstChild);
   const flagPaths = [];
-  // The Turkish crescent/star and Saudi calligraphy must keep their real
-  // proportions. Ordinary country backgrounds are still filled completely.
-  // Other countries keep their existing patterns and map geometry.
+  // Keep complex symbols in their actual flag proportions. Pure stripe
+  // patterns can still fill an irregular silhouette without visible distortion.
+  // The background matches each flag, filling gaps around its centered emblem.
   const emblemBackgrounds = new Map([
-    ['TUR', '#e30a17'],
-    ['SAU', '#165d31']
+    ['TUR', '#e30a17'], ['SAU', '#165d31'],
+    ['USA', '#ffffff'], ['AUS', '#012169'], ['FRA', '#ffffff'],
+    ['CAN', '#ffffff'], ['BRA', '#009b3a'], ['IND', '#ffffff'],
+    ['JPN', '#ffffff'], ['KOR', '#ffffff'], ['CHN', '#de2910'],
+    ['PRT', '#006600'], ['ESP', '#aa151b'], ['MEX', '#ffffff'],
+    ['NZL', '#012169'], ['GBR', '#ffffff'], ['PAK', '#01411c'],
+    ['ARG', '#ffffff'], ['ISR', '#ffffff'], ['EGY', '#ffffff'],
+    ['MAR', '#c1272d'], ['ALB', '#e41e20'], ['CHE', '#da291c']
   ]);
   function createProportionalFlag(c, piece, partIndex, asset, background) {
     let box;
@@ -144,6 +150,18 @@
     if (!original) flagDefs.append(pattern);
     return 'url(#' + pattern.id + ')';
   }
+  // Battles may draw the victor's flag on a completely different shape.
+  // Fit its symbol to the *captured* country; never reuse the old country's
+  // normalized pattern where stars, moons or emblems get stretched.
+  window.GeoPrzygodaFitFlag = function (ownerId, targetId, piece, index) {
+    const owner = byId.get(ownerId);
+    const backing = emblemBackgrounds.get(ownerId);
+    if (!owner || !backing || !piece || !/^[A-Z]{2}$/.test(owner.code))
+      return 'url(#flag-pattern-' + ownerId + ')';
+    return createProportionalFlag({ id: ownerId + '-on-' + targetId },
+      piece, index, 'flags/' + owner.code.toLowerCase() + '.svg', backing)
+      || 'url(#flag-pattern-' + ownerId + ')';
+  };
   for (const c of COUNTRY_DATA) {
     const path = $('land-' + c.id);
     if (!c.mapped || !path || !/^[A-Z]{2}$/.test(c.code)) continue;
@@ -313,7 +331,7 @@
     if (worldFailed || !map.viewBox || !map.viewBox.baseVal) return;
     const vb = map.viewBox.baseVal;
     // Full-world view should remain lightweight and responsive on phones.
-    if (!vb.width || vb.width > 400) return;
+    if (!vb.width || vb.width > 680) return;
     if (!detailedWorld) {
       if (worldLoading) return;
       worldLoading = true;

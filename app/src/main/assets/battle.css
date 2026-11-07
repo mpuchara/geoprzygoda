@@ -106,3 +106,55 @@
   filter:drop-shadow(0 0 2px #102d43)
 }
 @media(prefers-reduced-motion:reduce){#world-map .battle-unit-banner{filter:none}}
+
+/* Reference-game-inspired territory view: small strip, large unobstructed map. */
+.territory-game.battle-animating{
+  left:50%;transform:translateX(-50%);
+  bottom:calc(10px + env(safe-area-inset-bottom));
+  width:min(560px,calc(100vw - 16px));
+  max-height:min(29dvh,185px);overflow:hidden;
+  padding:9px 12px 11px;border-radius:17px;
+  background:rgba(12,29,49,.94);border:1px solid rgba(204,233,238,.48);
+  box-shadow:0 8px 26px #05111da8;
+}
+.territory-game.battle-animating .battle-head{font-size:12px}
+.territory-game.battle-animating .battle-head button{width:25px;height:25px;font-size:19px}
+.territory-game.battle-animating .battlefield{
+  margin-top:4px;padding:5px 9px 8px;background:rgba(10,32,54,.65);
+  border:1px solid rgba(184,218,229,.35);border-radius:10px;
+}
+.territory-game.battle-animating .battle-soldiers,
+.territory-game.battle-animating .battle-message{display:none}
+.territory-game.battle-animating .battle-balance{font-size:12px;margin:2px 0;color:#eefcff}
+.territory-game.battle-animating .battle-progress-caption{
+  margin:5px 0 4px;color:#e5f6fb;font-size:10px;
+}
+.territory-game.battle-animating .battle-progress-caption small{
+  font-size:9px;font-weight:700;color:#bdd8e1;
+}
+.territory-game.battle-animating .battle-progress-track{
+  height:10px;background:linear-gradient(90deg,#214c82,#823c44);
+  border:1px solid #8298a6;
+}
+.territory-game.battle-animating .battle-progress-track span{
+  background:linear-gradient(90deg,#88c5ef,#def9e7);
+}
+#world-map .battle-fictional-sector-line{
+  stroke:#51677a;stroke-opacity:.85;stroke-width:1.05;
+  stroke-linecap:round;stroke-linejoin:round;
+}
+#world-map .battle-fictional-sector-line.battle-fictional-sector-captured{
+  stroke:#fff7d5;stroke-opacity:.92;stroke-width:1.45;
+}
+#world-map .battle-organic-fill{
+  stroke:#fff6ce;stroke-width:1.5;stroke-dasharray:none;
+  stroke-linejoin:round;
+}
+#world-map .battle-route-line{stroke-opacity:.8;stroke-width:1.4}
+#world-map .battle-front-halo{fill:#ffe98425;stroke:#ffe899;stroke-opacity:.75}
+@media(max-height:500px) and (orientation:landscape){
+  .territory-game.battle-animating{
+    left:50%;bottom:7px;width:min(560px,calc(100vw - 16px));
+    max-height:44dvh;padding:6px 10px;
+  }
+}
