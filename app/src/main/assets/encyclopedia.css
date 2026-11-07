@@ -1,0 +1,40 @@
+/* GeoPrzygoda Plan 6: light, accessible, touch-friendly country cards. */
+.country-sheet.active .sheet-heading{position:relative;overflow:hidden;border-radius:16px;padding:10px;isolation:isolate}
+.country-sheet.active .sheet-heading::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(110deg,#66c0d022,#ffc27c38,#ad97f733,#68caaf27,#66c0d022);background-size:320% 100%;animation:geo6-ribbon 16s linear infinite}
+@keyframes geo6-ribbon{from{background-position:0 50%}to{background-position:100% 50%}}
+.geo6-encyclopedia{display:grid;gap:10px;margin:12px 0;color:#24473f}
+.geo6-intro{padding:4px 3px}
+.geo6-eyebrow{display:block;font-size:10px;letter-spacing:1.4px;font-weight:800;color:#498783}
+.geo6-intro p,.geo6-note{margin:4px 0 6px;font-size:11px;line-height:1.5;color:#667d79}
+.geo6-card{border-radius:14px;overflow:hidden;border:1px solid #b4d8cf;background:#f2faf7;color:#234d4a}
+.geo6-card summary{cursor:pointer;padding:12px 13px;font-size:13px;font-weight:800;touch-action:manipulation;list-style-position:inside}
+.geo6-card[open] summary{border-bottom:1px solid #d0e6dc;background:#e4f2ed}
+.geo6-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:7px;padding:10px}
+.geo6-fact{padding:10px 11px;border-radius:10px;background:#fff;min-width:0}
+.geo6-fact span{display:block;color:#5e7d78;font-size:10px;line-height:1.35}
+.geo6-fact strong{font-size:12px;display:block;margin-top:5px;overflow-wrap:anywhere;line-height:1.4}
+.geo6-sources,.geo6-list{padding:2px 16px 12px 31px;font-size:12px;line-height:1.65;margin:4px 0}
+.geo6-sources a{color:#205d8b;overflow-wrap:anywhere}
+.geo6-history-button{border:0;min-height:47px;width:100%;background:#224e69;color:white;border-radius:12px;font-weight:800;font-size:14px;box-shadow:0 5px 12px #163f5325;touch-action:manipulation}
+.geo6-history-button:active{transform:scale(.99)}
+.geo6-history-panel{padding:13px;border:1px solid #b2d9ce;background:#eff9f6;border-radius:14px;display:grid;gap:11px;min-width:0}
+.geo6-history-panel[hidden]{display:none!important}
+.geo6-history-title{margin:0;font-size:16px}
+.geo6-timeline{min-width:0;display:grid;gap:8px}
+.geo6-slider{width:100%;accent-color:#3a8f78;min-height:36px;touch-action:pan-x}
+.geo6-years{display:flex;gap:7px;overflow-x:auto;scroll-snap-type:x proximity;overscroll-behavior-x:contain;padding:3px 0 8px}
+.geo6-year{scroll-snap-align:start;flex:0 0 auto;background:#d6e9e4;color:#2b625c;border:0;border-radius:18px;min-width:62px;padding:9px 11px;font-size:12px;font-weight:750}
+.geo6-year.active{background:#2d7465;color:#fff}
+.geo6-event{padding:13px;border:1px solid #d5e8df;background:#fff;border-radius:12px;min-height:118px}
+.geo6-date{display:block;color:#398d76;font-weight:850;font-size:12px}
+.geo6-event h4{margin:7px 0;font-size:14px;line-height:1.35}
+.geo6-event p{margin:0;color:#547169;font-size:12px;line-height:1.55}
+.geo6-flag-card{display:flex;align-items:center;gap:13px;margin:10px;padding:10px;border-radius:10px;background:#fff}
+.geo6-old-flag{width:110px;aspect-ratio:1.9;flex:0 0 110px;border:1px solid #b9c3c6;box-shadow:0 3px 8px #0001;overflow:hidden}
+.geo6-old-flag svg{width:100%;height:100%;display:block}
+.geo6-flag-card strong,.geo6-flag-card span,.geo6-flag-card small{display:block;font-size:11px;line-height:1.35;margin:2px 0}
+.geo6-flag-card small{color:#6f807c}
+.geo6-map-note{border-left:3px solid #6da892;background:#e3f0eb;margin:0;padding:10px;font-size:11px;line-height:1.55}
+.geo6-encyclopedia button:focus-visible,.geo6-encyclopedia input:focus-visible{outline:3px solid #c59d52;outline-offset:2px}
+@media(max-width:380px){.geo6-grid{grid-template-columns:1fr 1fr}.geo6-old-flag{width:88px;flex-basis:88px}.geo6-history-panel{padding:9px}}
+@media(prefers-reduced-motion:reduce){.country-sheet.active .sheet-heading::before{animation:none!important}.geo6-history-button:active{transform:none}}
