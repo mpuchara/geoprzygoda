@@ -29,9 +29,9 @@
   const panel = document.createElement('section');
   panel.id = 'territory-game';
   panel.className = 'territory-game hidden';
-  panel.setAttribute('aria-label', 'Bitwa o terytoria');
+  panel.setAttribute('aria-label', 'Kampania podbojów');
   panel.innerHTML =
-    '<div class="battle-head"><strong>⚔️ Bitwa o terytoria</strong><button id="battle-exit" aria-label="Zakończ rywalizację">×</button></div>' +
+    '<div class="battle-head"><strong>⚔️ Kampania podbojów</strong><button id="battle-exit" aria-label="Zakończ rywalizację">×</button></div>' +
     '<div id="battle-title" class="battle-title"></div>' +
     '<div id="battle-stats" class="battle-stats"></div>' +
     '<label for="battle-target">Sąsiedni teren do zdobycia</label><select id="battle-target" class="battle-select"></select>' +
@@ -41,9 +41,9 @@
     '<div class="battle-progress-caption"><span id="battle-stage">Przygotowanie</span><strong id="battle-progress-label">0%</strong></div>' +
     '<div id="battle-progress" class="battle-progress-track" role="progressbar" aria-label="Postęp zdobywania terenu" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="battle-conquest-fill"></span></div></div>' +
     '<div id="battle-message" class="battle-message" aria-live="polite">Wybierz sąsiada i rozpocznij bitwę!</div>' +
-    '<div class="battle-actions"><button id="battle-attack" class="battle-primary">⚔️ Bitwa żołnierska</button>' +
+    '<div class="battle-actions"><button id="battle-attack" class="battle-primary">⚔️ Rozpocznij natarcie</button>' +
     '<button id="battle-history" class="battle-secondary">📜 Historia</button></div>' +
-    '<p class="battle-disclaimer">Fikcyjna gra planszowa: oddziały i wynik są losowe. Każdy teren to całe państwo ze współczesnej mapy.</p>';
+    '<p class="battle-disclaimer">Fikcyjna gra planszowa. Front przesuwa się przez prawdziwy kształt państwa, ale wynik i oddziały są wymyślone. Nie pokazujemy prawdziwych działań wojskowych.</p>';
   app.append(panel);
 
   const history = document.createElement('div');
@@ -67,7 +67,7 @@
   const rivalStart = document.createElement('button');
   rivalStart.id = 'rival-start-map';
   rivalStart.className = 'rival-compare rival-start-map';
-  rivalStart.textContent = '⚔️ Start: Bitwa o terytoria';
+  rivalStart.textContent = '⚔️ Start: Kampania podbojów';
   $('rival-compare').after(rivalStart);
   const rivalHistory = document.createElement('button');
   rivalHistory.id = 'rival-open-history';
@@ -120,127 +120,278 @@
     const primary = $('land-' + id);
     return primary ? primary.parentElement.querySelectorAll('path.land') : [];
   }
-  // The front line is drawn directly on the offline SVG map, not over a screenshot.
-  // All changes remain temporary until the fictional battle is decided.
+  // Gradual fictional conquest. Organic wave shapes are clipped to the country's
+  // real offline Natural Earth outline; no rectangular or straight-cut borders.
+  const CAPITAL_POSITION = {
+    BLR:[27.5615,53.9023], POL:[21.0122,52.2297], UKR:[30.5234,50.4501],
+    LTU:[25.2797,54.6872], LVA:[24.1052,56.9496], EST:[24.7536,59.437],
+    CZE:[14.4208,50.088], SVK:[17.1077,48.1486], DEU:[13.405,52.52],
+    AUT:[16.3738,48.2082], HUN:[19.0402,47.4979], ROU:[26.1025,44.4268],
+    MDA:[28.8638,47.0105], RUS:[37.6173,55.7558], FRA:[2.3522,48.8566],
+    BEL:[4.3517,50.8503], NLD:[4.9041,52.3676], LUX:[6.1319,49.6116],
+    GBR:[-0.1276,51.5072], IRL:[-6.2603,53.3498], ESP:[-3.7038,40.4168],
+    PRT:[-9.1393,38.7223], ITA:[12.4964,41.9028], CHE:[7.4474,46.948],
+    DNK:[12.5683,55.6761], NOR:[10.7522,59.9139], SWE:[18.0632,59.3293],
+    FIN:[24.9384,60.1699], GRC:[23.7275,37.9838], TUR:[32.8597,39.9334],
+    HRV:[15.9819,45.815], SRB:[20.4489,44.7866], BIH:[18.4131,43.8563],
+    SVN:[14.5058,46.0569], BGR:[23.3219,42.6977], USA:[-77.0369,38.9072],
+    CAN:[-75.6972,45.4215], MEX:[-99.1332,19.4326], BRA:[-47.8825,-15.7942],
+    ARG:[-58.3816,-34.6037], CHL:[-70.6693,-33.4489], CHN:[116.4074,39.9042],
+    JPN:[139.6917,35.6895], KOR:[126.978,37.5665], PRK:[125.7625,39.0392],
+    IND:[77.209,28.6139], PAK:[73.0479,33.6844], IRN:[51.389,35.6892],
+    ISR:[35.2137,31.7683], EGY:[31.2357,30.0444], ZAF:[28.1881,-25.7461],
+    AUS:[149.13,-35.2809], NZL:[174.7767,-41.2865], MAR:[-6.8498,34.0209],
+    DZA:[3.0588,36.7538], IDN:[106.8456,-6.2088]
+  };
+  const mapPoint = (lon, lat) => ({
+    x: (lon + 180) * 3,
+    y: 540 - (540 / Math.PI) * Math.asinh(Math.tan(Math.max(-85, Math.min(85, lat)) * Math.PI / 180))
+  });
+  const clamp01 = value => Math.max(0, Math.min(1, value));
+  function countryGoal(c) {
+    const coords = CAPITAL_POSITION[c.id];
+    return {
+      ...(coords ? mapPoint(coords[0],coords[1]) : {x:c.x,y:c.y}),
+      city: coords ? c.cap : null
+    };
+  }
+  // Sample actual coast/border path geometry. This also handles tiny countries
+  // and irregular polygons without relying on bounding-box rectangles.
+  function borderSamples(path, count) {
+    let length = 0;
+    try { length = path.getTotalLength(); } catch { return []; }
+    if (!Number.isFinite(length) || length <= 0) return [];
+    const result = [];
+    for(let i=0;i<count;i++){
+      const p = path.getPointAtLength(length * i / count);
+      result.push({x:p.x,y:p.y});
+    }
+    return result;
+  }
+  function closestBorderStart(targetId, goal) {
+    const targetPaths = [...countryPieces(targetId)];
+    const targetBorder = targetPaths.flatMap(path => borderSamples(path,30));
+    const special = game.player === 'POL' && targetId === 'BLR';
+    const source = special ? mapPoint(23.1688,53.1325) : null; // Białystok, still in Poland
+    let entry = targetBorder[0] || {x:goal.x,y:goal.y};
+    let start = source || entry;
+    let min = Infinity;
+    const nearLands = landsOf(game.player).filter(c => neighbors.get(c.id)?.has(targetId));
+    if (special) {
+      for (const p of targetBorder) {
+        const d = Math.hypot(source.x-p.x,source.y-p.y);
+        if (d<min){min=d;entry=p;}
+      }
+    } else {
+      const ownBorder = nearLands.flatMap(c => [...countryPieces(c.id)]
+        .flatMap(path => borderSamples(path,24)));
+      for (const own of ownBorder) for (const p of targetBorder) {
+        const d = Math.hypot(own.x-p.x,own.y-p.y);
+        if(d<min){min=d;start=own;entry=p;}
+      }
+    }
+    return {start,entry,sourceCity:special?'Białystok':null};
+  }
+  function smoothBlob(cx,cy,rx,ry,seed) {
+    if (rx<0.03 || ry<0.03) return '';
+    const pts = [];
+    const count = 36;
+    for(let i=0;i<count;i++){
+      const a=2*Math.PI*i/count;
+      const wave=1 + .13*Math.sin(3*a+seed*1.7)
+        + .09*Math.sin(5*a-seed*2.3) + .055*Math.sin(9*a+seed*.7);
+      pts.push([cx+Math.cos(a)*rx*wave,cy+Math.sin(a)*ry*wave]);
+    }
+    const midpoint=(a,b)=>[(a[0]+b[0])/2,(a[1]+b[1])/2];
+    const first=midpoint(pts[count-1],pts[0]);
+    let out='M'+first[0].toFixed(2)+','+first[1].toFixed(2);
+    for(let i=0;i<count;i++){
+      const p=pts[i], mid=midpoint(p,pts[(i+1)%count]);
+      out+='Q'+p[0].toFixed(2)+','+p[1].toFixed(2)+' '+mid[0].toFixed(2)+','+mid[1].toFixed(2);
+    }
+    return out+'Z';
+  }
   function clearAdvance() {
     if (advanceFrame !== null) cancelAnimationFrame(advanceFrame);
     advanceFrame = null;
     if (!advanceScene) return;
     advanceScene.host.classList.remove('battle-attacking');
-    advanceScene.ink.remove();
-    advanceScene.front.remove();
-    advanceScene.wipe.remove();
-    advanceScene.outline.remove();
+    for (const node of advanceScene.nodes) node.remove();
     advanceScene = null;
   }
   function setAdvanceProgress(fraction) {
-    const progress = Math.max(0, Math.min(1, fraction));
-    const percent = Math.round(progress * 100);
+    const progress = clamp01(fraction);
+    const percent = Math.round(progress*100);
     $('battle-conquest-fill').style.width = percent + '%';
     $('battle-progress-label').textContent = percent + '%';
-    $('battle-progress').setAttribute('aria-valuenow', String(percent));
+    $('battle-progress').setAttribute('aria-valuenow',String(percent));
     if (!advanceScene) return;
-    const { box, reverse, rect, line } = advanceScene;
-    const width = Math.max(0.01, box.width * progress);
-    const x = reverse ? box.x + box.width - width : box.x;
-    const frontX = reverse ? x : x + width;
-    rect.setAttribute('x', String(x));
-    rect.setAttribute('width', String(width));
-    line.setAttribute('x1', String(frontX));
-    line.setAttribute('x2', String(frontX));
+    const scene=advanceScene;
+    const {box,routeNodes,frontShape,unit,route,goal,entry} = scene;
+    const base=Math.max(1.5,Math.min(box.width,box.height)*.15);
+    const parts=[];
+    // Small adjacent bulges advance along a curved route, not a straight wipe.
+    for(let i=0;i<routeNodes.length;i++){
+      const threshold=i/(routeNodes.length-1)*.49;
+      const amount=clamp01((progress-threshold)/.15);
+      if(amount===0)continue;
+      const p=routeNodes[i];
+      parts.push(smoothBlob(p.x,p.y,base*(.58+amount*.60)*(1+(i%3)*.12),
+        base*(.62+amount*.65)*(1+(i%4)*.08),i*2.7+scene.seed));
+    }
+    // After reaching the capital, the captured regions spread unevenly to the
+    // remaining corners. Final shape exactly follows the country's coastline.
+    if(progress>.43){
+      const growth=clamp01((progress-.43)/.57);
+      const rad=scene.radius*Math.pow(growth,.96)*1.62;
+      parts.push(smoothBlob(goal.x,goal.y,rad,rad,scene.seed+7.2));
+      if(progress>.7){
+        const side=clamp01((progress-.7)/.3);
+        parts.push(smoothBlob(box.x+box.width*.23,box.y+box.height*.60,
+          scene.radius*1.45*side,scene.radius*1.45*side,scene.seed+3.4));
+        parts.push(smoothBlob(box.x+box.width*.77,box.y+box.height*.38,
+          scene.radius*1.45*side,scene.radius*1.45*side,scene.seed+11.5));
+      }
+    }
+    if(progress>=1){
+      parts.length=0;
+      parts.push('M'+(box.x-2)+','+(box.y-2)+'h'+(box.width+4)+'v'+(box.height+4)+'h-'+(box.width+4)+'Z');
+    }
+    frontShape.setAttribute('d',parts.join(''));
+    // The unit follows the invasion route; it retreats on unsuccessful attacks.
+    const march=clamp01(progress/.55);
+    const index=march*(routeNodes.length-1);
+    const i=Math.min(routeNodes.length-2,Math.floor(index));
+    const f=index-i;
+    const a=routeNodes[i],b=routeNodes[i+1];
+    unit.setAttribute('transform','translate('+(a.x+(b.x-a.x)*f)+','+(a.y+(b.y-a.y)*f)+')');
+    route.setAttribute('stroke-dashoffset',String(34-34*march));
+    // A small frontline halo follows the edge without drawing an artificial
+    // vertical country-wide border.
+    scene.glow.setAttribute('cx',String(a.x+(b.x-a.x)*f));
+    scene.glow.setAttribute('cy',String(a.y+(b.y-a.y)*f));
+    scene.glow.setAttribute('r',String(base*(.7+progress*.3)));
   }
   function createAdvance(targetId) {
     clearAdvance();
-    const primary = $('land-' + targetId);
-    if (!primary || !primary.ownerSVGElement) return;
-    const host = primary.parentElement;
-    const paths = [...countryPieces(targetId)];
-    if (!paths.length) return;
+    const primary=$('land-'+targetId);
+    if(!primary || !primary.ownerSVGElement)return;
+    const host=primary.parentElement;
+    const paths=[...countryPieces(targetId)];
+    if(!paths.length)return;
     let box;
-    try { box = host.getBBox(); } catch { return; }
-    if (!box || box.width <= 0 || box.height <= 0) return;
-    const svg = primary.ownerSVGElement;
-    const ns = 'http://www.w3.org/2000/svg';
-    const make = name => document.createElementNS(ns, name);
-    let defs = svg.querySelector('defs');
-    if (!defs) {
-      defs = make('defs');
-      svg.insertBefore(defs, svg.firstChild);
+    try{box=host.getBBox();}catch{return;}
+    if(!box || box.width<=0 || box.height<=0)return;
+    const c=playable.get(targetId);
+    const goal=countryGoal(c);
+    const {start,entry,sourceCity}=closestBorderStart(targetId,goal);
+    const svg=primary.ownerSVGElement, ns='http://www.w3.org/2000/svg';
+    const make=name=>document.createElementNS(ns,name);
+    let defs=svg.querySelector('defs');
+    if(!defs){defs=make('defs');svg.insertBefore(defs,svg.firstChild);}
+    const clip=make('clipPath');
+    clip.id='battle-organic-country-clip';
+    clip.setAttribute('clipPathUnits','userSpaceOnUse');
+    for(const path of paths){
+      const copy=path.cloneNode(false);
+      copy.removeAttribute('id');
+      copy.removeAttribute('class');
+      copy.removeAttribute('style');
+      clip.append(copy);
     }
-    const wipe = make('clipPath');
-    wipe.id = 'battle-advance-wipe';
-    wipe.setAttribute('clipPathUnits', 'userSpaceOnUse');
-    const rect = make('rect');
-    rect.setAttribute('y', String(box.y - 1));
-    rect.setAttribute('height', String(box.height + 2));
-    wipe.append(rect);
-    defs.append(wipe);
-    const outline = make('clipPath');
-    outline.id = 'battle-advance-outline';
-    outline.setAttribute('clipPathUnits', 'userSpaceOnUse');
-    const ink = make('g');
-    ink.classList.add('battle-advance-overlay');
-    ink.setAttribute('clip-path', 'url(#battle-advance-wipe)');
-    const attackerShape = $('land-' + game.player);
-    const fill = map.classList.contains('flag-fill')
-      ? 'url(#flag-pattern-' + game.player + ')'
-      : (attackerShape && attackerShape.getAttribute('fill')) || '#77cfa3';
-    for (const path of paths) {
-      const stencil = path.cloneNode(false);
-      stencil.removeAttribute('id');
-      stencil.removeAttribute('class');
-      stencil.removeAttribute('style');
-      outline.append(stencil);
-      const colored = path.cloneNode(false);
-      colored.removeAttribute('id');
-      colored.removeAttribute('class');
-      colored.removeAttribute('style');
-      colored.setAttribute('fill', fill);
-      colored.setAttribute('stroke', 'none');
-      ink.append(colored);
+    defs.append(clip);
+    const ink=make('path');
+    ink.classList.add('battle-organic-fill');
+    ink.setAttribute('clip-path','url(#battle-organic-country-clip)');
+    const attacker=$('land-'+game.player);
+    const fill=map.classList.contains('flag-fill')
+      ? 'url(#flag-pattern-'+game.player+')'
+      : (attacker?.getAttribute('fill') || '#77cfa3');
+    ink.setAttribute('fill',fill);
+    ink.setAttribute('fill-rule','nonzero');
+    const graphics=make('g');
+    graphics.classList.add('battle-route-graphics');
+    const dx=goal.x-entry.x,dy=goal.y-entry.y;
+    const len=Math.max(1,Math.hypot(dx,dy));
+    const seed=Array.from(targetId).reduce((sum,ch)=>sum*7+ch.charCodeAt(0),1)%31;
+    const bend=(seed%2?1:-1)*Math.min(len*.24,Math.min(box.width,box.height)*.19);
+    const routeNodes=[start];
+    for(let i=0;i<10;i++){
+      const t=i/9;
+      const offset=Math.sin(Math.PI*t)*bend;
+      routeNodes.push({x:entry.x+dx*t-dy/len*offset,
+                       y:entry.y+dy*t+dx/len*offset});
     }
-    defs.append(outline);
-    const front = make('line');
-    front.classList.add('battle-front-line');
-    front.setAttribute('y1', String(box.y - 1));
-    front.setAttribute('y2', String(box.y + box.height + 1));
-    front.setAttribute('clip-path', 'url(#battle-advance-outline)');
-    const targetCenter = box.x + box.width / 2;
-    // Advance from the closest already-owned territory, including captured land.
-    let nearest = Infinity;
-    let reverse = false;
-    for (const owned of landsOf(game.player)) {
-      const node = $('land-' + owned.id);
-      if (!node) continue;
-      const otherBox = node.parentElement.getBBox();
-      const center = otherBox.x + otherBox.width / 2;
-      const distance = Math.abs(center - targetCenter);
-      if (distance < nearest) { nearest = distance; reverse = center > targetCenter; }
+    const route=make('path');
+    route.classList.add('battle-route-line');
+    route.setAttribute('d','M'+start.x+','+start.y+' L'+entry.x+','+entry.y+
+      ' Q'+(entry.x+dx*.5-dy/len*bend*2)+','+(entry.y+dy*.5+dx/len*bend*2)+
+      ' '+goal.x+','+goal.y);
+    graphics.append(route);
+    const glow=make('circle');
+    glow.classList.add('battle-front-halo');
+    graphics.append(glow);
+    const unit=make('g');
+    unit.classList.add('battle-moving-unit');
+    const unitRing=make('circle');
+    unitRing.setAttribute('r','5');
+    const unitCore=make('circle');
+    unitCore.setAttribute('r','2');
+    unitCore.classList.add('battle-unit-core');
+    unit.append(unitRing,unitCore);
+    graphics.append(unit);
+    const marker=make('g');
+    marker.classList.add('battle-capital-marker');
+    marker.setAttribute('transform','translate('+goal.x+','+goal.y+')');
+    const outer=make('circle');
+    outer.setAttribute('r','5');
+    const inner=make('circle');
+    inner.setAttribute('r','2');
+    marker.append(outer,inner);
+    if(goal.city){
+      const label=make('text');
+      label.setAttribute('x','8');
+      label.setAttribute('y','-7');
+      label.textContent='★ '+goal.city;
+      marker.append(label);
     }
-    host.append(ink, front);
+    graphics.append(marker);
+    host.append(ink,graphics);
     host.classList.add('battle-attacking');
-    advanceScene = { host, ink, front, wipe, outline, rect, line: front, box, reverse };
+    const radius=Math.max(...[
+      [box.x,box.y],[box.x+box.width,box.y],
+      [box.x,box.y+box.height],[box.x+box.width,box.y+box.height]
+    ].map(corner=>Math.hypot(corner[0]-goal.x,corner[1]-goal.y)));
+    advanceScene={
+      nodes:[ink,graphics,clip],host,frontShape:ink,route,unit,glow,
+      goal,entry,sourceCity,seed,routeNodes,box,radius
+    };
     setAdvanceProgress(0);
   }
-  function playAdvance(targetId, won, duration) {
+  function playAdvance(targetId,won,duration) {
     createAdvance(targetId);
-    const startAt = performance.now();
-    const stage = $('battle-stage');
-    stage.textContent = '⚡ Linia frontu';
-    if (reduced) {
-      setAdvanceProgress(won ? 1 : 0);
+    const stage=$('battle-stage');
+    const location=advanceScene?.goal.city;
+    const source=advanceScene?.sourceCity;
+    const started=performance.now();
+    stage.textContent=source ? '📍 Start: '+source : '⚔️ Początek natarcia';
+    if(reduced){
+      setAdvanceProgress(won?1:0);
+      stage.textContent=won?'🏆 Zwycięstwo':'🛡️ Obrona';
       return;
     }
-    function frame(now) {
-      const t = Math.max(0, Math.min(1, (now - startAt) / duration));
-      const progress = won ? t : (t < 0.60 ? (t / 0.60) * 0.72 : 0.72 * (1 - (t - 0.60) / 0.40));
+    function frame(now){
+      const t=clamp01((now-started)/duration);
+      const progress=won?t:(t<.60?t/.60*.59:(1-t)/.40*.59);
       setAdvanceProgress(progress);
-      stage.textContent = won ? '🏳️ Zdobywanie terenu' :
-        (t < 0.60 ? '⚔️ Trwa natarcie' : '🛡️ Obrona odpycha atak');
-      if (t < 1 && fighting && game) advanceFrame = requestAnimationFrame(frame);
-      else advanceFrame = null;
+      if(t<.15)stage.textContent=source?'📍 Start: '+source:'⚔️ Przekroczenie granicy';
+      else if(!won && t>=.60)stage.textContent='🛡️ Obrońcy odzyskują teren';
+      else if(progress<.55)stage.textContent=location?'➡️ Kierunek: '+location:'➡️ Natarcie w głąb kraju';
+      else stage.textContent='🗺️ Zajmowanie kolejnych regionów';
+      if(t<1 && fighting && game)advanceFrame=requestAnimationFrame(frame);
+      else advanceFrame=null;
     }
-    advanceFrame = requestAnimationFrame(frame);
+    advanceFrame=requestAnimationFrame(frame);
   }
   function restoreOriginalColors() {
     for (const c of regions) {
@@ -354,7 +505,7 @@
       : '🏁 Rozpoczyna się rywalizacja: ' + countryLabel(player) + ' kontra ' + countryLabel(opponent) + '.');
     panel.classList.remove('hidden');
     app.classList.add('battle-running');
-    $('battle-message').textContent = 'Dotknij sąsiedniego kraju na mapie albo wybierz go z listy.';
+    $('battle-message').textContent = 'Dotknij sąsiedniego kraju lub wybierz go z listy. Zobacz, jak zmienia się linia frontu.';
     updatePanel(opponent);
     focusCountry(player);
     save();
@@ -386,7 +537,7 @@
     }
     selectedTarget = id;
     $('battle-target').value = id;
-    $('battle-message').textContent = 'Cel: ' + countryLabel(id) + '. Wciśnij „Bitwa żołnierska”.';
+    $('battle-message').textContent = 'Cel: ' + countryLabel(id) + '. Wciśnij „Rozpocznij natarcie”.';
     refreshOwnership();
     if (window.GeoPrzygodaPicker) window.GeoPrzygodaPicker.refreshBattle();
   }

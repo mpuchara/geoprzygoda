@@ -67,9 +67,11 @@ Kod aplikacji jest na licencji MIT. Dane pochodzą z Natural Earth (domena publi
 - Ekran wyboru nazwy nie narzuca już przykładowego nicku w polu.
 
 
-## Bitwa o terytoria i Historia 🏰
+## Kampania podbojów i Historia 🏰
 
-Po kliknięciu państwa otwórz **Rywalizacja** i wybierz **Start: Bitwa o terytoria**. Wystarczy wskazać sąsiednie państwo na mapie lub w polu wyboru, a potem nacisnąć **Bitwa żołnierska**. Krótka animacja pokazuje starcie umownych oddziałów. Zwycięstwo zmienia barwy terenu na barwy zwycięskiego państwa. Można zdobywać kolejne tereny, sąsiadujące z posiadanymi.
+Po kliknięciu państwa otwórz **Rywalizacja** i wybierz **Start: Kampania podbojów**. Wskaż sąsiednie państwo na mapie lub w wyszukiwarce i naciśnij **Rozpocznij natarcie**. Na mapie widać symboliczny marsz od granicy w kierunku stolicy, a potem rozchodzące się nieregularne obszary podboju. Dla Polski atakującej Białoruś animacja rusza z okolic Białegostoku w kierunku Mińska. Dla innych państw kierunek i przebieg frontu są inne; gdy obrona wygra, obszary podboju stopniowo znikają.
+
+Kolorowana animacja jest ograniczona prawdziwym kształtem granic państwa, a nie pionowym paskiem. Jest to wyłącznie **fikcyjna animacja gry**, nie dokładna mapa działań wojskowych ani prowincji. Zwycięstwo zmienia barwy zdobytego kraju na barwy państwa gracza. Można potem zdobywać kolejne tereny graniczące z posiadanymi.
 
 **Historia** zapisuje przebieg gry lokalnie na telefonie; można wznowić rozgrywkę. W Historii jest również scenariusz **Rzeczpospolita Obojga Narodów**: w uproszczonej zabawie Polska i Litwa zaczynają jako jeden sojusz, a celem jest zdobycie obszarów Białorusi i Ukrainy na współczesnej mapie. Nie jest to historyczna rekonstrukcja granic ani prawdziwa symulacja walk. Podbijamy całe kraje, ponieważ atlas nie zawiera prowincji.
 
