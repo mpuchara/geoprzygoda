@@ -107,13 +107,13 @@
   // The background matches each flag, filling gaps around its centered emblem.
   const emblemBackgrounds = new Map([
     ['TUR', '#e30a17'], ['SAU', '#165d31'],
-    ['USA', '#ffffff'], ['AUS', '#012169'], ['FRA', '#ffffff'],
-    ['CAN', '#ffffff'], ['BRA', '#009b3a'], ['IND', '#ffffff'],
-    ['JPN', '#ffffff'], ['KOR', '#ffffff'], ['CHN', '#de2910'],
+    ['USA', '#bd3d44'], ['AUS', '#00008B'], ['FRA', '#ffffff'],
+    ['CAN', '#ffffff'], ['BRA', '#229e45'], ['IND', '#ffffff'],
+    ['JPN', '#ffffff'], ['KOR', '#ffffff'], ['CHN', '#ee1c25'],
     ['PRT', '#006600'], ['ESP', '#aa151b'], ['MEX', '#ffffff'],
-    ['NZL', '#012169'], ['GBR', '#ffffff'], ['PAK', '#01411c'],
+    ['NZL', '#00247d'], ['GBR', '#012169'], ['PAK', '#0c590b'],
     ['ARG', '#ffffff'], ['ISR', '#ffffff'], ['EGY', '#ffffff'],
-    ['MAR', '#c1272d'], ['ALB', '#e41e20'], ['CHE', '#da291c']
+    ['MAR', '#c1272d'], ['ALB', 'red'], ['CHE', 'red']
   ]);
   // These flags consist only of plain horizontal or vertical bands, without
   // a canton, emblem or coat of arms. Stretching bands is safe; all other SVGs
