@@ -68,3 +68,25 @@
 #world-map .battle-attacking .land{animation:battle-soft-border 1.5s ease-in-out infinite alternate;stroke-dasharray:none!important;stroke:#fce3ac!important;stroke-width:2!important;vector-effect:non-scaling-stroke}
 @keyframes battle-soft-border{from{stroke-opacity:.6}to{stroke-opacity:1}}
 @media(prefers-reduced-motion:reduce){#world-map .battle-attacking .land{animation:none}}
+
+/* Distinct irregular frontier: outline the existing capital-directed blobs,
+   and conceal the controls while the map territory is being animated. */
+#world-map .battle-organic-fill{
+  stroke:#fff6bd;stroke-width:1.35;stroke-linejoin:round;stroke-linecap:round;
+  stroke-dasharray:4 3;vector-effect:non-scaling-stroke;
+  filter:drop-shadow(0 0 1.4px #ffe4a7)
+}
+.territory-game.battle-animating{max-height:min(34dvh,300px);overflow-y:auto}
+.territory-game.battle-animating .battle-title,
+.territory-game.battle-animating .battle-stats,
+.territory-game.battle-animating > label,
+.territory-game.battle-animating > .battle-select,
+.territory-game.battle-animating > .country-picker,
+.territory-game.battle-animating .battle-actions,
+.territory-game.battle-animating .battle-disclaimer{display:none}
+.territory-game.battle-animating .battlefield{margin-top:8px}
+.territory-game.battle-animating .battle-message{margin-top:8px}
+@media(max-width:650px){.territory-game.battle-animating{max-height:34dvh}}
+@media(max-height:500px) and (orientation:landscape){
+  .territory-game.battle-animating{max-height:calc(100dvh - 18px)}
+}
