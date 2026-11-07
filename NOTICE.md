@@ -19,6 +19,13 @@ miejsc po przecinku w SVG. Dane wynikowe znajdują się w
 - https://www.naturalearthdata.com/downloads/10m-cultural-vectors/10m-admin-0-countries/
 - https://github.com/Can-Sahin/geojson-regions
 
+Dokładniejsze granice całego świata (przy przybliżeniu):
+Natural Earth 1:10m, domena publiczna, źródło `geojson/ne_10m_admin_0_countries.geojson`,
+z archiwum [natural-earth-vector](https://github.com/nvkelso/natural-earth-vector),
+przypiętego do commita `ca96624a56bd078437bca8184e78163e5039ad19`.
+Warstwa powstaje podczas budowania APK skryptem `scripts/build_world_detail.py`
+i nie pobiera się na telefonie podczas gry.
+
 Informacje geograficzne i polskie nazwy: mledoze/countries, ODC Open Database License 1.0. Wykorzystany i opracowany zestaw jest dostępny w `data/countries.json`, również na ODbL 1.0. Zmiany obejmują wybór pól, polskie opisy, część polskich nazw stolic i punktów na mapie. Zestaw jest edukacyjnym zapisem danych, bez aktualizacji przez internet.
 
 - https://github.com/mledoze/countries
