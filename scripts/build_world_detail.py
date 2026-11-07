@@ -21,7 +21,8 @@ SOURCE = (
 )
 WORLD = 1080
 MAX_LAT = math.degrees(math.atan(math.sinh(math.pi)))
-SPLIT_FLAGS = {"FRA", "USA", "AUS"}
+# Plan 10: real disconnected land polygons for all countries and archipelagos.
+# The Android client loads parts only near the visible viewport.
 
 
 def project(lon, lat):
@@ -95,10 +96,10 @@ def main():
             max(p["b"][3] for p in parts)
         ]
         entry = {"b": bounds, "v": sum(p["v"] for p in parts)}
-        if id_ in SPLIT_FLAGS:
+        if len(parts) > 1:
             entry["parts"] = [{"d": p["d"], "b": p["b"]} for p in parts]
         else:
-            entry["d"] = "".join(p["d"] for p in parts)
+            entry["d"] = parts[0]["d"]
         world[id_] = entry
 
     # The 1:50m atlas retains a few special islands/territories absent from the
