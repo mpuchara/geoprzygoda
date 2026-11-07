@@ -108,7 +108,7 @@
         const next = pool[cursor];
         if (!options.some(c => c.id === next.id) &&
             (type !== 'capital' || !options.some(c => c.cap === next.cap))) options.push(next);
-        cursor = (cursor + 109) % pool.length;
+        cursor = (cursor + 1) % pool.length;
       }
       const offset = (seed + q) % 4;
       result.push({
@@ -505,19 +505,20 @@
   }
   function makeDuel() {
     const base = hash(String(Date.now())+':duel');
+    const duelCountries = countries.filter(c => c.cap && c.cap !== '-');
     const questionTypes=['capital','country','flag'];
     const all=[];
     for(let i=0;i<10;i++){
-      const target=countries[(base+i*97)%countries.length];
+      const target=duelCountries[(base+i*97)%duelCountries.length];
       const type=questionTypes[i%3];
-      if(!target.cap || target.cap==='-')continue;
+
       const choices=[target];
-      let n=(base+i*17+29)%countries.length;
+      let n=(base+i*17+29)%duelCountries.length;
       while(choices.length<4){
-        const choice=countries[n];
+        const choice=duelCountries[n];
         if(!choices.some(c=>c.id===choice.id) &&
            (type!=='capital'||!choices.some(c=>c.cap===choice.cap)))choices.push(choice);
-        n=(n+131)%countries.length;
+        n=(n+1)%duelCountries.length;
       }
       const offset=(base+i)%4;
       all.push({target,type,choices:choices.slice(offset).concat(choices.slice(0,offset))});
