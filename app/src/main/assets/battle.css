@@ -194,3 +194,19 @@
   .battle-duel img{width:32px;height:22px}
   .battle-live-controls{margin-top:5px}
 }
+
+/* Plan 11: small animated armies with country flags, isolated to battle view. */
+#battlefield { position: relative; }
+.geo11-armies { position:absolute; inset:0; overflow:hidden; pointer-events:none; z-index:4; }
+.geo11-soldier { position:absolute; top:calc(22% + var(--unit) * 10%); width:19px; height:26px; display:block; animation-duration:3.6s; animation-delay:var(--delay); animation-fill-mode:both; animation-timing-function:ease-in-out; animation-iteration-count:infinite; filter:drop-shadow(0 1px 1px #24323b88); }
+.geo11-left { left:5%; animation-name:geo11-march-left; }
+.geo11-right { right:5%; animation-name:geo11-march-right; }
+.geo11-helmet { position:absolute; top:3px; left:6px; width:9px; height:7px; background:#627b5c; border-radius:60% 60% 20% 20%; }
+.geo11-body { position:absolute; top:10px; left:7px; width:7px; height:10px; background:#425c51; border-radius:2px; box-shadow:-3px 9px 0 -2px #273e37,3px 9px 0 -2px #273e37; }
+.geo11-right .geo11-helmet { background:#7c6860; }
+.geo11-right .geo11-body { background:#66564e; }
+.geo11-unit-flag { position:absolute; left:13px; top:1px; width:13px; height:9px; object-fit:contain; border:1px solid #ffffffa0; background:white; }
+.geo11-right .geo11-unit-flag { left:-7px; }
+@keyframes geo11-march-left { 0% {transform:translateX(0) translateY(0)} 45% {transform:translateX(120%) translateY(-2px)} 62% {transform:translateX(145%) translateY(0)} 80%,100% {transform:translateX(108%) translateY(1px)} }
+@keyframes geo11-march-right { 0% {transform:translateX(0) translateY(0)} 45% {transform:translateX(-120%) translateY(2px)} 62% {transform:translateX(-145%) translateY(0)} 80%,100% {transform:translateX(-108%) translateY(-1px)} }
+@media (prefers-reduced-motion:reduce) { .geo11-soldier { animation:none; } }
