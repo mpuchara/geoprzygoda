@@ -24,26 +24,32 @@
   let lastSaved = null;
   let battlePaused = false;
   let battleSpeed = 1;
-  let provinceData = null;
-  let provinceLoading = null;
-  function loadProvinceData() {
-    if (provinceData) return Promise.resolve(provinceData);
-    if (!provinceLoading) {
-      provinceLoading = fetch('world-provinces-10m.json')
-        .then(response => {
-          if (!response.ok) throw new Error('No offline admin-1 geometry');
-          return response.json();
-        })
-        .then(data => {
-          if (data.projection !== 'Mercator 1080x1080, 3 decimal SVG precision' ||
-              !data.countries || !Array.isArray(data.countries.BLR))
-            throw new Error('Bad administrative region data');
-          provinceData = data.countries;
-          return provinceData;
-        })
-        .catch(() => null); // Older builds still work with fictional sectors.
-    }
-    return provinceLoading;
+  // Keep only the province geometry of the active/previous target in memory.
+  // Previous versions parsed the entire 20+ MB world province file at once.
+  const provinceData = new Map();
+  const provinceLoading = new Map();
+  function loadProvinceData(targetId) {
+    if (!targetId || !playable.has(targetId)) return Promise.resolve(null);
+    if (provinceData.has(targetId)) return Promise.resolve(provinceData.get(targetId));
+    if (provinceLoading.has(targetId)) return provinceLoading.get(targetId);
+    const task = fetch('provinces/' + targetId.toLowerCase() + '.json')
+      .then(response => {
+        if (!response.ok) throw new Error('No offline regions for ' + targetId);
+        return response.json();
+      })
+      .then(data => {
+        if (!Array.isArray(data) || !data.every(region =>
+            typeof region.d === 'string' && Array.isArray(region.b))) {
+          throw new Error('Incorrect administrative region data');
+        }
+        provinceData.set(targetId, data);
+        while (provinceData.size > 2) provinceData.delete(provinceData.keys().next().value);
+        return data;
+      })
+      .catch(() => null)
+      .finally(() => provinceLoading.delete(targetId));
+    provinceLoading.set(targetId, task);
+    return task;
   }
   try {
     lastSaved = JSON.parse(localStorage.getItem(key) || 'null');
@@ -454,7 +460,7 @@
   }
   // Actual Natural Earth admin-1 region paths, clipped to the country outline.
   function createProvinceSectors(targetId, goal, routeNodes, make, clipId) {
-    const provinces = provinceData && provinceData[targetId];
+    const provinces = provinceData.get(targetId);
     if (!Array.isArray(provinces) || provinces.length < 2) return null;
     const grid = make('g');
     grid.classList.add('battle-fictional-sectors', 'battle-real-provinces');
@@ -863,7 +869,7 @@
     $('battle-message').textContent = 'Dotknij sąsiedniego kraju lub wybierz go z listy. Zobacz, jak zmienia się linia frontu.';
     updatePanel(opponent);
     focusCountry(player);
-    loadProvinceData(); // Local bundled geometry; no Internet permission needed.
+    loadProvinceData(selectedTarget); // Only the chosen country; no Internet.
     save();
   }
   function resume() {
@@ -880,7 +886,7 @@
     app.classList.add('battle-running');
     $('battle-message').textContent = 'Wznowiono grę. Wybierz teren do ataku.';
     updatePanel(game.opponent);
-    loadProvinceData();
+    loadProvinceData(selectedTarget);
   }
   function chooseTarget(id) {
     if (!game || fighting) return;
@@ -893,6 +899,7 @@
       return;
     }
     selectedTarget = id;
+    loadProvinceData(id);
     $('battle-target').value = id;
     $('battle-message').textContent = 'Cel: ' + countryLabel(id) + '. Wciśnij „Rozpocznij natarcie”.';
     refreshOwnership();
@@ -905,7 +912,7 @@
     const defenderId = selectedTarget;
     $('battle-attack').disabled = true;
     $('battle-message').textContent = '🗺️ Wczytywanie granic regionów...';
-    await loadProvinceData();
+    await loadProvinceData(defenderId);
     if (!game || game !== currentGame || !fighting) return;
     const defendingOwner = ownerOf(defenderId);
     const attacker = playable.get(game.player);
