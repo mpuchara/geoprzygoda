@@ -61,3 +61,25 @@
 .battle-running #world-map #geo8-overview-borders,
 .battle-running #world-map #geo8-selected-border,
 .battle-running #world-map .geo8-photo { display:none !important; }
+
+
+/* Plan 10: do not draw invented circular islands. The true land/atoll
+   polygons are loaded from Natural Earth 1:10m as the player zooms in.
+   Keep the transparent hit targets for tiny independent microstates. */
+#world-map #small-countries .small-marker .dot {
+  display: none !important;
+}
+#world-map #small-countries .small-marker .dot-hit {
+  fill: transparent !important;
+  stroke: none !important;
+  opacity: 0;
+}
+#world-map.flag-fill #countries .land {
+  stroke: #263a48;
+  stroke-width: 0.95;
+  stroke-linejoin: round;
+}
+#world-map.flag-fill #countries .country-link.selected .land {
+  stroke: #fff5c6;
+  stroke-width: 2.8;
+}
