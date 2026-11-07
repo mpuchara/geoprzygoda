@@ -1,9 +1,10 @@
-GeoPrzygoda – poprawione flagi 🇫🇷 🇺🇸 🇦🇺
+GeoPrzygoda — kolorowa rywalizacja i szybkie wyszukiwanie 🇵🇱🇫🇷🌍
 
-- Flaga Francji prawidłowo wypełnia Francję europejską, niezależnie od terytoriów zamorskich.
-- Flaga Stanów Zjednoczonych osobno dopasowuje się do głównego terytorium, Alaski i Hawajów.
-- Flaga Australii prawidłowo dopasowuje się do kontynentu i Tasmanii w Oceanii.
-- Wszystkie części krajów pozostają wybieralne; podboje kolorują także wyspy i oddalone terytoria.
-- Zachowane zostały dokładne granice, quiz, muzyka i działanie offline.
+- Kolorowe tło Rywalizacji przypomina animację z początku gry (fiolet, mięta i róż).
+- Wybrane państwo i przeciwnik mają czytelne, proste prostokątne flagi.
+- W Rywalizacji można wyszukiwać kraj po nazwie, stolicy albo kodzie.
+- Podczas Bitwy o terytoria można przeszukiwać tylko dostępne kraje sąsiadujące z własnymi terenami.
+- Zachowano poprzednie poprawki flag Francji, USA i Australii w Oceanii.
+- Działa bez internetu. Zachowano muzykę, quiz, dokładne granice i historię gry.
 
-**Instalacja:** pobierz GeoPrzygoda.apk z najnowszego wydania i zainstaluj na Androidzie.
+**Instalacja:** pobierz GeoPrzygoda.apk na Androida z tego wydania.
