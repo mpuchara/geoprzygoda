@@ -78,3 +78,7 @@ Punkty oddziałów są liczbami wymyślonymi do zabawy; gra nie używa statystyk
 ## Flagi Francji, Stanów Zjednoczonych i Australii
 
 Każda geograficznie oddzielona część tych państw ma teraz własne dopasowanie flagi w swoich dokładnych granicach. To poprawia wygląd Francji europejskiej (niezależnie od Gujany Francuskiej), kontynentalnych USA (niezależnie od Alaski i Hawajów), a także kontynentalnej Australii (niezależnie od Tasmanii). Wszystkie części państwa nadal działają wspólnie w trybie podbojów.
+
+## Rywalizacja w kolorach startowych
+
+Rywalizacja ma kolorowe, animowane tło w kolorach startowego ekranu. Na ekranie wybranego państwa i przeciwnika widać proste, prostokątne flagi SVG z lokalnego katalogu `flags/`. Do wyboru przeciwnika służy **Szukaj państwa** (nazwa, stolica lub kod ISO), a podczas Bitwy o terytoria podobna wyszukiwarka pokazuje wyłącznie sąsiadujące dostępne tereny. Działa offline.

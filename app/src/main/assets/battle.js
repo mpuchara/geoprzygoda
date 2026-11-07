@@ -300,6 +300,7 @@
     $('battle-attack').disabled = !selectedTarget || fighting;
     if (!selectedTarget) $('battle-message').textContent = 'Nie ma już sąsiednich terenów do zdobycia!';
     refreshOwnership();
+    if (window.GeoPrzygodaPicker) window.GeoPrzygodaPicker.refreshBattle();
   }
   function updatePanel(preferred) {
     if (!game) return;
@@ -387,6 +388,7 @@
     $('battle-target').value = id;
     $('battle-message').textContent = 'Cel: ' + countryLabel(id) + '. Wciśnij „Bitwa żołnierska”.';
     refreshOwnership();
+    if (window.GeoPrzygodaPicker) window.GeoPrzygodaPicker.refreshBattle();
   }
   function attack() {
     if (!game || fighting || !selectedTarget || !frontier().includes(selectedTarget)) return;

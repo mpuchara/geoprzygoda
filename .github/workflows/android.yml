@@ -40,6 +40,7 @@ jobs:
         run: |
           node --check app/src/main/assets/features.js
           node --check app/src/main/assets/battle.js
+          node --check app/src/main/assets/rival_ui.js
       - name: Check bundled game
         run: python3 scripts/check_assets.py
       - name: Compile APK and run Android lint

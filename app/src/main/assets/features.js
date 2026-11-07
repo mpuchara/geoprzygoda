@@ -360,7 +360,7 @@
     opponentList.value = firstNeighbor || (id !== 'POL' ? 'POL' : 'DEU');
     $('rival-disadvantage').value = '0';
     $('rival-result').replaceChildren();
-    openExtra(rivalry, 'rival-opponent');
+    openExtra(rivalry, 'rival-country-search');
     compare();
   }
   $('rival-compare').addEventListener('click', compare);
