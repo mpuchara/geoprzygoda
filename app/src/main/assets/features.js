@@ -156,12 +156,44 @@
     if (rule) underlay.setAttribute('fill-rule', rule);
   }
 
+  // Restore the exact SVG/objectBoundingBox technique from android-1.0.26,
+  // confirmed working on the author's physical Samsung. Keep the modern
+  // proportional PNG renderer below for dynamic battle ownership only.
+  function createLegacySamsungFlag(c, piece, patternId) {
+    const id = 'flag-pattern-' + c.id;
+    let pattern = document.getElementById(id);
+    if (!pattern) {
+      pattern = document.createElementNS(ns, 'pattern');
+      pattern.id = id;
+      pattern.setAttribute('patternUnits', 'objectBoundingBox');
+      pattern.setAttribute('patternContentUnits', 'objectBoundingBox');
+      pattern.setAttribute('width', '1');
+      pattern.setAttribute('height', '1');
+      const image = document.createElementNS(ns, 'image');
+      const url = 'flags/' + c.code.toLowerCase() + '.svg';
+      image.setAttribute('href', url);
+      image.setAttributeNS('http://www.w3.org/1999/xlink', 'href', url);
+      image.setAttribute('x', '0');
+      image.setAttribute('y', '0');
+      image.setAttribute('width', '1');
+      image.setAttribute('height', '1');
+      image.setAttribute('preserveAspectRatio', 'none');
+      pattern.append(image);
+      flagDefs.append(pattern);
+    }
+    syncTerrainUnderlay(piece);
+    return 'url(#' + id + ')';
+  }
+
   function createProportionalFlag(c, piece, partIndex, asset, background,
                                   plainBands = false, patternId = null) {
     let box;
     try { box = piece.getBBox(); } catch { return null; }
     if (!box || !Number.isFinite(box.x + box.y + box.width + box.height) ||
         box.width <= 0 || box.height <= 0) return null;
+    // Ordinary countries use the known-good 1.0.26 flag renderer. Dynamic
+    // conquest flags still use the modern proportional renderer below.
+    if (!c.id.includes('-on-')) return createLegacySamsungFlag(c, piece, patternId);
     syncTerrainUnderlay(piece);
     const id = patternId || 'flag-fitted-' + c.id + '-' + partIndex;
     const original = document.getElementById(id);
