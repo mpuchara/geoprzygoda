@@ -45,19 +45,27 @@ def flag_styles():
 
 
 def flag_tile(source, dimensions, stretch, background):
+    """Keep every star, maple leaf and emblem visible inside its flag tile.
+
+    ImageOps.fit previously cropped flag edges on irregular geographic pieces.
+    Preserve the complete artwork instead, using a matching backing colour.
+    Only flags consisting of plain stripes may safely stretch.
+    """
     w, h = dimensions
     if stretch:
         return source.resize((w, h), Image.Resampling.LANCZOS)
     if background:
-        output = Image.new("RGBA", dimensions, ImageColor.getrgb(background) + (255,))
-        ratio = min(w / source.width, h / source.height)
-        new_size = (max(1, round(source.width * ratio)),
-                    max(1, round(source.height * ratio)))
-        icon = source.resize(new_size, Image.Resampling.LANCZOS)
-        output.alpha_composite(icon, ((w - icon.width) // 2, (h - icon.height) // 2))
-        return output
-    return ImageOps.fit(source, dimensions, method=Image.Resampling.LANCZOS,
-                        centering=(.5, .5))
+        backing = ImageColor.getrgb(background)
+    else:
+        # Match the flag's corner rather than showing a transparent gap.
+        backing = source.convert("RGB").getpixel((0, 0))
+    output = Image.new("RGBA", dimensions, backing + (255,))
+    ratio = min(w / source.width, h / source.height)
+    new_size = (max(1, round(source.width * ratio)),
+                max(1, round(source.height * ratio)))
+    icon = source.resize(new_size, Image.Resampling.LANCZOS)
+    output.alpha_composite(icon, ((w - icon.width) // 2, (h - icon.height) // 2))
+    return output
 
 
 def individual_islands(d):
