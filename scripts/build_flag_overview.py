@@ -124,7 +124,7 @@ def individual_islands(d):
     return ["".join(paths) for paths in components.values()]
 
 
-def paint_piece(world, source, d, stretch, background):
+def paint_piece(world, source, d, stretch, background, country_id):
     points = [(float(x), float(y)) for x, y in COORDS.findall(d)]
     if not points:
         return False
@@ -144,7 +144,14 @@ def paint_piece(world, source, d, stretch, background):
     png = cairosvg.svg2png(bytestring=svg.encode("utf-8"),
                           output_width=w, output_height=h)
     mask = Image.open(BytesIO(png)).convert("RGBA").getchannel("A")
-    tile = flag_tile(source, (w, h), stretch, background)
+    # Small islands must not repeat a tiny, unreadable flag emblem.
+    # Keep their actual coastlines and country colour instead.
+    # Canada was explicitly approved by the player, so preserve its render.
+    if (w < 14 or h < 14) and country_id != "CAN":
+        color = ImageColor.getrgb(background) if background else source.convert("RGB").getpixel((0, 0))
+        tile = Image.new("RGBA", (w, h), color + (255,))
+    else:
+        tile = flag_tile(source, (w, h), stretch, background)
     tile.putalpha(ImageChops.multiply(tile.getchannel('A'), mask))
     world.alpha_composite(tile, (left, top))
     return True
@@ -171,7 +178,7 @@ def main():
         for element in anchor.findall("svg:path", NS):
             for island in individual_islands(element.get("d", "")):
                 if paint_piece(world, flag, island, country_id in stripes,
-                               backgrounds.get(country_id)):
+                               backgrounds.get(country_id), country_id):
                     rendered_shapes += 1
                     rendered_ids.add(country_id)
     if len(rendered_ids) < 230:
