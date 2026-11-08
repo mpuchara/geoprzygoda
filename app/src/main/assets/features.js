@@ -349,6 +349,12 @@
       ? 'none' : (emblemBackgrounds.has(country.id) ? 'xMidYMid meet' : 'xMidYMid slice');
     if (image.getAttribute('preserveAspectRatio') !== fit)
       image.setAttribute('preserveAspectRatio',fit);
+    // At close zoom the clipped PNG owns the flag pixels. Never draw the
+    // legacy SVG paint server underneath it: Android WebView can double-paint
+    // the same polygon and the regression test rejects this GPU-heavy path.
+    // Restore the legacy SVG if the PNG fails to load (error handler above).
+    piece.style.fill = piece.getAttribute('fill') || '#a8d77e';
+    geo10LegacyPaths.add(piece);
   }
   let geo8ZoomPieceIndex = 0, geo8ZoomPieces = null;
   function geo8PhotoBatch() {
@@ -530,11 +536,15 @@
     const url = 'flag-textures/' + c.code.toLowerCase() + '.png';
     const pieces = [...path.parentElement.querySelectorAll('path.land')];
     pieces.forEach((piece, index) => {
-      const fitted = createProportionalFlag(
-        c, piece, index, url, emblemBackgrounds.get(c.id),
-        stripeOnlyCountries.has(c.id),
-        index === 0 ? 'flag-pattern-' + c.id : null
-      );
+      // Android WebView can silently paint nested PNG patterns as solid fills.
+      // Prefer the SVG pattern proven in android-1.0.26 on Android only.
+      const fitted = geo8Android
+        ? 'url(#' + geo10LegacyFlag(c) + ') ' + (piece.getAttribute('fill') || '#a8d77e')
+        : createProportionalFlag(
+          c, piece, index, url, emblemBackgrounds.get(c.id),
+          stripeOnlyCountries.has(c.id),
+          index === 0 ? 'flag-pattern-' + c.id : null
+        );
       if (!fitted) return; // Keep original country color if geometry is invalid.
       piece.dataset.geoprzygodaFittedFlag = fitted;
       flagPaths.set(piece, fitted);
@@ -571,11 +581,13 @@
     if (!c || !primary) return;
     const pieces = [...primary.parentElement.querySelectorAll('path.land')];
     pieces.forEach((piece, index) => {
-      const fitted = createProportionalFlag(
-        c, piece, index, 'flag-textures/' + c.code.toLowerCase() + '.png', background,
-        stripeOnlyCountries.has(id),
-        index === 0 ? 'flag-pattern-' + id : null
-      );
+      const fitted = geo8Android
+        ? 'url(#' + geo10LegacyFlag(c) + ') ' + (piece.getAttribute('fill') || '#a8d77e')
+        : createProportionalFlag(
+          c, piece, index, 'flag-textures/' + c.code.toLowerCase() + '.png', background,
+          stripeOnlyCountries.has(id),
+          index === 0 ? 'flag-pattern-' + id : null
+        );
       if (!fitted) return;
       piece.dataset.geoprzygodaFittedFlag = fitted;
       flagPaths.set(piece, fitted);
