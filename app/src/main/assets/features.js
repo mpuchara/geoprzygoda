@@ -357,9 +357,30 @@
     geo10LegacyPaths.add(piece);
   }
   let geo8ZoomPieceIndex = 0, geo8ZoomPieces = null;
+  // Avoid synchronous getBBox and PNG uploads while the player is dragging.
+  // Rebuild the visible flag overlays once the gesture has settled.
+  let geo8GestureActive = false;
+  let geo8GestureResume = null;
+  function geo8EndGesture() {
+    geo8GestureActive = false;
+    if (geo8GestureResume !== null) clearTimeout(geo8GestureResume);
+    geo8GestureResume = setTimeout(() => {
+      geo8GestureResume = null;
+      geo8QueueZoomPhotos();
+    }, 180);
+  }
+  map.addEventListener('pointerdown', () => {
+    geo8GestureActive = true;
+    if (geo8GestureResume !== null) clearTimeout(geo8GestureResume);
+    geo8GestureResume = null;
+    if (geo8ZoomFrame !== null) cancelAnimationFrame(geo8ZoomFrame);
+    geo8ZoomFrame = null;
+  }, {passive:true});
+  map.addEventListener('pointerup', geo8EndGesture, {passive:true});
+  map.addEventListener('pointercancel', geo8EndGesture, {passive:true});
   function geo8PhotoBatch() {
     geo8ZoomFrame = null;
-    if (!geo8Android || !map.classList.contains('geo8-zoom-flags') ||
+    if (!geo8Android || geo8GestureActive || !map.classList.contains('geo8-zoom-flags') ||
         app.classList.contains('battle-running')) return;
     const view = map.viewBox.baseVal;
     const start = performance.now();
@@ -367,8 +388,8 @@
     // Even if all countries are outside the camera, inspect at most 12
     // individual paths per frame. A single USA/Canada country can contain
     // hundreds of islands, and getBBox() is synchronous on Android WebView.
-    while (geo8ZoomIndex < flagCountries.length && checked < 12) {
-      if (checked && performance.now() - start >= 5) break;
+    while (geo8ZoomIndex < flagCountries.length && checked < 5) {
+      if (checked && performance.now() - start >= 3) break;
       const country = flagCountries[geo8ZoomIndex];
       if (!geo8ZoomPieces) {
         const primary = $('land-' + country.id);
