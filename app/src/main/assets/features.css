@@ -43,3 +43,43 @@
    The overlay flag can remain transparent without revealing the ocean. */
 #world-map .flag-terrain-underlay { display:none; pointer-events:none; stroke:none; }
 #world-map.flag-fill .flag-terrain-underlay { display:block; }
+
+
+/* Plan 8: overview is one build-time preclipped PNG, while the selectable
+   geographic SVG paths and thin country borders remain fully interactive. */
+#world-map #geo8-overview-flags,
+#world-map #geo8-overview-borders,
+#world-map #geo8-selected-border,
+#world-map .geo8-photo {
+  pointer-events: none;
+}
+#world-map .geo8-photo { display:none; }
+#world-map.geo8-zoom-flags .geo8-photo { display:block; }
+/* Campaigns draw their own ownership and front lines. Never paint an
+   atlas raster over an active battle's conquered territories. */
+.battle-running #world-map #geo8-overview-flags,
+.battle-running #world-map #geo8-overview-borders,
+.battle-running #world-map #geo8-selected-border,
+.battle-running #world-map .geo8-photo { display:none !important; }
+
+
+/* Plan 10: do not draw invented circular islands. The true land/atoll
+   polygons are loaded from Natural Earth 1:10m as the player zooms in.
+   Keep the transparent hit targets for tiny independent microstates. */
+#world-map #small-countries .small-marker .dot {
+  display: none !important;
+}
+#world-map #small-countries .small-marker .dot-hit {
+  fill: transparent !important;
+  stroke: none !important;
+  opacity: 0;
+}
+#world-map.flag-fill #countries .land {
+  stroke: #263a48;
+  stroke-width: 0.95;
+  stroke-linejoin: round;
+}
+#world-map.flag-fill #countries .country-link.selected .land {
+  stroke: #fff5c6;
+  stroke-width: 2.8;
+}

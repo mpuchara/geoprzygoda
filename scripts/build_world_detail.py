@@ -21,7 +21,8 @@ SOURCE = (
 )
 WORLD = 1080
 MAX_LAT = math.degrees(math.atan(math.sinh(math.pi)))
-SPLIT_FLAGS = {"FRA", "USA", "AUS"}
+# Plan 10: real disconnected land polygons for all countries and archipelagos.
+# The Android client loads parts only near the visible viewport.
 
 
 def project(lon, lat):
@@ -74,7 +75,7 @@ def main():
             id_ = props.get("ISO_A3_EH")
         if id_ not in mapped:
             id_ = by_iso2.get(props.get("ISO_A2_EH"))
-        if id_ not in mapped:
+        if id_ not in mapped and props.get("ADM0_A3") != "IOA":
             continue
         geometry = feature["geometry"]
         polygons = (geometry["coordinates"] if geometry["type"] == "MultiPolygon"
@@ -82,7 +83,13 @@ def main():
         for polygon in polygons:
             part = process_polygon(polygon)
             if part:
-                result.setdefault(id_, []).append(part)
+                # Natural Earth groups Cocos and Christmas Island under IOA.
+                # Preserve each island's real 1:10m shape and correct ISO ID.
+                target = id_
+                if props.get("ADM0_A3") == "IOA":
+                    target = "CCK" if polygon[0][0][0] < 100 else "CXR"
+                if target in mapped:
+                    result.setdefault(target, []).append(part)
 
     world = {}
     for id_, parts in result.items():
@@ -95,10 +102,10 @@ def main():
             max(p["b"][3] for p in parts)
         ]
         entry = {"b": bounds, "v": sum(p["v"] for p in parts)}
-        if id_ in SPLIT_FLAGS:
+        if len(parts) > 1:
             entry["parts"] = [{"d": p["d"], "b": p["b"]} for p in parts]
         else:
-            entry["d"] = "".join(p["d"] for p in parts)
+            entry["d"] = parts[0]["d"]
         world[id_] = entry
 
     # The 1:50m atlas retains a few special islands/territories absent from the

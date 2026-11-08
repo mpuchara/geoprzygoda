@@ -35,7 +35,22 @@
     '<select id="rival-disadvantage" class="rival-select"><option value="0">Bez utrudnień</option><option value="0.15">Trudny teren (−15%)</option><option value="0.30">Bez sprzętu (−30%)</option></select>' +
     '<button id="rival-compare" class="rival-compare">🏁 Porównaj państwa</button><div id="rival-result" aria-live="polite"></div>' +
     '<p class="extra-note">Tryb „bez broni”: punkty są liczone wyłącznie z powierzchni i liczby sąsiadów z atlasu. Nie pokazujemy liczebności armii, bo obecna baza nie zawiera sprawdzonych danych wojskowych.</p></div>';
-  document.body.append(settings, rivalry);
+  // Plan 9 + Plan 10: preserve the other branch's offline island finder,
+  // extended with real archipelago locations. A shortcut zooms to existing
+  // Natural Earth geometry; it never invents an island or enlarges its shape.
+  const islands = document.createElement('div');
+  islands.className = 'overlay extras-overlay hidden';
+  islands.id = 'islands-overlay';
+  islands.setAttribute('role','dialog');
+  islands.setAttribute('aria-modal','true');
+  islands.setAttribute('aria-labelledby','islands-title');
+  islands.innerHTML =
+    '<div class="extras-panel"><button class="close-overlay extras-close" data-extra-close="islands-overlay" aria-label="Zamknij wyspy">×</button>' +
+    '<h2 id="islands-title">🏝️ Odkrywaj prawdziwe wyspy</h2>' +
+    '<p>Wybierz archipelag, a mapa pokaże jego prawdziwe położenie i dokładne wybrzeże po przybliżeniu.</p>' +
+    '<div id="islands-list"></div>' +
+    '<p class="extra-note">Małe wyspy i terytoria zależne pozostają częścią właściwych państw. Jeśli danych geometrycznych brakuje, nie rysujemy sztucznych kółek.</p></div>';
+  document.body.append(settings, rivalry, islands);
 
   const settingsButton = document.createElement('button');
   settingsButton.id = 'open-settings';
@@ -43,6 +58,14 @@
   settingsButton.textContent = '⚙';
   settingsButton.setAttribute('aria-label', 'Otwórz ustawienia');
   $('open-about').before(settingsButton);
+  const islandButton = document.createElement('button');
+  islandButton.type='button';
+  islandButton.id='open-islands';
+  islandButton.className='dock-info';
+  islandButton.textContent='🏝️';
+  islandButton.setAttribute('aria-label','Odkrywaj wyspy i archipelagi');
+  islandButton.title='Odkrywaj wyspy';
+  settingsButton.before(islandButton);
 
   function openExtra(panel, focusId) {
     priorFocus = document.activeElement;
@@ -59,17 +82,62 @@
     priorFocus = null;
   }
   function openExtraId() {
-    for (const id of ['rivalry-overlay', 'settings-overlay']) {
+    for (const id of ['rivalry-overlay', 'settings-overlay', 'islands-overlay']) {
       if (!$(id).classList.contains('hidden')) return id;
     }
     return null;
   }
   settingsButton.addEventListener('click', () => openExtra(settings, 'setting-flags'));
+  islandButton.addEventListener('click', () => openExtra(islands,'geo9-island-first'));
+  // [atlas entity, visible archipelago, longitude, latitude]. Locations are
+  // navigational centers, not synthetic points rendered as physical islands.
+  const islandShortcuts = [
+    ['WLF','Wallis i Futuna',-176.2,-13.3],
+    ['VIR','Wyspy Dziewicze Stanów Zjednoczonych',-64.9,18.35],
+    ['MYT','Majotta',45.16,-12.83],
+    ['ATF','Wyspy Kerguelena',69.2,-49.35],
+    ['FRO','Wyspy Owcze',-6.8,62.05],
+    ['PRT','Azory',-27.2,38.7],
+    ['PRT','Madera',-16.95,32.75],
+    ['ESP','Baleary',2.72,39.68],
+    ['ESP','Wyspy Kanaryjskie',-16.55,28.3],
+    ['MDV','Malediwy',73.48,4.2],
+    ['BHS','Bahamy',-77.4,25],
+    ['SYC','Seszele',55.45,-4.61],
+    ['KIR','Kiribati',172.98,1.45],
+    ['TUV','Tuvalu',179.2,-8.52],
+    ['FJI','Fidżi',178.43,-17.7],
+    ['COK','Wyspy Cooka',-159.78,-21.22],
+    ['PYF','Polinezja Francuska',-149.57,-17.54]
+  ];
+  for (const [id,name,lon,lat] of islandShortcuts) {
+    const c = byId.get(id);
+    if (!c) continue;
+    const item = document.createElement('button');
+    item.type='button'; item.className='rival-compare';
+    item.style.cssText='display:block;width:100%;margin:9px 0;text-align:left';
+    item.textContent=(c.flag||'🏝️')+' '+name+' — pokaż na mapie';
+    item.setAttribute('aria-label','Pokaż na mapie: '+name);
+    if (name === 'Wallis i Futuna') item.id='geo9-island-first';
+    item.addEventListener('click',()=>{
+      closeExtra('islands-overlay');
+      const x=(lon+180)*3;
+      const y=540-540/Math.PI*Math.asinh(Math.tan(lat*Math.PI/180));
+      const width=36;
+      setView({
+        x:Math.max(0,Math.min(1080-width,x-width/2)),
+        y:Math.max(0,Math.min(1080-width,y-width/2)),
+        w:width,h:width
+      },true);
+      openCountry(id,false);
+    });
+    $('islands-list').append(item);
+  }
   $('setting-edit-name').addEventListener('click', () => {
     closeExtra('settings-overlay');
     showWelcome(true);
   });
-  for (const panel of [settings, rivalry]) {
+  for (const panel of [settings, rivalry, islands]) {
     panel.addEventListener('click', e => {
       const close = e.target.closest('[data-extra-close]');
       if (close) closeExtra(close.dataset.extraClose);
@@ -108,6 +176,232 @@
   flagDefs.id = 'country-flag-patterns';
   map.insertBefore(flagDefs, map.firstChild);
   const flagPaths = new Map();
+
+  // Plan 8: a pre-masked, single PNG paints all 238 flag-shaped countries on
+  // Android. No SVG pattern, image/clipPath or hundreds of GPU masks are needed
+  // for the overview. Original interactive country polygons remain underneath.
+  const geo8Android = /\bAndroid\b/i.test(navigator.userAgent);
+  const geo8CountryGroup = document.getElementById('countries');
+  let geo8Raster = null, geo8Borders = null, geo8SelectedBorder = null;
+  if (geo8Android && geo8CountryGroup) {
+    geo8Raster = document.createElementNS(ns, 'image');
+    geo8Raster.id = 'geo8-overview-flags';
+    geo8Raster.setAttribute('href', 'flag-overview.png');
+    geo8Raster.setAttributeNS('http://www.w3.org/1999/xlink', 'href', 'flag-overview.png');
+    geo8Raster.setAttribute('x', '0');
+    geo8Raster.setAttribute('y', '0');
+    geo8Raster.setAttribute('width', '1080');
+    geo8Raster.setAttribute('height', '1080');
+    geo8Raster.setAttribute('preserveAspectRatio', 'none');
+    geo8Raster.setAttribute('pointer-events', 'none');
+    geo8Raster.setAttribute('aria-hidden', 'true');
+    geo8Raster.style.display = 'none';
+    geo8Borders = document.createElementNS(ns, 'path');
+    geo8Borders.id = 'geo8-overview-borders';
+    geo8Borders.setAttribute('fill', 'none');
+    geo8Borders.setAttribute('stroke', '#293f50');
+    geo8Borders.setAttribute('stroke-width', '1.05');
+    geo8Borders.setAttribute('stroke-linejoin', 'round');
+    geo8Borders.setAttribute('vector-effect', 'non-scaling-stroke');
+    geo8Borders.setAttribute('pointer-events', 'none');
+    geo8Borders.style.display = 'none';
+    geo8Borders.setAttribute('d', [...geo8CountryGroup.querySelectorAll('path.land')]
+      .map(piece => piece.getAttribute('d') || '').join(''));
+    geo8SelectedBorder = document.createElementNS(ns, 'path');
+    geo8SelectedBorder.id = 'geo8-selected-border';
+    geo8SelectedBorder.setAttribute('fill', 'none');
+    geo8SelectedBorder.setAttribute('stroke', '#fff5c6');
+    geo8SelectedBorder.setAttribute('stroke-width', '2.8');
+    geo8SelectedBorder.setAttribute('stroke-linejoin', 'round');
+    geo8SelectedBorder.setAttribute('vector-effect', 'non-scaling-stroke');
+    geo8SelectedBorder.setAttribute('pointer-events', 'none');
+    geo8SelectedBorder.style.display = 'none';
+    // Labels and tiny-country clickable dots stay above this transparent image.
+    geo8CountryGroup.after(geo8Raster, geo8Borders, geo8SelectedBorder);
+    const syncSelected = () => {
+      if (!geo8SelectedBorder) return;
+      const selected = geo8CountryGroup.querySelector('.country-link.selected');
+      geo8SelectedBorder.setAttribute('d', selected
+        ? [...selected.querySelectorAll('path.land')].map(piece => piece.getAttribute('d') || '').join('')
+        : '');
+      geo8SelectedBorder.style.display = selected && geo8Raster.style.display !== 'none'
+        ? '' : 'none';
+    };
+    new MutationObserver(syncSelected).observe(geo8CountryGroup,
+      {subtree:true, attributes:true, attributeFilter:['class']});
+    syncSelected();
+  }
+  function geo8UpdateRaster() {
+    if (!geo8Raster) return;
+    // When 1:10m replaces the paths, switch back to live geometry so raster
+    // coastlines can never escape newly refined borders.
+    const overview = map.viewBox.baseVal.width > DETAIL_ZOOM_LIMIT;
+    const visible = flagsEnabled && mode !== 'quiz' && overview;
+    geo8Raster.style.display = visible ? '' : 'none';
+    geo8Borders.style.display = visible ? '' : 'none';
+    geo8SelectedBorder.style.display = visible && geo8SelectedBorder.getAttribute('d') ? '' : 'none';
+    const zoomFlags = flagsEnabled && mode !== 'quiz' && !overview;
+    const wasZoom = map.classList.contains('geo8-zoom-flags');
+    map.classList.toggle('geo8-zoom-flags', zoomFlags);
+    if (zoomFlags !== wasZoom) {
+      if (zoomFlags) geo8QueueZoomPhotos();
+      else geo10RestoreColors();
+    }
+  }
+
+
+  // At close zoom the detailed 1:10m geometry takes precedence. Load ordinary
+  // clipped PNGs only for countries currently in the viewport, in small frames.
+  // This is independent of the robust single-image world overview.
+  let geo8ZoomFrame = null, geo8ZoomIndex = 0, geo8PhotoSerial = 0;
+  // Plan 10: restore the known working GeoPrzygoda 1.0.26 paint-server
+  // technique as a lazy close-up fallback. The source is the original local
+  // SVG, not the nested PNG that disappears on some Samsung WebViews.
+  // Unlike 1.0.26, stretch is allowed only for simple stripe flags; every
+  // emblem, star and cross keeps its correct aspect ratio.
+  const geo10LegacyPaths = new Set();
+  function geo10LegacyFlag(country) {
+    const id = 'geo10-legacy-flag-' + country.id;
+    if (document.getElementById(id)) return id;
+    const pattern = document.createElementNS(ns,'pattern');
+    pattern.id = id;
+    pattern.setAttribute('patternUnits','objectBoundingBox');
+    pattern.setAttribute('patternContentUnits','objectBoundingBox');
+    pattern.setAttribute('x','0');
+    pattern.setAttribute('y','0');
+    pattern.setAttribute('width','1');
+    pattern.setAttribute('height','1');
+    const backing = document.createElementNS(ns,'rect');
+    backing.setAttribute('x','0');backing.setAttribute('y','0');
+    backing.setAttribute('width','1');backing.setAttribute('height','1');
+    backing.setAttribute('fill',emblemBackgrounds.get(country.id) || '#ffffff');
+    pattern.append(backing);
+    const image = document.createElementNS(ns,'image');
+    const asset = 'flags/' + country.code.toLowerCase() + '.svg';
+    image.setAttribute('href',asset);
+    image.setAttributeNS('http://www.w3.org/1999/xlink','href',asset);
+    image.setAttribute('x','0');image.setAttribute('y','0');
+    image.setAttribute('width','1');image.setAttribute('height','1');
+    image.setAttribute('preserveAspectRatio',stripeOnlyCountries.has(country.id)
+      ? 'none' : 'xMidYMid meet');
+    pattern.append(image);
+    flagDefs.append(pattern);
+    return id;
+  }
+  function geo10RestoreColors() {
+    if (app.classList.contains('battle-running')) return;
+    for(const piece of geo10LegacyPaths) {
+      if (!piece.isConnected) { geo10LegacyPaths.delete(piece); continue; }
+      piece.style.fill = piece.dataset.geoprzygodaFittedFlag ||
+        piece.getAttribute('fill') || '#a8d77e';
+    }
+  }
+  // Do NOT paint an SVG clipPath PNG and an SVG pattern simultaneously.
+  // The stacked GPU paint servers caused Android emulator stalls at zoom.
+  // The proven 1.0.26 objectBoundingBox SVG pattern (with preserved emblem
+  // aspect ratio) already clips itself perfectly to the real 1:10m path.
+  function geo8SyncPhoto(piece, country, measuredBox = null) {
+    if (!piece?.isConnected || !country || app.classList.contains('battle-running')) return;
+    let box = measuredBox;
+    if (!box) {
+      try { box = piece.getBBox(); } catch { return; }
+    }
+    if (!box || box.width <= 0 || box.height <= 0) return;
+    let clip = piece._geo8PhotoClip, image = piece._geo8PhotoImage;
+    if (!clip || !image || !image.isConnected) {
+      clip = document.createElementNS(ns, 'clipPath');
+      clip.id = 'geo8-photo-clip-' + country.id + '-' + (++geo8PhotoSerial);
+      clip.setAttribute('clipPathUnits','userSpaceOnUse');
+      clip.append(document.createElementNS(ns,'path'));
+      flagDefs.append(clip);
+      image = document.createElementNS(ns,'image');
+      image.classList.add('geo8-photo');
+      image.setAttribute('clip-path','url(#'+clip.id+')');
+      image.setAttribute('pointer-events','none');
+      image.setAttribute('aria-hidden','true');
+      piece.after(image);
+      piece._geo8PhotoClip = clip;
+      piece._geo8PhotoImage = image;
+      // The old 1.0.26 SVG pattern remains a fallback, but is never
+      // painted simultaneously with the PNG (important for mobile GPUs).
+      image.addEventListener('error', () => {
+        if (!piece.isConnected || app.classList.contains('battle-running')) return;
+        const legacy = geo10LegacyFlag(country);
+        piece.style.fill = 'url(#'+legacy+') '+(piece.getAttribute('fill')||'#a8d77e');
+        geo10LegacyPaths.add(piece);
+      });
+    }
+    if (image.previousElementSibling !== piece) piece.after(image);
+    const path = clip.firstElementChild;
+    const geometry = piece.getAttribute('d') || '';
+    if (path.getAttribute('d') !== geometry) path.setAttribute('d',geometry);
+    path.setAttribute('clip-rule',piece.getAttribute('fill-rule')||'evenodd');
+    for (const [attr,value] of Object.entries({x:box.x,y:box.y,width:box.width,height:box.height})) {
+      const expected = String(value);
+      if (image.getAttribute(attr) !== expected) image.setAttribute(attr,expected);
+    }
+    const asset = 'flag-textures/' + country.code.toLowerCase() + '.png';
+    if (image.getAttribute('href') !== asset) {
+      image.setAttribute('href',asset);
+      image.setAttributeNS('http://www.w3.org/1999/xlink','href',asset);
+    }
+    const fit = stripeOnlyCountries.has(country.id)
+      ? 'none' : (emblemBackgrounds.has(country.id) ? 'xMidYMid meet' : 'xMidYMid slice');
+    if (image.getAttribute('preserveAspectRatio') !== fit)
+      image.setAttribute('preserveAspectRatio',fit);
+    // At close zoom the clipped PNG owns the flag pixels. Never draw the
+    // legacy SVG paint server underneath it: Android WebView can double-paint
+    // the same polygon and the regression test rejects this GPU-heavy path.
+    // Restore the legacy SVG if the PNG fails to load (error handler above).
+    piece.style.fill = piece.getAttribute('fill') || '#a8d77e';
+    geo10LegacyPaths.add(piece);
+  }
+  let geo8ZoomPieceIndex = 0, geo8ZoomPieces = null;
+  function geo8PhotoBatch() {
+    geo8ZoomFrame = null;
+    if (!geo8Android || !map.classList.contains('geo8-zoom-flags') ||
+        app.classList.contains('battle-running')) return;
+    const view = map.viewBox.baseVal;
+    const start = performance.now();
+    let checked = 0;
+    // Even if all countries are outside the camera, inspect at most 12
+    // individual paths per frame. A single USA/Canada country can contain
+    // hundreds of islands, and getBBox() is synchronous on Android WebView.
+    while (geo8ZoomIndex < flagCountries.length && checked < 12) {
+      if (checked && performance.now() - start >= 5) break;
+      const country = flagCountries[geo8ZoomIndex];
+      if (!geo8ZoomPieces) {
+        const primary = $('land-' + country.id);
+        geo8ZoomPieces = primary
+          ? [...primary.parentElement.querySelectorAll('path.land')] : [];
+        geo8ZoomPieceIndex = 0;
+      }
+      if (geo8ZoomPieceIndex >= geo8ZoomPieces.length) {
+        geo8ZoomIndex++;
+        geo8ZoomPieces = null;
+        continue;
+      }
+      const piece = geo8ZoomPieces[geo8ZoomPieceIndex++];
+      checked++;
+      let box;
+      try { box = piece.getBBox(); } catch { continue; }
+      if (box.x > view.x + view.width || box.x + box.width < view.x ||
+          box.y > view.y + view.height || box.y + box.height < view.y) continue;
+      geo8SyncPhoto(piece,country,box);
+    }
+    if (geo8ZoomIndex < flagCountries.length)
+      geo8ZoomFrame = requestAnimationFrame(geo8PhotoBatch);
+  }
+  function geo8QueueZoomPhotos() {
+    if (!geo8Android) return;
+    if (geo8ZoomFrame !== null) cancelAnimationFrame(geo8ZoomFrame);
+    geo8ZoomFrame = null;
+    geo8ZoomIndex = 0;
+    geo8ZoomPieceIndex = 0;
+    geo8ZoomPieces = null;
+    if (map.classList.contains('geo8-zoom-flags'))
+      geo8ZoomFrame = requestAnimationFrame(geo8PhotoBatch);
+  }
   // Keep complex symbols in their actual flag proportions. Pure stripe
   // patterns can still fill an irregular silhouette without visible distortion.
   // The background matches each flag, filling gaps around its centered emblem.
@@ -162,6 +456,9 @@
     try { box = piece.getBBox(); } catch { return null; }
     if (!box || !Number.isFinite(box.x + box.y + box.width + box.height) ||
         box.width <= 0 || box.height <= 0) return null;
+    // Keep the original solid country color below the world PNG on Android.
+    // GPU SVG paint servers are only needed for dynamic battle ownership.
+    if (geo8Android && !c._geo8DynamicBattle) return piece.getAttribute('fill') || '#a8d77e';
     syncTerrainUnderlay(piece);
     const id = patternId || 'flag-fitted-' + c.id + '-' + partIndex;
     const original = document.getElementById(id);
@@ -222,7 +519,7 @@
     const backing = emblemBackgrounds.get(ownerId);
     if (!owner || !piece || !/^[A-Z]{2}$/.test(owner.code))
       return null;
-    return createProportionalFlag({ id: ownerId + '-on-' + targetId },
+    return createProportionalFlag({ id: ownerId + '-on-' + targetId, _geo8DynamicBattle: true },
       piece, index, 'flag-textures/' + owner.code.toLowerCase() + '.png', backing,
       stripeOnlyCountries.has(ownerId));
   };
@@ -239,11 +536,15 @@
     const url = 'flag-textures/' + c.code.toLowerCase() + '.png';
     const pieces = [...path.parentElement.querySelectorAll('path.land')];
     pieces.forEach((piece, index) => {
-      const fitted = createProportionalFlag(
-        c, piece, index, url, emblemBackgrounds.get(c.id),
-        stripeOnlyCountries.has(c.id),
-        index === 0 ? 'flag-pattern-' + c.id : null
-      );
+      // Android WebView can silently paint nested PNG patterns as solid fills.
+      // Prefer the SVG pattern proven in android-1.0.26 on Android only.
+      const fitted = geo8Android
+        ? 'url(#' + geo10LegacyFlag(c) + ') ' + (piece.getAttribute('fill') || '#a8d77e')
+        : createProportionalFlag(
+          c, piece, index, url, emblemBackgrounds.get(c.id),
+          stripeOnlyCountries.has(c.id),
+          index === 0 ? 'flag-pattern-' + c.id : null
+        );
       if (!fitted) return; // Keep original country color if geometry is invalid.
       piece.dataset.geoprzygodaFittedFlag = fitted;
       flagPaths.set(piece, fitted);
@@ -280,11 +581,13 @@
     if (!c || !primary) return;
     const pieces = [...primary.parentElement.querySelectorAll('path.land')];
     pieces.forEach((piece, index) => {
-      const fitted = createProportionalFlag(
-        c, piece, index, 'flag-textures/' + c.code.toLowerCase() + '.png', background,
-        stripeOnlyCountries.has(id),
-        index === 0 ? 'flag-pattern-' + id : null
-      );
+      const fitted = geo8Android
+        ? 'url(#' + geo10LegacyFlag(c) + ') ' + (piece.getAttribute('fill') || '#a8d77e')
+        : createProportionalFlag(
+          c, piece, index, 'flag-textures/' + c.code.toLowerCase() + '.png', background,
+          stripeOnlyCountries.has(id),
+          index === 0 ? 'flag-pattern-' + id : null
+        );
       if (!fitted) return;
       piece.dataset.geoprzygodaFittedFlag = fitted;
       flagPaths.set(piece, fitted);
@@ -299,10 +602,12 @@
     const enabled = flagsEnabled && mode !== 'quiz';
     if (enabled === flagsApplied) {
       if (enabled) queueFlagPreparation();
+      geo8UpdateRaster();
       return;
     }
     flagsApplied = enabled;
     map.classList.toggle('flag-fill', enabled);
+    geo8UpdateRaster();
     for (const [path, fill] of flagPaths) {
       // An inline fill keeps the selected country showing its flag; stroke
       // highlights the selection. In quiz, restore the original palette.
@@ -340,8 +645,27 @@
     const x = view.width * amount, y = view.height * amount;
     return {x:view.x-x,y:view.y-y,width:view.width+2*x,height:view.height+2*y};
   }
-  function matchDetailedFragment(nodes, parts) {
+  function matchDetailedFragment(nodes, parts, countryId) {
     const assignments = [], unused = new Set(parts.map((_, i) => i));
+    // For a country with distant islands, its 1:50m single path's bounding
+    // box may span oceans (e.g. Netherlands + Caribbean). Anchor that path
+    // to the real geographic label, not the midpoint of the giant box.
+    if (nodes.length === 1 && parts.length > 1) {
+      const c = byId.get(countryId);
+      if (c) {
+        let best = 0, score = Infinity;
+        parts.forEach((part,i) => {
+          const b = part.b;
+          const dx = Math.max(b[0]-c.x,0,c.x-b[2]);
+          const dy = Math.max(b[1]-c.y,0,c.y-b[3]);
+          const size = Math.max(1e-6,(b[2]-b[0])*(b[3]-b[1]));
+          const value = Math.hypot(dx,dy) - Math.min(size,250)/100000;
+          if (value < score) {score=value;best=i;}
+        });
+        return {assignments:[[nodes[0],best]],
+          unused:new Set(parts.map((_,i)=>i).filter(i=>i!==best))};
+      }
+    }
     for (const node of nodes) {
       let b;
       try { b = node.getBBox(); } catch { b = null; }
@@ -366,6 +690,9 @@
     for (const extra of [...primary.parentElement.querySelectorAll('path.land')]) {
       if (keep.has(extra)) continue;
       extra._geoprzygodaTerrainUnderlay?.remove();
+      extra._geo8PhotoImage?.remove();
+      extra._geo8PhotoClip?.remove();
+      geo10LegacyPaths.delete(extra);
       flagPaths.delete(extra);
       const fitted = /url\(#([^)]+)\)/.exec(extra.dataset.geoprzygodaFittedFlag || '');
       if (fitted) document.getElementById(fitted[1])?.remove();
@@ -385,7 +712,7 @@
     const anchor = primary.parentElement;
     const previous = [...anchor.querySelectorAll('path.land')];
     if (Array.isArray(detail.parts) && detail.parts.length && previous.length) {
-      const {assignments,unused} = matchDetailedFragment(previous,detail.parts);
+      const {assignments,unused} = matchDetailedFragment(previous,detail.parts,id);
       for (const [old,index] of assignments) {
         if (old.getAttribute('d') !== detail.parts[index].d)
           old.setAttribute('d', detail.parts[index].d);
@@ -415,6 +742,7 @@
         primary.setAttribute('d',detail.d);
     } else return false;
     refitProportionalCountry(id);
+    if (geo8Android) geo8QueueZoomPhotos();
     enhancedCountries.add(id);
     const vb = map.viewBox.baseVal;
     detailViewport.set(id,{x:vb.x,y:vb.y,width:vb.width,height:vb.height});
@@ -505,7 +833,10 @@
         deferred.delete(index);
         if (++added >= 12) break;
       }
-      if (added) refitProportionalCountry(id);
+      if (added) {
+        refitProportionalCountry(id);
+        if (geo8Android) geo8QueueZoomPhotos();
+      }
       if (!deferred.size) deferredDetailParts.delete(id);
       if (added >= 12) queueVisibleDetails();
     }
@@ -545,6 +876,7 @@
       detailFrame = requestAnimationFrame(() => {
         detailFrame = null;
         updateVisibleDetailedCountries();
+        geo8UpdateRaster();
       });
     }, 100);
   }
